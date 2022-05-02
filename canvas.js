@@ -10,10 +10,11 @@ class point{
 
 class tirangel{
 
-    constructor( a = new point() , b = new point() , c = new point()){
+    constructor( a = new point() , b = new point() , c = new point() , color = "white"){
         this.a = a;
         this.b = b;
         this.c = c;
+        this.color = color;
 
         this.center = {
             x : 0,
@@ -34,7 +35,9 @@ const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 // =============== triangle test ===============
-const trig = new tirangel(new point(250,200,1) , new point(300,340,1) , new point(180,300,1))
+const trig1 = new tirangel(new point(200,300,-1) , new point(300,200,-1) , new point(300,400,-1) , "white");
+const trig2 = new tirangel(new point(400,300,-1) , new point(400,200,-1) , new point(600,400,-1) , "red");
+const trig3 = new tirangel(new point(250,200,-1) , new point(300,340,-1) , new point(180,300,-1) , "yellow");
 
 // =============== rotate functions ===============
 function to_radian ( deg_angle = 0 ){
@@ -111,10 +114,11 @@ var angel_y = -2;
 
 var rotate_each_time = setInterval(() => {
     // debugger
-    rotate_x( angel_x , trig , { x : trig.b.x , y : trig.b.y , z : 1 } );
-    rotate_z( angel_z , trig , { x : 240 , y : 240 , z : 1});
-    rotate_y( angel_y , trig , { x : trig.b.x , y : trig.b.y , z : 1 } );
-
+    /*
+    rotate_x( angel_x , trig2 , { x : trig2.a.x , y : trig2.a.y , z : trig2.a.z } );
+    rotate_z( angel_z , trig3 , { x : trig3.a.x , y : trig3.a.y , z : trig3.a.z } );
+    rotate_y( angel_y , trig1 , { x : trig1.a.x , y : trig1.a.y , z : trig1.a.z } );
+    */
 }, 10);
 
 // =============== FPS ===============
@@ -128,6 +132,16 @@ var frame_calc = setInterval(() => {
 }, 1000);
 
 
+function render_trig( CTX = ctx , trig){
+    // =============== triangle ===============
+    CTX.fillStyle = trig.color;
+    CTX.beginPath();
+    CTX.moveTo(trig.a.x, trig.a.y);
+    CTX.lineTo(trig.b.x, trig.b.y);
+    CTX.lineTo(trig.c.x, trig.c.y);
+    CTX.fill();
+}
+
 function render(){
 
     setTimeout(() =>{
@@ -136,12 +150,9 @@ function render(){
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
         // =============== triangle ===============
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.moveTo(trig.a.x, trig.a.y);
-        ctx.lineTo(trig.b.x, trig.b.y);
-        ctx.lineTo(trig.c.x, trig.c.y);
-        ctx.fill();
+        render_trig(ctx , trig1);
+        render_trig(ctx , trig2);
+        render_trig(ctx , trig3);
 
         // =============== FPS ===============
         fps_ms += 1;
