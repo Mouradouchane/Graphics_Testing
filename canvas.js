@@ -114,11 +114,11 @@ var angel_y = 0.5;
 var rotate_each_time = setInterval(() => {
     // debugger
 
-    rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
-    rotate_x( angel_x , trig2 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
+    //rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
+    rotate_x( angel_x , trig2 , { x : trig2.a.x  , y :trig2.a.y  , z : trig2.a.z } );
+    rotate_y( angel_y , trig2 , { x : trig2.c.x  , y :trig2.c.y  , z : trig2.c.z } );
 
-    rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
-    rotate_y( angel_y , trig2 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
+    //rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
     /*
     rotate_z( angel_y , trig3 , { x : trig3.a.x , y : trig3.a.y , z : trig3.a.z } );
 */
@@ -140,9 +140,9 @@ function render_trig( CTX = ctx , trig){
     // =============== triangle ===============
     CTX.fillStyle = trig.color;
     CTX.beginPath();
-    CTX.moveTo(trig.a.x, trig.a.y);
-    CTX.lineTo(trig.b.x, trig.b.y);
-    CTX.lineTo(trig.c.x, trig.c.y);
+    CTX.moveTo(trig.a.x * fov * aspect_ratio, trig.a.y * fov);
+    CTX.lineTo(trig.b.x * fov * aspect_ratio, trig.b.y * fov);
+    CTX.lineTo(trig.c.x * fov * aspect_ratio, trig.c.y * fov);
     CTX.fill();
 }
 
@@ -152,24 +152,51 @@ let b = canvas.clientHeight;
 let l = 1;
 let r = canvas.clientWidth;
 
-let f = -1;
+let f = -1000;
 let n = 1;
 
-function orthographic_projection( trig = new tirangel(1,1,-1,0)){
-    //debugger
+let aspect_ratio = canvas.height / canvas.width;
+let fov = 1 / Math.tan(to_radian(90/2));
+let orth_matrix = [
+    //      x               y               z                   w
+    [  2 / (r - l)  ,       0       ,       0       , -( (r + l) / (r - l) )],
+    [   0           , 2 / (t - b)   ,       0       , -( (t + b) / (t - b) )],
+    [   0           ,       0       ,   -2 / (f - n), -( (f + n) / (f - n) )],
+    [   0           ,       0       ,       0       ,           1           ] 
+];
+function orthographic_projection( point = new tirangel(1,1,-1,0)){
+    // debugger
+    
+    point.x = point.x * orth_matrix[0][0] + point.w * orth_matrix[0][3];
+    point.y = point.y * orth_matrix[1][1] + point.w * orth_matrix[1][3];
+    point.z = point.z * orth_matrix[2][2] + point.w * orth_matrix[2][3];
 
-    trig.a.x *= ((2 / (r - l) ) - ( (r + l) / (r - l)));
-    trig.b.x *= ((2 / (r - l) ) - ( (r + l) / (r - l)));
-    trig.c.x *= ((2 / (r - l) ) - ( (r + l) / (r - l)));
-
-    trig.a.y *= ((2 / (t - b) ) - ( (t + b) / (t - b)));
-    trig.b.y *= ((2 / (t - b) ) - ( (t + b) / (t - b)));
-    trig.c.y *= ((2 / (t - b) ) - ( (t + b) / (t - b)));
-
-    trig.a.z *= ((-2 / (f - n)) - ( (f + n) / (f - n)));
-    trig.b.z *= ((-2 / (f - n)) - ( (f + n) / (f - n)));
-    trig.c.z *= ((-2 / (f - n)) - ( (f + n) / (f - n)));
+    point.x = point.x * aspect_ratio * fov;
+    point.y = point.y * fov ;
 }
+
+let depth = 0.005;
+document.addEventListener("keydown" , (e) => {
+
+    if(e.key == "z"){
+        trig1.a.z += depth;
+        trig1.b.z += depth;
+        trig1.c.z += depth;
+
+        orthographic_projection(trig1.a );
+        orthographic_projection(trig1.b );
+        orthographic_projection(trig1.c );
+    } 
+    if(e.key == "s") {
+        trig1.a.z -= depth;
+        trig1.b.z -= depth;
+        trig1.c.z -= depth;
+        
+        orthographic_projection(trig1.a );
+        orthographic_projection(trig1.b );
+        orthographic_projection(trig1.c );
+    }
+});
 
 function render(){
 
@@ -181,8 +208,7 @@ function render(){
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
         // =============== triangle ============  
-        orthographic_projection(trig1);
-        orthographic_projection(trig2);
+
         render_trig(ctx , trig1);
         render_trig(ctx , trig2);
 
