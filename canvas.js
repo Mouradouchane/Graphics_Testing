@@ -35,9 +35,8 @@ const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 // =============== triangle test ===============
-const trig1 = new tirangel(new point(200,300,-1) , new point(300,200,-1) , new point(300,400,-1) , "white");
-const trig2 = new tirangel(new point(350,300,-1) , new point(450,200,-1) , new point(450,400,-1) , "red");
-const trig3 = new tirangel(new point(500,300,-1) , new point(600,200,-1) , new point(600,400,-1) , "yellow");
+const trig1 = new tirangel(new point(200,300,1) , new point(200,500,1) , new point(400,300,1) , "white");
+const trig2 = new tirangel(new point(400,300,1) , new point(200,500,1) , new point(400,500,1) , "red");
 
 // =============== rotate functions ===============
 function to_radian ( deg_angle = 0 ){
@@ -108,19 +107,21 @@ function rotate_z( angel = 0 , tg = new tirangel() , origin = { x : 0 , y : 0 , 
     }
 }
 
-var angel_x = 2;
+var angel_x = 0.8;
 var angel_z = 1;
-var angel_y = -1.5;
+var angel_y = 0.5;
 
 var rotate_each_time = setInterval(() => {
     // debugger
 
-    rotate_x( angel_x , trig1 , { x : trig1.a.z  , y :trig1.a.z  , z : trig1.a.z } );
+    rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
+    rotate_x( angel_x , trig2 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
 
-    rotate_y( angel_y , trig2 , { x : trig2.a.x , y : trig2.a.y , z : trig2.a.z } );
-
+    rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
+    rotate_y( angel_y , trig2 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
+    /*
     rotate_z( angel_y , trig3 , { x : trig3.a.x , y : trig3.a.y , z : trig3.a.z } );
-
+*/
 }, 10);
 
 // =============== FPS ===============
@@ -135,6 +136,7 @@ var frame_calc = setInterval(() => {
 
 
 function render_trig( CTX = ctx , trig){
+
     // =============== triangle ===============
     CTX.fillStyle = trig.color;
     CTX.beginPath();
@@ -144,23 +146,52 @@ function render_trig( CTX = ctx , trig){
     CTX.fill();
 }
 
+let t = 1;
+let b = canvas.clientHeight;
+
+let l = 1;
+let r = canvas.clientWidth;
+
+let f = -1;
+let n = 1;
+
+function orthographic_projection( trig = new tirangel(1,1,-1,0)){
+    //debugger
+
+    trig.a.x *= ((2 / (r - l) ) - ( (r + l) / (r - l)));
+    trig.b.x *= ((2 / (r - l) ) - ( (r + l) / (r - l)));
+    trig.c.x *= ((2 / (r - l) ) - ( (r + l) / (r - l)));
+
+    trig.a.y *= ((2 / (t - b) ) - ( (t + b) / (t - b)));
+    trig.b.y *= ((2 / (t - b) ) - ( (t + b) / (t - b)));
+    trig.c.y *= ((2 / (t - b) ) - ( (t + b) / (t - b)));
+
+    trig.a.z *= ((-2 / (f - n)) - ( (f + n) / (f - n)));
+    trig.b.z *= ((-2 / (f - n)) - ( (f + n) / (f - n)));
+    trig.c.z *= ((-2 / (f - n)) - ( (f + n) / (f - n)));
+}
+
 function render(){
 
     setTimeout(() =>{
+        debugger
+        // =============== clear ===============
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        // =============== triangle ===============
+        // =============== triangle ============  
+        orthographic_projection(trig1);
+        orthographic_projection(trig2);
         render_trig(ctx , trig1);
         render_trig(ctx , trig2);
-        render_trig(ctx , trig3);
 
-        // =============== FPS ===============
+        // =============== FPS =================
         fps_ms += 1;
         ctx.fillStyle = "yellow";
         ctx.font = "20px Tahoma";
         ctx.fillText(`FPS   : ${fps_s}`,20,20);
+
 
         requestAnimationFrame(render);
     } , max_fps);
