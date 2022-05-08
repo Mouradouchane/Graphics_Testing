@@ -35,8 +35,8 @@ const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 // =============== triangle test ===============
-const trig1 = new tirangel(new point(200,300,1) , new point(200,500,1) , new point(400,300,1) , "white");
-const trig2 = new tirangel(new point(400,300,10) , new point(200,500,10) , new point(400,500,10) , "red");
+const trig1 = new tirangel(new point(20,30,-100) , new point(20,50,-100) , new point(40,30,-100) , "white");
+const trig2 = new tirangel(new point(40,30,-60) , new point(20,50,-60) , new point(40,50,-60) , "red");
 
 // =============== rotate functions ===============
 function to_radian ( deg_angle = 0 ){
@@ -115,8 +115,8 @@ var rotate_each_time = setInterval(() => {
     // debugger
 
     //rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
-    //rotate_x( angel_x , trig2 , { x : trig2.a.x  , y :trig2.a.y  , z : trig2.a.z } );
-    //rotate_y( angel_y , trig2 , { x : trig2.a.x  , y :trig2.a.y  , z : trig2.a.z } );
+    //rotate_x( angel_x , trig2 , { x : trig2.a.x /2 , y :trig2.a.y /2 , z : trig2.a.z } );
+    //rotate_y( angel_y , trig2 , { x : trig2.a.x /2 , y :trig2.a.y /2 , z : trig2.a.z } );
 
     //rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
     /*
@@ -137,13 +137,14 @@ var frame_calc = setInterval(() => {
 
 function render_coordinates(CTX = ctx , color = "white", p , render_points = false){
     
-    let x = (p.x * fov * aspect_ratio) * canvas.width;
-    let y = (p.y * fov) * canvas.width;
+    let x = (p.x * fov  * aspect_ratio) * canvas.width;
+    let y = (p.y * fov) * canvas.height;
 
     ctx.fillStyle = color;
-    CTX.fillText(`x=${p.x}`,x+5,y);
-    CTX.fillText(`y=${p.y}`,x+5,y+20);
+    CTX.fillText(`x=${x}`,x+5,y);
+    CTX.fillText(`y=${y}`,x+5,y+20);
     CTX.fillText(`z=${p.z}`,x+5,y+40);
+    CTX.fillText(`w=${p.w}`,x+5,y+60);
 
     if(render_points){
         ctx.beginPath();
@@ -160,7 +161,7 @@ function render_trig( CTX = ctx , trig , debug = false){
     let c = orthographic_projection(trig.c);
 
     // =============== triangle ===============
-    CTX.fillStyle = "red";
+    CTX.fillStyle = trig.color;
 
     CTX.beginPath();
     CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
@@ -177,7 +178,7 @@ function render_trig( CTX = ctx , trig , debug = false){
 }
 
 let aspect_ratio = canvas.height / canvas.width;
-let fov = 1 / Math.tan(to_radian(90/2));
+let fov = 1 / Math.tan(to_radian(100/2));
 
 let t = 1;
 let b = -1;
@@ -201,42 +202,53 @@ function orthographic_projection( Point = new point(1,1,-1,0)){
     let x = Point.x * orth_matrix[0][0] + Point.w * orth_matrix[0][3];
     let y = Point.y * orth_matrix[1][1] + Point.w * orth_matrix[1][3];
     let z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
+    let w = Point.w;
 
     if(Point.z != 0){
-        x /= z;
-        x += Point.x;
-        y /= z;
-        y += Point.y;
+        x /= -z;
+        y /= -z;
     }
 
-    return new point(x,y,z,Point.w);
+    return new point(x,y,z,w);
 }
 
 let speed = 0.5;
 let speed_lr = 1.5;
 document.addEventListener("keydown" , (e) => {
 
-    if(e.key == "s"){
+    if(e.key == "z"){
+        trig2.a.y += speed_lr;
+        trig2.b.y += speed_lr;
+        trig2.c.y += speed_lr;
+    } 
+    if(e.key == "s") {
+        trig2.a.y -= speed_lr;
+        trig2.b.y -= speed_lr;
+        trig2.c.y -= speed_lr; 
+    }
+
+    if(e.key == "q"){
+        trig2.a.x += speed_lr;
+        trig2.b.x += speed_lr;
+        trig2.c.x += speed_lr;
+    } 
+    if(e.key == "d") {
+        trig2.a.x -= speed_lr;
+        trig2.b.x -= speed_lr;
+        trig2.c.x -= speed_lr; 
+    }
+
+    if(e.key == "e"){
         trig2.a.z += speed;
         trig2.b.z += speed;
         trig2.c.z += speed;
     } 
-    if(e.key == "z") {
+    if(e.key == "a") {
         trig2.a.z -= speed;
         trig2.b.z -= speed;
         trig2.c.z -= speed; 
     }
 
-    if(e.key == "d"){
-        trig2.a.x += speed_lr;
-        trig2.b.x += speed_lr;
-        trig2.c.x += speed_lr;
-    } 
-    if(e.key == "q") {
-        trig2.a.x -= speed_lr;
-        trig2.b.x -= speed_lr;
-        trig2.c.x -= speed_lr; 
-    }
 });
 
 function render(){
