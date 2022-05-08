@@ -135,15 +135,41 @@ var frame_calc = setInterval(() => {
 }, 1000);
 
 
-function render_trig( CTX = ctx , trig){
+function render_coordinates(CTX = ctx , color = "white", p , render_points = false){
+    
+    let x = p.x * fov * aspect_ratio + 5;
+    let y = p.y * fov;
+
+    ctx.fillStyle = color;
+    CTX.fillText(`x=${p.x}`,x,y);
+    CTX.fillText(`y=${p.y}`,x,y+20);
+    CTX.fillText(`z=${p.z}`,x,y+40);
+
+    if(render_points){
+        ctx.beginPath();
+        CTX.arc(x,y,4,0,Math.PI*2);
+        ctx.fill(); 
+    }
+    
+}
+
+function render_trig( CTX = ctx , trig , debug = false){
 
     // =============== triangle ===============
     CTX.fillStyle = trig.color;
+    //debugger
     CTX.beginPath();
     CTX.moveTo(trig.a.x * fov * aspect_ratio, trig.a.y * fov);
     CTX.lineTo(trig.b.x * fov * aspect_ratio, trig.b.y * fov);
     CTX.lineTo(trig.c.x * fov * aspect_ratio, trig.c.y * fov);
     CTX.fill();
+
+    if(debug){
+        render_coordinates(ctx,"cyan",trig.a,true);
+        render_coordinates(ctx,"orange",trig.b,true);
+        render_coordinates(ctx,"lightgreen",trig.c,true);
+    }
+
 }
 
 let t = 1;
@@ -201,7 +227,7 @@ document.addEventListener("keydown" , (e) => {
 function render(){
 
     setTimeout(() =>{
-        debugger
+        //debugger
         // =============== clear ===============
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle = "black";
@@ -210,14 +236,13 @@ function render(){
         // =============== triangle ============  
 
         render_trig(ctx , trig1);
-        render_trig(ctx , trig2);
+        render_trig(ctx , trig2 , true);
 
         // =============== FPS =================
         fps_ms += 1;
         ctx.fillStyle = "yellow";
         ctx.font = "20px Tahoma";
         ctx.fillText(`FPS   : ${fps_s}`,20,20);
-
 
         requestAnimationFrame(render);
     } , max_fps);
