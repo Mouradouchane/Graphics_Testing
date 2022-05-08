@@ -1,6 +1,6 @@
 
 class point{
-    constructor(x = 0 , y = 0 , z = 0 , w = 0){
+    constructor(x = 0 , y = 0 , z = 0 , w = 1){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -36,7 +36,7 @@ const ctx = canvas.getContext("2d");
 
 // =============== triangle test ===============
 const trig1 = new tirangel(new point(200,300,1) , new point(200,500,1) , new point(400,300,1) , "white");
-const trig2 = new tirangel(new point(400,300,1) , new point(200,500,1) , new point(400,500,1) , "red");
+const trig2 = new tirangel(new point(400,300,10) , new point(200,500,10) , new point(400,500,10) , "red");
 
 // =============== rotate functions ===============
 function to_radian ( deg_angle = 0 ){
@@ -115,8 +115,8 @@ var rotate_each_time = setInterval(() => {
     // debugger
 
     //rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
-    rotate_x( angel_x , trig2 , { x : trig2.a.x  , y :trig2.a.y  , z : trig2.a.z } );
-    rotate_y( angel_y , trig2 , { x : trig2.c.x  , y :trig2.c.y  , z : trig2.c.z } );
+    //rotate_x( angel_x , trig2 , { x : trig2.a.x  , y :trig2.a.y  , z : trig2.a.z } );
+    //rotate_y( angel_y , trig2 , { x : trig2.a.x  , y :trig2.a.y  , z : trig2.a.z } );
 
     //rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
     /*
@@ -137,13 +137,13 @@ var frame_calc = setInterval(() => {
 
 function render_coordinates(CTX = ctx , color = "white", p , render_points = false){
     
-    let x = p.x * fov * aspect_ratio + 5;
-    let y = p.y * fov;
+    let x = (p.x * fov * aspect_ratio) * canvas.width;
+    let y = (p.y * fov) * canvas.width;
 
     ctx.fillStyle = color;
-    CTX.fillText(`x=${p.x}`,x,y);
-    CTX.fillText(`y=${p.y}`,x,y+20);
-    CTX.fillText(`z=${p.z}`,x,y+40);
+    CTX.fillText(`x=${p.x}`,x+5,y);
+    CTX.fillText(`y=${p.y}`,x+5,y+20);
+    CTX.fillText(`z=${p.z}`,x+5,y+40);
 
     if(render_points){
         ctx.beginPath();
@@ -155,34 +155,39 @@ function render_coordinates(CTX = ctx , color = "white", p , render_points = fal
 
 function render_trig( CTX = ctx , trig , debug = false){
 
+    let a = orthographic_projection(trig.a);
+    let b = orthographic_projection(trig.b);
+    let c = orthographic_projection(trig.c);
+
     // =============== triangle ===============
-    CTX.fillStyle = trig.color;
-    //debugger
+    CTX.fillStyle = "red";
+
     CTX.beginPath();
-    CTX.moveTo(trig.a.x * fov * aspect_ratio, trig.a.y * fov);
-    CTX.lineTo(trig.b.x * fov * aspect_ratio, trig.b.y * fov);
-    CTX.lineTo(trig.c.x * fov * aspect_ratio, trig.c.y * fov);
+    CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
+    CTX.lineTo((b.x * fov * aspect_ratio) * canvas.width , (b.y * fov) * canvas.height);
+    CTX.lineTo((c.x * fov * aspect_ratio) * canvas.width , (c.y * fov) * canvas.height);
     CTX.fill();
 
     if(debug){
-        render_coordinates(ctx,"cyan",trig.a,true);
-        render_coordinates(ctx,"orange",trig.b,true);
-        render_coordinates(ctx,"lightgreen",trig.c,true);
+        render_coordinates(ctx,"cyan",a,true);
+        render_coordinates(ctx,"orange",b,true);
+        render_coordinates(ctx,"lightgreen",c,true);
     }
 
 }
 
-let t = 1;
-let b = canvas.clientHeight;
-
-let l = 1;
-let r = canvas.clientWidth;
-
-let f = -1000;
-let n = 1;
-
 let aspect_ratio = canvas.height / canvas.width;
 let fov = 1 / Math.tan(to_radian(90/2));
+
+let t = 1;
+let b = -1;
+
+let l = -1;
+let r = 1;
+
+let f = -1;
+let n = 1;
+
 let orth_matrix = [
     //      x               y               z                   w
     [  2 / (r - l)  ,       0       ,       0       , -( (r + l) / (r - l) )],
@@ -190,37 +195,47 @@ let orth_matrix = [
     [   0           ,       0       ,   -2 / (f - n), -( (f + n) / (f - n) )],
     [   0           ,       0       ,       0       ,           1           ] 
 ];
-function orthographic_projection( point = new tirangel(1,1,-1,0)){
+function orthographic_projection( Point = new point(1,1,-1,0)){
     // debugger
     
-    point.x = point.x * orth_matrix[0][0] + point.w * orth_matrix[0][3];
-    point.y = point.y * orth_matrix[1][1] + point.w * orth_matrix[1][3];
-    point.z = point.z * orth_matrix[2][2] + point.w * orth_matrix[2][3];
+    let x = Point.x * orth_matrix[0][0] + Point.w * orth_matrix[0][3];
+    let y = Point.y * orth_matrix[1][1] + Point.w * orth_matrix[1][3];
+    let z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
 
-    point.x = point.x * aspect_ratio * fov;
-    point.y = point.y * fov ;
+    if(Point.z != 0){
+        x /= z;
+        x += Point.x;
+        y /= z;
+        y += Point.y;
+    }
+
+    return new point(x,y,z,Point.w);
 }
 
-let depth = 0.005;
+let speed = 0.5;
+let speed_lr = 1.5;
 document.addEventListener("keydown" , (e) => {
 
-    if(e.key == "z"){
-        trig1.a.z += depth;
-        trig1.b.z += depth;
-        trig1.c.z += depth;
-
-        orthographic_projection(trig1.a );
-        orthographic_projection(trig1.b );
-        orthographic_projection(trig1.c );
+    if(e.key == "s"){
+        trig2.a.z += speed;
+        trig2.b.z += speed;
+        trig2.c.z += speed;
     } 
-    if(e.key == "s") {
-        trig1.a.z -= depth;
-        trig1.b.z -= depth;
-        trig1.c.z -= depth;
-        
-        orthographic_projection(trig1.a );
-        orthographic_projection(trig1.b );
-        orthographic_projection(trig1.c );
+    if(e.key == "z") {
+        trig2.a.z -= speed;
+        trig2.b.z -= speed;
+        trig2.c.z -= speed; 
+    }
+
+    if(e.key == "d"){
+        trig2.a.x += speed_lr;
+        trig2.b.x += speed_lr;
+        trig2.c.x += speed_lr;
+    } 
+    if(e.key == "q") {
+        trig2.a.x -= speed_lr;
+        trig2.b.x -= speed_lr;
+        trig2.c.x -= speed_lr; 
     }
 });
 
@@ -234,7 +249,6 @@ function render(){
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
         // =============== triangle ============  
-
         render_trig(ctx , trig1);
         render_trig(ctx , trig2 , true);
 
