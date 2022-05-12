@@ -116,12 +116,12 @@ var rotate_each_time = setInterval(() => {
 
     //rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
     //rotate_x( angel_x , trig2 , { x : trig2.a.x /2 , y :trig2.a.y /2 , z : trig2.a.z } );
-    //rotate_y( angel_y , trig2 , { x : trig2.a.x /2 , y :trig2.a.y /2 , z : trig2.a.z } );
+    rotate_y( angel_y , trig2 , { x : 0 , y :0 , z : -100 } );
 
     //rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
     /*
     rotate_z( angel_y , trig3 , { x : trig3.a.x , y : trig3.a.y , z : trig3.a.z } );
-*/
+    */
 }, 10);
 
 // =============== FPS ===============
@@ -197,16 +197,20 @@ let orth_matrix = [
     [   0           ,       0       ,       0       ,           1           ] 
 ];
 function orthographic_projection( Point = new point(1,1,-1,0)){
-    // debugger
+    //debugger
     
     let x = Point.x * orth_matrix[0][0] + Point.w * orth_matrix[0][3];
     let y = Point.y * orth_matrix[1][1] + Point.w * orth_matrix[1][3];
     let z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
     let w = Point.w;
 
+    
     if(Point.z != 0){
         x /= -z;
         y /= -z;
+
+        x = (x + 1) / 2;
+        y = (y + 1) / 2;
     }
 
     return new point(x,y,z,w);
