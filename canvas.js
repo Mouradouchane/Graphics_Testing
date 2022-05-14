@@ -1,20 +1,36 @@
 
 class point{
     constructor(x = 0 , y = 0 , z = 0 , w = 1){
+
         this.x = x;
         this.y = y;
         this.z = z;
         this.w = w;
+
+        this.scalar = ( size = 1 , x , y , z ) => {
+            this.x *= size;
+            this.y *= size;
+            this.z *= size;
+
+            this.x += x;
+            this.y += y;
+            this.z += z;
+        }
     }
 }
 
 class tirangel{
 
     constructor( a = new point() , b = new point() , c = new point() , color = "white"){
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        
         this.a = a;
         this.b = b;
         this.c = c;
         this.color = color;
+        this.scalar = 1;
 
         this.center = {
             x : 0,
@@ -27,6 +43,89 @@ class tirangel{
             this.b = b;
             this.c = c;    
         }
+
+        this.set_coordinates = ( x = 0,y = 0,z = 0 ) => {
+            this.x = x;
+            this.y = y;
+            this.z = z;    
+        }
+
+        this.set_scalar = ( size = 1 ) => {
+            this.scalar = size;
+            
+            this.a.scalar(size , this.x , this.y , this.z);
+            this.b.scalar(size , this.x , this.y , this.z);
+            this.c.scalar(size , this.x , this.y , this.z);
+        }
+
+        this.sort = () => {
+            let swap = null;
+
+            if(this.a.z < this.b.z){
+                swap = this.a;
+
+                this.a = this.b;
+                this.b = swap;
+            } 
+
+            if(this.a.z < this.c.z){
+                swap = this.a;
+
+                this.a = this.c;
+                this.c = swap;
+            } 
+
+
+            if(this.b.z < this.c.z){
+                swap = this.b;
+
+                this.b = this.c;
+                this.c = swap;
+            } 
+        }
+    }
+}
+
+class meshe{
+
+    constructor( x , y , z , size = 1){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        
+        this.size = size;
+
+        this.trigs = [];
+
+        this.set_trigs = ( ...triangles ) => {
+
+            for(let trig of triangles){
+
+                trig.set_coordinates( this.x , this.y , this.z );
+                trig.set_scalar( this.size );
+
+                this.trigs.push( trig );
+
+            }
+        }
+
+        this.sort = () => {
+
+            for(let trig of this.trigs){
+                trig.sort();
+            }
+
+            this.trigs.sort(( t , k ) => {
+                if( 
+                    t.a.z > k.a.z ||
+                    t.b.z > k.b.z ||
+                    t.c.z > k.c.z 
+                ) 
+                return true;
+
+                else return false;
+            })
+        }
     }
 }
 
@@ -34,9 +133,27 @@ class tirangel{
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
-// =============== triangle test ===============
-const trig1 = new tirangel(new point(20,30,-100) , new point(20,50,-100) , new point(40,30,-100) , "white");
-const trig2 = new tirangel(new point(40,30,-60) , new point(20,50,-60) , new point(40,50,-60) , "red");
+// =============== triangles & shapes ===============
+let x = 20, y = 40 , z = -80;
+let size = 40;
+
+const shape = new meshe( x , y , z , size );
+
+shape.set_trigs(
+    new tirangel(new point(0,0,0) , new point(0,1,0) , new point(1,1,0) , "white"),
+    new tirangel(new point(0,0,0) , new point(1,0,0) , new point(1,1,0) , "red"),
+
+    new tirangel(new point(0,0,-1) , new point(1,0,-1) , new point(1,1,-1) , "yellow"),
+    new tirangel(new point(0,0,-1) , new point(0,1,-1) , new point(1,1,-1) , "green"),
+
+    new tirangel(new point(1,1,0) , new point(1,0,-1) , new point(1,1,-1) , "cyan"),
+    new tirangel(new point(1,1,0) , new point(1,0,-1) , new point(1,0,0) , "orange"),
+
+    new tirangel(new point(0,0,0) , new point(0,0,-1) , new point(0,1,-1) , "pink"),
+    new tirangel(new point(0,0,0) , new point(0,1,0) , new point(0,1,-1) , "blue"),
+);
+
+
 
 // =============== rotate functions ===============
 function to_radian ( deg_angle = 0 ){
@@ -111,17 +228,17 @@ var angel_x = 0.8;
 var angel_z = 1;
 var angel_y = 0.5;
 
+let r_z_point = new point(40,40,0);
+let r_x_point = new point(0,40,-100);
+
 var rotate_each_time = setInterval(() => {
     // debugger
-
-    //rotate_x( angel_x , trig1 , { x : trig1.a.x  , y :trig1.a.y  , z : trig1.a.z } );
-    //rotate_x( angel_x , trig2 , { x : trig2.a.x /2 , y :trig2.a.y /2 , z : trig2.a.z } );
-    rotate_y( angel_y , trig2 , { x : 0 , y :0 , z : -100 } );
-
-    //rotate_y( angel_y , trig1 , { x : trig1.c.x  , y :trig1.c.y  , z : trig1.c.z } );
-    /*
-    rotate_z( angel_y , trig3 , { x : trig3.a.x , y : trig3.a.y , z : trig3.a.z } );
-    */
+    
+    for(let trig of shape.trigs){
+        rotate_x( angel_y , trig , r_x_point );
+        rotate_z( angel_z , trig , r_z_point );
+    }
+    
 }, 10);
 
 // =============== FPS ===============
@@ -140,41 +257,62 @@ function render_coordinates(CTX = ctx , color = "white", p , render_points = fal
     let x = (p.x * fov  * aspect_ratio) * canvas.width;
     let y = (p.y * fov) * canvas.height;
 
-    ctx.fillStyle = color;
+    CTX.font = 'bold 10px serif';
+    CTX.fillStyle = color;
     CTX.fillText(`x=${x}`,x+5,y);
     CTX.fillText(`y=${y}`,x+5,y+20);
     CTX.fillText(`z=${p.z}`,x+5,y+40);
-    CTX.fillText(`w=${p.w}`,x+5,y+60);
+    //CTX.fillText(`w=${p.w}`,x+5,y+60);
 
     if(render_points){
-        ctx.beginPath();
+        CTX.beginPath();
         CTX.arc(x,y,4,0,Math.PI*2);
-        ctx.fill(); 
+        CTX.fill(); 
     }
     
 }
 
-function render_trig( CTX = ctx , trig , debug = false){
+function render_trig( CTX = ctx , SHAPE , colors = true , just_line = false , debug = false){
 
-    let a = orthographic_projection(trig.a);
-    let b = orthographic_projection(trig.b);
-    let c = orthographic_projection(trig.c);
+    for(let trig of SHAPE.trigs){
 
-    // =============== triangle ===============
-    CTX.fillStyle = trig.color;
+        let a = orthographic_projection(trig.a);
+        let b = orthographic_projection(trig.b);
+        let c = orthographic_projection(trig.c);
 
-    CTX.beginPath();
-    CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
-    CTX.lineTo((b.x * fov * aspect_ratio) * canvas.width , (b.y * fov) * canvas.height);
-    CTX.lineTo((c.x * fov * aspect_ratio) * canvas.width , (c.y * fov) * canvas.height);
-    CTX.fill();
+        // =============== triangle ===============
+        
+        if(!just_line){
 
-    if(debug){
-        render_coordinates(ctx,"cyan",a,true);
-        render_coordinates(ctx,"orange",b,true);
-        render_coordinates(ctx,"lightgreen",c,true);
+            CTX.fillStyle = (colors) ? trig.color : "white";
+            CTX.beginPath();
+            CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
+            CTX.lineTo((b.x * fov * aspect_ratio) * canvas.width , (b.y * fov) * canvas.height);
+            CTX.lineTo((c.x * fov * aspect_ratio) * canvas.width , (c.y * fov) * canvas.height);
+            CTX.fill();
+
+        }
+        else{
+
+            ctx.lineWidth = 2;
+            CTX.strokeStyle = (colors) ? trig.color : "white";
+
+            CTX.beginPath();
+            CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
+            CTX.lineTo((b.x * fov * aspect_ratio) * canvas.width , (b.y * fov) * canvas.height);
+            CTX.lineTo((c.x * fov * aspect_ratio) * canvas.width , (c.y * fov) * canvas.height);
+            CTX.lineTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
+
+            CTX.stroke();
+
+        }
+        if(debug){
+            render_coordinates(CTX,"maginta",a,true);
+            render_coordinates(CTX,"maginta",b,true);
+            render_coordinates(CTX,"maginta",c,true);
+        }
+
     }
-
 }
 
 let aspect_ratio = canvas.height / canvas.width;
@@ -216,41 +354,65 @@ function orthographic_projection( Point = new point(1,1,-1,0)){
     return new point(x,y,z,w);
 }
 
-let speed = 0.5;
-let speed_lr = 1.5;
+let speed = 2;
+let speed_lr = 2;
 document.addEventListener("keydown" , (e) => {
 
     if(e.key == "z"){
-        trig2.a.y += speed_lr;
-        trig2.b.y += speed_lr;
-        trig2.c.y += speed_lr;
+
+        for(let trig of shape.trigs){
+            trig.a.y += speed_lr;
+            trig.b.y += speed_lr;
+            trig.c.y += speed_lr;
+            
+        }
+        
     } 
     if(e.key == "s") {
-        trig2.a.y -= speed_lr;
-        trig2.b.y -= speed_lr;
-        trig2.c.y -= speed_lr; 
+
+        for(let trig of shape.trigs){
+            trig.a.y -= speed_lr;
+            trig.b.y -= speed_lr;
+            trig.c.y -= speed_lr;
+        }
+
     }
 
     if(e.key == "q"){
-        trig2.a.x += speed_lr;
-        trig2.b.x += speed_lr;
-        trig2.c.x += speed_lr;
+
+        for(let trig of shape.trigs){
+            trig.a.x += speed_lr;
+            trig.b.x += speed_lr;
+            trig.c.x += speed_lr;
+        }
+
     } 
     if(e.key == "d") {
-        trig2.a.x -= speed_lr;
-        trig2.b.x -= speed_lr;
-        trig2.c.x -= speed_lr; 
+
+        for(let trig of shape.trigs){
+            trig.a.x -= speed_lr;
+            trig.b.x -= speed_lr;
+            trig.c.x -= speed_lr;
+        }
     }
 
     if(e.key == "e"){
-        trig2.a.z += speed;
-        trig2.b.z += speed;
-        trig2.c.z += speed;
+
+        for(let trig of shape.trigs){
+            trig.a.z += speed;
+            trig.b.z += speed;
+            trig.c.z += speed;
+        }
+
     } 
     if(e.key == "a") {
-        trig2.a.z -= speed;
-        trig2.b.z -= speed;
-        trig2.c.z -= speed; 
+
+        for(let trig of shape.trigs){
+            trig.a.z -= speed;
+            trig.b.z -= speed;
+            trig.c.z -= speed;
+        }
+
     }
 
 });
@@ -264,9 +426,9 @@ function render(){
         ctx.fillStyle = "black";
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
+        shape.sort();
         // =============== triangle ============  
-        render_trig(ctx , trig1);
-        render_trig(ctx , trig2 , true);
+        render_trig(ctx , shape , false , false , false );
 
         // =============== FPS =================
         fps_ms += 1;
