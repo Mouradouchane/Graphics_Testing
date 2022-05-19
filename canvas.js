@@ -138,6 +138,7 @@ let x = 20, y = 40 , z = -80;
 let size = 40;
 
 const shape = new meshe( x , y , z , size );
+let pshape = new meshe();
 
 shape.set_trigs(
     new tirangel(new point(0,0,0) , new point(0,1,0) , new point(1,1,0) , "white"),
@@ -235,8 +236,8 @@ var rotate_each_time = setInterval(() => {
     // debugger
     
     for(let trig of shape.trigs){
-        rotate_x( angel_y , trig , r_x_point );
-        rotate_z( angel_z , trig , r_z_point );
+        //rotate_x( angel_y , trig , r_x_point );
+        //rotate_z( angel_z , trig , r_z_point );
     }
     
 }, 10);
@@ -254,17 +255,18 @@ var frame_calc = setInterval(() => {
 
 function render_coordinates(CTX = ctx , color = "white", p , render_points = false){
     
-    let x = (p.x * fov  * aspect_ratio) * canvas.width;
-    let y = (p.y * fov) * canvas.height;
+    let x = (p.x ) * canvas.width;
+    let y = (p.y ) * canvas.height;
 
-    CTX.font = 'bold 10px serif';
+    CTX.font = 'bold 12px serif';
     CTX.fillStyle = color;
     CTX.fillText(`x=${x}`,x+5,y);
-    CTX.fillText(`y=${y}`,x+5,y+20);
-    CTX.fillText(`z=${p.z}`,x+5,y+40);
+    //CTX.fillText(`y=${y}`,x+5,y+20);
+    //CTX.fillText(`z=${p.z}`,x+5,y+40);
     //CTX.fillText(`w=${p.w}`,x+5,y+60);
 
     if(render_points){
+        CTX.fillStyle = "white";
         CTX.beginPath();
         CTX.arc(x,y,4,0,Math.PI*2);
         CTX.fill(); 
@@ -272,44 +274,46 @@ function render_coordinates(CTX = ctx , color = "white", p , render_points = fal
     
 }
 
-function render_trig( CTX = ctx , SHAPE , colors = true , just_line = false , debug = false){
+function render_meshe( CTX = ctx , SHAPE , colors = true , just_line = false , debug = false){
+
 
     for(let trig of SHAPE.trigs){
+        let a = trig.a;
+        let b = trig.b;
+        let c = trig.c;
 
-        let a = orthographic_projection(trig.a);
-        let b = orthographic_projection(trig.b);
-        let c = orthographic_projection(trig.c);
-
+        if(a.x * canvas.width < l) console.warn("left");
+        if(a.x > canvas.width ) console.warn("right");
         // =============== triangle ===============
         
         if(!just_line){
 
             CTX.fillStyle = (colors) ? trig.color : "white";
             CTX.beginPath();
-            CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
-            CTX.lineTo((b.x * fov * aspect_ratio) * canvas.width , (b.y * fov) * canvas.height);
-            CTX.lineTo((c.x * fov * aspect_ratio) * canvas.width , (c.y * fov) * canvas.height);
+            CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
+            CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
+            CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
             CTX.fill();
 
         }
         else{
 
-            ctx.lineWidth = 2;
+            ctx.lineWidth   = 1;
             CTX.strokeStyle = (colors) ? trig.color : "white";
 
             CTX.beginPath();
-            CTX.moveTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
-            CTX.lineTo((b.x * fov * aspect_ratio) * canvas.width , (b.y * fov) * canvas.height);
-            CTX.lineTo((c.x * fov * aspect_ratio) * canvas.width , (c.y * fov) * canvas.height);
-            CTX.lineTo((a.x * fov * aspect_ratio) * canvas.width , (a.y * fov) * canvas.height);
+            CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
+            CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
+            CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
+            CTX.lineTo((a.x ) * canvas.width , (a.y ) * canvas.height);
 
             CTX.stroke();
 
         }
         if(debug){
-            render_coordinates(CTX,"maginta",a,true);
-            render_coordinates(CTX,"maginta",b,true);
-            render_coordinates(CTX,"maginta",c,true);
+            render_coordinates(CTX,"red",a,true);
+            render_coordinates(CTX,"yellow",b,true);
+            render_coordinates(CTX,"cyan",c,true);
         }
 
     }
@@ -334,28 +338,54 @@ let orth_matrix = [
     [   0           ,       0       ,   -2 / (f - n), -( (f + n) / (f - n) )],
     [   0           ,       0       ,       0       ,           1           ] 
 ];
-function orthographic_projection( Point = new point(1,1,-1,0)){
-    //debugger
-    
-    let x = Point.x * orth_matrix[0][0] + Point.w * orth_matrix[0][3];
-    let y = Point.y * orth_matrix[1][1] + Point.w * orth_matrix[1][3];
-    let z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
-    let w = Point.w;
 
+function ortho_calc( Point = new point() ){
+
+    Point.x = Point.x * orth_matrix[0][0] + Point.w * orth_matrix[0][3];
+    Point.y = Point.y * orth_matrix[1][1] + Point.w * orth_matrix[1][3];
+    Point.z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
+    Point.w = Point.w;
+
+    /*
     
+    if(Point.y < t) console.warn("top !");
+    if(Point.y > b) console.warn("buttom !");
+    
+    if(Point.z > 1) console.warn("far !");
+    if(Point.z < -1) console.warn("near !");
+    */
+
+    // perspective divide
     if(Point.z != 0){
-        x /= -z;
-        y /= -z;
+        Point.x /= -Point.z;
+        Point.y /= -Point.z;
 
-        x = (x + 1) / 2;
-        y = (y + 1) / 2;
+        // go to canonical space between 0 - 1
+        Point.x = (Point.x + 1) / 2;
+        Point.y = (Point.y + 1) / 2;
     }
 
-    return new point(x,y,z,w);
+    return Point;
+    
 }
 
-let speed = 2;
+function orthographic_projection( SHAPE = new meshe() ){
+    //debugger
+
+    for(let trig of SHAPE.trigs){
+        
+        trig.a = ortho_calc(trig.a);
+        trig.b = ortho_calc(trig.b);
+        trig.c = ortho_calc(trig.c);
+ 
+    }
+
+    return SHAPE;
+}
+
+let speed = 1;
 let speed_lr = 2;
+
 document.addEventListener("keydown" , (e) => {
 
     if(e.key == "z"){
@@ -364,7 +394,6 @@ document.addEventListener("keydown" , (e) => {
             trig.a.y += speed_lr;
             trig.b.y += speed_lr;
             trig.c.y += speed_lr;
-            
         }
         
     } 
@@ -415,6 +444,9 @@ document.addEventListener("keydown" , (e) => {
 
     }
 
+    pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
+   
+
 });
 
 function render(){
@@ -428,7 +460,7 @@ function render(){
 
         shape.sort();
         // =============== triangle ============  
-        render_trig(ctx , shape , false , false , false );
+        render_meshe(ctx , pshape , false , true , true );
 
         // =============== FPS =================
         fps_ms += 1;
