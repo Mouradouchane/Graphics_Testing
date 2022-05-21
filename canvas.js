@@ -347,36 +347,7 @@ function ortho_calc( Point = new point() ){
     Point.z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
     Point.w = Point.w;
 
-    /*
-    
-    if(Point.y < t) console.warn("top !");
-    if(Point.y > b) console.warn("buttom !");
-    
-    if(Point.z > 1) console.warn("far !");
-    if(Point.z < -1) console.warn("near !");
-    */
 
-    // perspective divide
-    if(Point.z != 0){
-
-        Point.x /= -Point.z;
-        Point.y /= -Point.z;
-        
-        /*
-        if( Point.x < l ) console.warn("left" , Point.x );
-        if( Point.x > r ) console.warn("right", Point.x );
-        
-        if( Point.y < t ) console.warn("top", Point.y );
-        if( Point.y > b ) console.warn("buttom", Point.y );
-        */
-
-        if( Point.z > n ) console.warn("near", Point.z );
-
-        // go to canonical space between 0 - 1
-        Point.x = (Point.x + 1) / 2;
-        Point.y = (Point.y + 1) / 2;
-
-    }
 
     return Point;
     
@@ -384,13 +355,43 @@ function ortho_calc( Point = new point() ){
 
 function orthographic_projection( SHAPE = new meshe() ){
     //debugger
+    let points = ['a','b','c'];
 
     for(let trig of SHAPE.trigs){
         
+        // normalize values to NDC -1 0 1 
         trig.a = ortho_calc(trig.a);
         trig.b = ortho_calc(trig.b);
         trig.c = ortho_calc(trig.c);
- 
+        
+
+        for(let p = 0 ; p < 3 ; p += 1){
+
+            // perspective divide
+            if(trig[points[p]].z != 0){
+
+                trig[points[p]].x /= -trig[points[p]].z;
+                trig[points[p]].y /= -trig[points[p]].z;
+                
+                // clipping check
+                
+                if( trig[points[p]].x < l ) console.warn("left" , trig[points[p]].x );
+                if( trig[points[p]].x > r ) console.warn("right", trig[points[p]].x );
+                
+                if( trig[points[p]].y < t ) console.warn("top"   , trig[points[p]].y );
+                if( trig[points[p]].y > b ) console.warn("buttom", trig[points[p]].y );
+                if( trig[points[p]].z > n ) console.warn("near"  , trig[points[p]].z );
+                
+
+
+                // go to canonical space between 0 - 1
+                trig[points[p]].x = (trig[points[p]].x + 1) / 2;
+                trig[points[p]].y = (trig[points[p]].y + 1) / 2;
+
+            }
+        }
+
+
     }
 
     return SHAPE;
