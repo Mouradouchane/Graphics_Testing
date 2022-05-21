@@ -254,16 +254,19 @@ var frame_calc = setInterval(() => {
 
 
 function render_coordinates(CTX = ctx , color = "white", p , render_points = false){
-    
-    let x = (p.x ) * canvas.width;
-    let y = (p.y ) * canvas.height;
+
+    let ndc_x = p.x;
+    let ndc_y = p.y;
+
+    let x = ( p.x ) * canvas.width;
+    let y = ( p.y ) * canvas.height;
 
     CTX.font = 'bold 12px serif';
     CTX.fillStyle = color;
-    CTX.fillText(`x=${x}`,x+5,y);
-    //CTX.fillText(`y=${y}`,x+5,y+20);
-    //CTX.fillText(`z=${p.z}`,x+5,y+40);
-    //CTX.fillText(`w=${p.w}`,x+5,y+60);
+    CTX.fillText(`x=${ndc_x}`,x+5,y);
+    CTX.fillText(`y=${ndc_y}`,x+5,y+20);
+    CTX.fillText(`z=${p.z}`,x+5,y+40);
+    CTX.fillText(`w=${p.w}`,x+5,y+60);
 
     if(render_points){
         CTX.fillStyle = "white";
@@ -278,14 +281,11 @@ function render_meshe( CTX = ctx , SHAPE , colors = true , just_line = false , d
 
 
     for(let trig of SHAPE.trigs){
+
         let a = trig.a;
         let b = trig.b;
         let c = trig.c;
 
-        if(a.x * canvas.width < l) console.warn("left");
-        if(a.x > canvas.width ) console.warn("right");
-        // =============== triangle ===============
-        
         if(!just_line){
 
             CTX.fillStyle = (colors) ? trig.color : "white";
@@ -293,6 +293,7 @@ function render_meshe( CTX = ctx , SHAPE , colors = true , just_line = false , d
             CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
             CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
             CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
+            CTX.lineTo((a.x ) * canvas.width , (a.y ) * canvas.height);
             CTX.fill();
 
         }
@@ -322,8 +323,8 @@ function render_meshe( CTX = ctx , SHAPE , colors = true , just_line = false , d
 let aspect_ratio = canvas.height / canvas.width;
 let fov = 1 / Math.tan(to_radian(100/2));
 
-let t = 1;
-let b = -1;
+let t = -1;
+let b = 1;
 
 let l = -1;
 let r = 1;
@@ -357,12 +358,24 @@ function ortho_calc( Point = new point() ){
 
     // perspective divide
     if(Point.z != 0){
+
         Point.x /= -Point.z;
         Point.y /= -Point.z;
+        
+        /*
+        if( Point.x < l ) console.warn("left" , Point.x );
+        if( Point.x > r ) console.warn("right", Point.x );
+        
+        if( Point.y < t ) console.warn("top", Point.y );
+        if( Point.y > b ) console.warn("buttom", Point.y );
+        */
+
+        if( Point.z > n ) console.warn("near", Point.z );
 
         // go to canonical space between 0 - 1
         Point.x = (Point.x + 1) / 2;
         Point.y = (Point.y + 1) / 2;
+
     }
 
     return Point;
@@ -383,8 +396,8 @@ function orthographic_projection( SHAPE = new meshe() ){
     return SHAPE;
 }
 
-let speed = 1;
-let speed_lr = 2;
+let speed = 0.4;
+let speed_lr = 0.4;
 
 document.addEventListener("keydown" , (e) => {
 
@@ -445,9 +458,10 @@ document.addEventListener("keydown" , (e) => {
     }
 
     pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
-   
 
 });
+
+pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
 
 function render(){
 
