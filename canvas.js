@@ -141,6 +141,7 @@ const shape = new meshe( x , y , z , size );
 let pshape = new meshe();
 
 shape.set_trigs(
+    /*
     new tirangel(new point(0,0,0) , new point(0,1,0) , new point(1,1,0) , "white"),
     new tirangel(new point(0,0,0) , new point(1,0,0) , new point(1,1,0) , "red"),
 
@@ -151,7 +152,8 @@ shape.set_trigs(
     new tirangel(new point(1,1,0) , new point(1,0,-1) , new point(1,0,0) , "orange"),
 
     new tirangel(new point(0,0,0) , new point(0,0,-1) , new point(0,1,-1) , "pink"),
-    new tirangel(new point(0,0,0) , new point(0,1,0) , new point(0,1,-1) , "blue"),
+    */
+   new tirangel(new point(1,1,-1) , new point(0,1,0) , new point(0,1,-1.5) , "blue"),
 );
 
 
@@ -253,20 +255,23 @@ var frame_calc = setInterval(() => {
 }, 1000);
 
 
-function render_coordinates(CTX = ctx , color = "white", p , render_points = false){
+function render_coordinates(CTX = ctx , color = "white", p , render_info = false , render_points = false){
 
-    let ndc_x = p.x;
-    let ndc_y = p.y;
-
+    
     let x = ( p.x ) * canvas.width;
     let y = ( p.y ) * canvas.height;
+    
+    if(render_info){
+        let ndc_x = p.x;
+        let ndc_y = p.y;
 
-    CTX.font = 'bold 12px serif';
-    CTX.fillStyle = color;
-    CTX.fillText(`x=${ndc_x}`,x+5,y);
-    CTX.fillText(`y=${ndc_y}`,x+5,y+20);
-    CTX.fillText(`z=${p.z}`,x+5,y+40);
-    CTX.fillText(`w=${p.w}`,x+5,y+60);
+        CTX.font = 'bold 12px serif';
+        CTX.fillStyle = color;
+        CTX.fillText(`x=${ndc_x}`,x+5,y);
+        CTX.fillText(`y=${ndc_y}`,x+5,y+20);
+        CTX.fillText(`z=${p.z}`,x+5,y+40);
+        CTX.fillText(`w=${p.w}`,x+5,y+60);
+    }
 
     if(render_points){
         CTX.fillStyle = "white";
@@ -281,40 +286,44 @@ function render_meshe( CTX = ctx , SHAPE , colors = true , just_line = false , d
 
 
     for(let trig of SHAPE.trigs){
+        if(trig != null){
+            let a = trig.a;
+            let b = trig.b;
+            let c = trig.c;
 
-        let a = trig.a;
-        let b = trig.b;
-        let c = trig.c;
+            if(!just_line){
 
-        if(!just_line){
+                CTX.fillStyle = (colors) ? trig.color : "white";
+                CTX.beginPath();
+                CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
+                CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
+                CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
+                CTX.lineTo((a.x ) * canvas.width , (a.y ) * canvas.height);
+                CTX.fill();
 
-            CTX.fillStyle = (colors) ? trig.color : "white";
-            CTX.beginPath();
-            CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
-            CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
-            CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
-            CTX.lineTo((a.x ) * canvas.width , (a.y ) * canvas.height);
-            CTX.fill();
+            }
+            else{
 
-        }
-        else{
+                ctx.lineWidth   = 1;
+                CTX.strokeStyle = (colors) ? trig.color : "white";
 
-            ctx.lineWidth   = 1;
-            CTX.strokeStyle = (colors) ? trig.color : "white";
+                CTX.beginPath();
+                CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
+                CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
+                CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
+                CTX.lineTo((a.x ) * canvas.width , (a.y ) * canvas.height);
 
-            CTX.beginPath();
-            CTX.moveTo((a.x ) * canvas.width , (a.y ) * canvas.height);
-            CTX.lineTo((b.x ) * canvas.width , (b.y ) * canvas.height);
-            CTX.lineTo((c.x ) * canvas.width , (c.y ) * canvas.height);
-            CTX.lineTo((a.x ) * canvas.width , (a.y ) * canvas.height);
+                CTX.stroke();
 
-            CTX.stroke();
-
-        }
-        if(debug){
-            render_coordinates(CTX,"red",a,true);
-            render_coordinates(CTX,"yellow",b,true);
-            render_coordinates(CTX,"cyan",c,true);
+                render_coordinates(CTX,"red",a,false,true);
+                render_coordinates(CTX,"yellow",b,false,true);
+                render_coordinates(CTX,"cyan",c,false,true);
+            }
+            if(debug){
+                render_coordinates(CTX,"red",a,true,true);
+                render_coordinates(CTX,"yellow",b,true,true);
+                render_coordinates(CTX,"cyan",c,true,true);
+            }
         }
 
     }
@@ -330,7 +339,7 @@ let l = -1;
 let r = 1;
 
 let f = -1;
-let n = 1;
+let n = 0.5;
 
 let orth_matrix = [
     //      x               y               z                   w
@@ -347,8 +356,6 @@ function ortho_calc( Point = new point() ){
     Point.z = Point.z * orth_matrix[2][2] + Point.w * orth_matrix[2][3];
     Point.w = Point.w;
 
-
-
     return Point;
     
 }
@@ -359,12 +366,11 @@ function orthographic_projection( SHAPE = new meshe() ){
 
     for(let trig of SHAPE.trigs){
         
-        // normalize values to NDC -1 0 1 
         trig.a = ortho_calc(trig.a);
         trig.b = ortho_calc(trig.b);
         trig.c = ortho_calc(trig.c);
         
-
+        // normalize values to NDC -1 0 1 
         for(let p = 0 ; p < 3 ; p += 1){
 
             // perspective divide
@@ -372,33 +378,69 @@ function orthographic_projection( SHAPE = new meshe() ){
 
                 trig[points[p]].x /= -trig[points[p]].z;
                 trig[points[p]].y /= -trig[points[p]].z;
-                
-                // clipping check
-                
-                if( trig[points[p]].x < l ) console.warn("left" , trig[points[p]].x );
-                if( trig[points[p]].x > r ) console.warn("right", trig[points[p]].x );
-                
-                if( trig[points[p]].y < t ) console.warn("top"   , trig[points[p]].y );
-                if( trig[points[p]].y > b ) console.warn("buttom", trig[points[p]].y );
-                if( trig[points[p]].z > n ) console.warn("near"  , trig[points[p]].z );
-                
-
-
-                // go to canonical space between 0 - 1
-                trig[points[p]].x = (trig[points[p]].x + 1) / 2;
-                trig[points[p]].y = (trig[points[p]].y + 1) / 2;
-
+              
             }
         }
 
+        // process clipping 
+        let triangles = z_clipping(trig.a,trig.b,trig.c);
+     
+        trig = triangles;
+        // go to canonical space between 0 - 1
+        if(trig != null){
+            for(let p = 0 ; p < 3 ; p += 1){
+                trig[points[p]].x = (trig[points[p]].x + 1) / 2;
+                trig[points[p]].y = (trig[points[p]].y + 1) / 2;
+                
+            }
+        }
 
     }
 
     return SHAPE;
 }
 
-let speed = 0.4;
-let speed_lr = 0.4;
+function z_clipping( p1 , p2 , p3 ){
+    //debugger
+    // check if all in
+    if(p1.z < n && p2.z < n && p3.z < n){
+        return new tirangel(p1,p2,p3);
+    }
+    
+    // check if all out
+    if(p1.z > n && p2.z > n && p3.z > n){
+        return null;
+    }
+    
+    // check who is out 
+    let a = p1.z > n ? true : false; 
+    let b = p2.z > n ? true : false; 
+    let c = p3.z > n ? true : false; 
+
+    // if tow point's outside & on point inside
+    if( a && !b && !c)return clip_vs_tow(p1 , p2 , p3);
+    if(!a &&  b && !c)return clip_vs_tow(p2 , p1 , p3);
+    if(!a && !b &&  c)return clip_vs_tow(p3 , p2 , p1);
+
+    // if one point outside & tow point inside
+    if(!a &&  b &&  c)return clip_vs_one(p1 , p2 , p3);
+    if( a && !b &&  c)return clip_vs_one(p2 , p1 , p3);
+    if( a &&  b && !c)return clip_vs_one(p3 , p2 , p1);
+}
+
+function clip_vs_tow( inp1 , outp1 , outp2 ){
+    // debugger
+
+    let m = (inp1.y - outp1.y) / (inp1.z - outp1.z);
+
+    let new_p1 = new point( outp1.x , -(m * inp1.z) + outp1.y , n ); 
+    let new_p2 = new point( outp2.x , -(m * inp1.z) + outp2.y , n ); 
+
+    return new tirangel(inp1 , new_p1 , new_p2);
+}
+
+let speed = 1.4;
+let speed_lr = 1.4;
 
 document.addEventListener("keydown" , (e) => {
 
@@ -475,7 +517,7 @@ function render(){
 
         shape.sort();
         // =============== triangle ============  
-        render_meshe(ctx , pshape , false , true , true );
+        render_meshe(ctx , pshape , false , true , false );
 
         // =============== FPS =================
         fps_ms += 1;
