@@ -1,8 +1,8 @@
 
 import {NDC} from "./NDC.js"
+import {xy_check,xy_clipping} from "./clipping.js"
 
 const ndc = new NDC(-1 , 1 , -1 , 1 , 1 , -1 , canvas.height / canvas.width , 90);
-
 
 export let orth_matrix = [
     //      x               y               z                   w
@@ -37,17 +37,22 @@ export function orthographic_projection( MESH = new mesh() ){
         trig.b = ortho_calc(trig.b);
         trig.c = ortho_calc(trig.c);
         
-        // normalize values to NDC -1 0 1 
+        
+        // normalize values to -1 0 1  "NDC VALUES" 
         for(let p = 0 ; p < 3 ; p += 1){
-
+            
             // perspective divide
             if(trig[points[p]].z != 0){
-
+                
                 trig[points[p]].x /= -trig[points[p]].z;
                 trig[points[p]].y /= -trig[points[p]].z;
-              
+                
             }
         }
+        
+        // clipping 
+        xy_check( ndc , trig );
+        
 
         // go to canonical space between 0 - 1
         if(trig != null){
