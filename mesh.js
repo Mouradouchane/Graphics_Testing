@@ -9,27 +9,42 @@ export class mesh{
         
         this.size = size;
 
-        this.trigs = [];
+        this.triangles = [];
 
-        this.set_trigs = ( ...triangles ) => {
-
+        this.set_triangles = (...triangles ) => {
+            
+          
             for(let trig of triangles){
 
                 trig.set_coordinates( this.x , this.y , this.z );
-                trig.set_scalar( this.size );
+                trig.scale( this.size );
 
-                this.trigs.push( trig );
+                this.triangles.push( trig );
 
             }
         }
 
+        this.copy = () => {
+
+            let mesh_copy = new mesh(
+                this.x,
+                this.y,
+                this.z,
+                this.size
+            )
+            
+            mesh_copy.set_triangles( ...(this.triangles) )
+
+            return mesh_copy;
+        }
+
         this.sort = () => {
 
-            for(let trig of this.trigs){
+            for(let trig of this.triangles){
                 trig.sort();
             }
 
-            this.trigs.sort(( t , k ) => {
+            this.triangles.sort(( t , k ) => {
                 if( 
                     t.a.z > k.a.z ||
                     t.b.z > k.b.z ||

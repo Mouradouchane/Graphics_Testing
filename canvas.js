@@ -15,22 +15,22 @@ const ctx = canvas.getContext("2d");
 // =============== objects and meshes ===============
 let pshape = new mesh();
 
-function render_coordinates(CTX = ctx , color = "white", p , render_info = false , render_points = false){
+function render_coordinates(CTX = ctx , color = "white", point , render_info = false , render_points = false){
 
     
-    let x = ( p.x ) * canvas.width;
-    let y = ( p.y ) * canvas.height;
+    let x = ( point.x ) * canvas.width;
+    let y = ( point.y ) * canvas.height;
     
     if(render_info){
-        let ndc_x = p.x;
-        let ndc_y = p.y;
+        let ndc_x = point.x;
+        let ndc_y = point.y;
 
         CTX.font = 'bold 12px serif';
         CTX.fillStyle = color;
         CTX.fillText(`x=${ndc_x}`,x+5,y);
         CTX.fillText(`y=${ndc_y}`,x+5,y+20);
-        CTX.fillText(`z=${p.z}`,x+5,y+40);
-        CTX.fillText(`w=${p.w}`,x+5,y+60);
+        CTX.fillText(`z=${point.z}`,x+5,y+40);
+        CTX.fillText(`w=${point.w}`,x+5,y+60);
     }
 
     if(render_points){
@@ -42,10 +42,10 @@ function render_coordinates(CTX = ctx , color = "white", p , render_info = false
     
 }
 
-function render_mesh( CTX = ctx , SHAPE , colors = true , just_line = false , debug = false){
+function render_mesh( CTX = ctx , MESH , colors = true , just_line = false , debug = false){
+    //debugger
 
-
-    for(let trig of SHAPE.trigs){
+    for(let trig of MESH.triangles){
         if(trig != null){
             let a = trig.a;
             let b = trig.b;
@@ -120,11 +120,15 @@ function ortho_calc( Point = new point() ){
     
 }
 
-function orthographic_projection( SHAPE = new mesh() ){
+function orthographic_projection( MESH = new mesh() ){
+    
     //debugger
+
+    let COPY_MESH = MESH.copy();
+
     let points = ['a','b','c'];
 
-    for(let trig of SHAPE.trigs){
+    for(let trig of COPY_MESH.triangles){
         
         trig.a = ortho_calc(trig.a);
         trig.b = ortho_calc(trig.b);
@@ -142,10 +146,7 @@ function orthographic_projection( SHAPE = new mesh() ){
             }
         }
 
-        // process clipping 
-        let triangles = z_clipping(trig.a,trig.b,trig.c);
-     
-        trig = triangles;
+
         // go to canonical space between 0 - 1
         if(trig != null){
             for(let p = 0 ; p < 3 ; p += 1){
@@ -157,7 +158,8 @@ function orthographic_projection( SHAPE = new mesh() ){
 
     }
 
-    return SHAPE;
+    // return mesh copy with projected coordinates 
+    return COPY_MESH;
 }
 
 function z_clipping( p1 , p2 , p3 ){
@@ -206,7 +208,7 @@ document.addEventListener("keydown" , (e) => {
 
     if(e.key == "z"){
 
-        for(let trig of shape.trigs){
+        for(let trig of shape.triangles){
             trig.a.y += speed_lr;
             trig.b.y += speed_lr;
             trig.c.y += speed_lr;
@@ -215,7 +217,7 @@ document.addEventListener("keydown" , (e) => {
     } 
     if(e.key == "s") {
 
-        for(let trig of shape.trigs){
+        for(let trig of shape.triangles){
             trig.a.y -= speed_lr;
             trig.b.y -= speed_lr;
             trig.c.y -= speed_lr;
@@ -225,7 +227,7 @@ document.addEventListener("keydown" , (e) => {
 
     if(e.key == "q"){
 
-        for(let trig of shape.trigs){
+        for(let trig of shape.triangles){
             trig.a.x += speed_lr;
             trig.b.x += speed_lr;
             trig.c.x += speed_lr;
@@ -234,7 +236,7 @@ document.addEventListener("keydown" , (e) => {
     } 
     if(e.key == "d") {
 
-        for(let trig of shape.trigs){
+        for(let trig of shape.triangles){
             trig.a.x -= speed_lr;
             trig.b.x -= speed_lr;
             trig.c.x -= speed_lr;
@@ -243,7 +245,7 @@ document.addEventListener("keydown" , (e) => {
 
     if(e.key == "e"){
 
-        for(let trig of shape.trigs){
+        for(let trig of shape.triangles){
             trig.a.z += speed;
             trig.b.z += speed;
             trig.c.z += speed;
@@ -252,7 +254,7 @@ document.addEventListener("keydown" , (e) => {
     } 
     if(e.key == "a") {
 
-        for(let trig of shape.trigs){
+        for(let trig of shape.triangles){
             trig.a.z -= speed;
             trig.b.z -= speed;
             trig.c.z -= speed;
@@ -260,15 +262,13 @@ document.addEventListener("keydown" , (e) => {
 
     }
 
-    pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
-    pshape.sort();
-
+    pshape = orthographic_projection(shape);
+    //for(let p in pshape) console.log(p);
 });
 
-pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
+pshape = orthographic_projection(shape);
 
-
-let fps = new FPS();
+const fps = new FPS();
 fps.start_calc_frames();
 
 function render(){

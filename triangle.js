@@ -31,7 +31,7 @@ export class triangle{
             this.z = z;    
         }
 
-        this.set_scalar = ( size = 1 ) => {
+        this.scale = ( size = 1 ) => {
             this.scalar = size;
             
             this.a.scalar(size , this.x , this.y , this.z);

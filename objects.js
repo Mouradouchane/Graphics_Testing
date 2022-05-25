@@ -10,7 +10,8 @@ let size = 40;
 
 let shape = new mesh( x , y , z , size );
 
-shape.set_trigs(
+shape.set_triangles(
+    
     /*
     new triangle(new point(0,0,0) , new point(0,1,0) , new point(1,1,0) , "white"),
     new triangle(new point(0,0,0) , new point(1,0,0) , new point(1,1,0) , "red"),
