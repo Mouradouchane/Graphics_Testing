@@ -2,7 +2,8 @@ import {triangle} from "./triangle.js"
 
 export class mesh{
 
-    constructor( x , y , z , size = 1){
+    constructor( x , y , z , size = 1 , ...triangles){
+        
         this.x = x;
         this.y = y;
         this.z = z;
@@ -11,13 +12,17 @@ export class mesh{
 
         this.triangles = [];
 
-        this.set_triangles = (...triangles ) => {
+        for(let trig of triangles){
+            this.triangles.push(trig);
+        }
+
+        this.set_triangles = ( ...triangles ) => {
             
           
             for(let trig of triangles){
 
                 trig.set_coordinates( this.x , this.y , this.z );
-                trig.scale( this.size );
+                trig.scale_triangle_by( this.size );
 
                 this.triangles.push( trig );
 
@@ -25,17 +30,14 @@ export class mesh{
         }
 
         this.copy = () => {
-
-            let mesh_copy = new mesh(
+            
+            return new mesh(
                 this.x,
                 this.y,
                 this.z,
-                this.size
-            )
-            
-            mesh_copy.set_triangles( ...(this.triangles) )
-
-            return mesh_copy;
+                this.size,
+                ...(this.triangles)
+            );
         }
 
         this.sort = () => {

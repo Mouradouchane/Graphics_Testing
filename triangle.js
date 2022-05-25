@@ -3,6 +3,7 @@ import {point} from "./point.js"
 export class triangle{
 
     constructor( a = new point() , b = new point() , c = new point() , color = "white"){
+        
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -10,33 +11,31 @@ export class triangle{
         this.a = a;
         this.b = b;
         this.c = c;
-        this.color = color;
-        this.scalar = 1;
 
-        this.center = {
-            x : 0,
-            y : 0,
-            z : 0,
+        this.color = color;
+
+        this.scale_factor = 1;
+
+        this.scale_point_by = ( point = new point() , scale_factor = 1  ) => {
+           
+            point.x = point.x * scale_factor + this.x;
+            point.y = point.y * scale_factor + this.y;
+            point.z = point.z * scale_factor + this.z;
+
         }
 
-        this.set_center = ( x = 0,y = 0,z = 0 ) => {
-            this.a = a;
-            this.b = b;
-            this.c = c;    
+        this.scale_triangle_by = ( scale_factor = 1 ) => {
+            this.scale_factor = scale_factor;
+            
+            this.scale_point_by( this.a , this.scale_factor);
+            this.scale_point_by( this.b , this.scale_factor);
+            this.scale_point_by( this.c , this.scale_factor);
         }
 
         this.set_coordinates = ( x = 0,y = 0,z = 0 ) => {
             this.x = x;
             this.y = y;
             this.z = z;    
-        }
-
-        this.scale = ( size = 1 ) => {
-            this.scalar = size;
-            
-            this.a.scalar(size , this.x , this.y , this.z);
-            this.b.scalar(size , this.x , this.y , this.z);
-            this.c.scalar(size , this.x , this.y , this.z);
         }
 
         this.sort = () => {

@@ -125,6 +125,7 @@ function orthographic_projection( MESH = new mesh() ){
     //debugger
 
     let COPY_MESH = MESH.copy();
+    //let COPY_MESH = JSON.parse(JSON.stringify(MESH));
 
     let points = ['a','b','c'];
 
@@ -281,7 +282,7 @@ function render(){
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
         // =============== triangle ============  
-        render_mesh(ctx , pshape , false , true , false );
+        render_mesh(ctx , pshape , false , true , true );
 
         // =============== FPS =================
         if(fps.draw){
