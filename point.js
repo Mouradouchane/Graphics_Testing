@@ -7,5 +7,8 @@ export class point{
         this.z = z;
         this.w = w;
 
+        this.copy = () => {
+            return new point(this.x, this.y , this.z , this.w);
+        }
     }
 }

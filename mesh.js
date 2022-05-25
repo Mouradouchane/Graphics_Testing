@@ -13,7 +13,8 @@ export class mesh{
         this.triangles = [];
 
         for(let trig of triangles){
-            this.triangles.push(trig);
+            let copy_trig = new triangle(trig.a.copy(),trig.b.copy(),trig.c.copy(),trig.color);
+            this.triangles.push(copy_trig);
         }
 
         this.set_triangles = ( ...triangles ) => {
@@ -30,7 +31,7 @@ export class mesh{
         }
 
         this.copy = () => {
-            
+
             return new mesh(
                 this.x,
                 this.y,
