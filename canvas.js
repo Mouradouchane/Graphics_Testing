@@ -1,259 +1,19 @@
 
-class point{
-    constructor(x = 0 , y = 0 , z = 0 , w = 1){
+import {point} from "./point.js"
+import {triangle} from "./triangle.js"
+import {mesh} from "./mesh.js"
+import {shape} from "./objects.js"
 
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+import {to_radian,rotate_x,rotate_y,rotate_z,rotate_each_time,stop_rotate} from "./rotate.js"
 
-        this.scalar = ( size = 1 , x , y , z ) => {
-            this.x *= size;
-            this.y *= size;
-            this.z *= size;
-
-            this.x += x;
-            this.y += y;
-            this.z += z;
-        }
-    }
-}
-
-class tirangel{
-
-    constructor( a = new point() , b = new point() , c = new point() , color = "white"){
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.color = color;
-        this.scalar = 1;
-
-        this.center = {
-            x : 0,
-            y : 0,
-            z : 0,
-        }
-
-        this.set_center = ( x = 0,y = 0,z = 0 ) => {
-            this.a = a;
-            this.b = b;
-            this.c = c;    
-        }
-
-        this.set_coordinates = ( x = 0,y = 0,z = 0 ) => {
-            this.x = x;
-            this.y = y;
-            this.z = z;    
-        }
-
-        this.set_scalar = ( size = 1 ) => {
-            this.scalar = size;
-            
-            this.a.scalar(size , this.x , this.y , this.z);
-            this.b.scalar(size , this.x , this.y , this.z);
-            this.c.scalar(size , this.x , this.y , this.z);
-        }
-
-        this.sort = () => {
-            let swap = null;
-
-            if(this.a.z < this.b.z){
-                swap = this.a;
-
-                this.a = this.b;
-                this.b = swap;
-            } 
-
-            if(this.a.z < this.c.z){
-                swap = this.a;
-
-                this.a = this.c;
-                this.c = swap;
-            } 
-
-
-            if(this.b.z < this.c.z){
-                swap = this.b;
-
-                this.b = this.c;
-                this.c = swap;
-            } 
-        }
-    }
-}
-
-class meshe{
-
-    constructor( x , y , z , size = 1){
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        
-        this.size = size;
-
-        this.trigs = [];
-
-        this.set_trigs = ( ...triangles ) => {
-
-            for(let trig of triangles){
-
-                trig.set_coordinates( this.x , this.y , this.z );
-                trig.set_scalar( this.size );
-
-                this.trigs.push( trig );
-
-            }
-        }
-
-        this.sort = () => {
-
-            for(let trig of this.trigs){
-                trig.sort();
-            }
-
-            this.trigs.sort(( t , k ) => {
-                if( 
-                    t.a.z > k.a.z ||
-                    t.b.z > k.b.z ||
-                    t.c.z > k.c.z 
-                ) 
-                return true;
-
-                else return false;
-            })
-        }
-    }
-}
+import {fps as FPS} from "./fps.js"
 
 // =============== canvas ===============
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
-// =============== triangles & shapes ===============
-let x = 20, y = 40 , z = -80;
-let size = 40;
-
-const shape = new meshe( x , y , z , size );
-let pshape = new meshe();
-
-shape.set_trigs(
-    /*
-    new tirangel(new point(0,0,0) , new point(0,1,0) , new point(1,1,0) , "white"),
-    new tirangel(new point(0,0,0) , new point(1,0,0) , new point(1,1,0) , "red"),
-
-    new tirangel(new point(0,0,-1) , new point(1,0,-1) , new point(1,1,-1) , "yellow"),
-    new tirangel(new point(0,0,-1) , new point(0,1,-1) , new point(1,1,-1) , "green"),
-
-    new tirangel(new point(1,1,0) , new point(1,0,-1) , new point(1,1,-1) , "cyan"),
-    new tirangel(new point(1,1,0) , new point(1,0,-1) , new point(1,0,0) , "orange"),
-
-    new tirangel(new point(0,0,0) , new point(0,0,-1) , new point(0,1,-1) , "pink"),
-    */
-   new tirangel(new point(1,1,-1) , new point(0,1,0) , new point(0,1,-1.5) , "blue"),
-);
-
-
-
-// =============== rotate functions ===============
-function to_radian ( deg_angle = 0 ){
-    return ( deg_angle * Math.PI ) / 180;
-}
-
-function rotate_x( angel = 0 , tg = new tirangel() , origin = { x : 0 , y : 0 , z : 0} ){
-    // debugger
-    r_angel = to_radian(angel);
-
-    let cos = Math.cos(r_angel);
-    let sin = Math.sin(r_angel); 
-    
-    let names = ["a","b","c"];
-
-    for(let p of names){
-        tg[p].y -= origin.y;
-        tg[p].z -= origin.z;
-        
-        let new_y = (tg[p].y * cos + tg[p].z * -sin);
-        let new_z = (tg[p].y * sin + tg[p].z * cos);
-        
-        tg[p].y = new_y + origin.y;
-        tg[p].z = new_z + origin.z;
-    }
-}
-
-function rotate_y( angel = 0 , tg = new tirangel() , origin = { x : 0 , y : 0 , z : 0} ){
-    // debugger
-    r_angel = to_radian(angel);
-
-    let cos = Math.cos(r_angel);
-    let sin = Math.sin(r_angel); 
-    
-    let names = ["a","b","c"];
-
-    for(let p of names){
-        tg[p].x -= origin.x;
-        tg[p].z -= origin.z;
-        
-        let new_x = (tg[p].x * cos + tg[p].z * sin);
-        let new_z = (tg[p].x * -sin + tg[p].z * cos);
-        
-        tg[p].x = new_x + origin.x;
-        tg[p].z = new_z + origin.z;
-    }
-}
-
-
-function rotate_z( angel = 0 , tg = new tirangel() , origin = { x : 0 , y : 0 , z : 0} ){
-    // debugger
-    r_angel = to_radian(angel);
-
-    let cos = Math.cos(r_angel);
-    let sin = Math.sin(r_angel); 
-    
-    let names = ["a","b","c"];
-
-    for(let p of names){
-        tg[p].x -= origin.x;
-        tg[p].y -= origin.y;
-        
-        let new_x = (tg[p].x * cos + tg[p].y * -sin);
-        let new_y = (tg[p].x * sin + tg[p].y * cos);
-        
-        tg[p].x = new_x + origin.x;
-        tg[p].y = new_y + origin.y;
-    }
-}
-
-var angel_x = 0.8;
-var angel_z = 1;
-var angel_y = 0.5;
-
-let r_z_point = new point(40,40,0);
-let r_x_point = new point(0,40,-100);
-
-var rotate_each_time = setInterval(() => {
-    // debugger
-    
-    for(let trig of shape.trigs){
-        //rotate_x( angel_y , trig , r_x_point );
-        //rotate_z( angel_z , trig , r_z_point );
-    }
-    
-}, 10);
-
-// =============== FPS ===============
-var max_fps = 1000 / 40;
-var fps_s = 0;
-var fps_ms = false;
-
-var frame_calc = setInterval(() => {
-    fps_s = fps_ms;
-    fps_ms = 0;
-}, 1000);
-
+// =============== objects and meshes ===============
+let pshape = new mesh();
 
 function render_coordinates(CTX = ctx , color = "white", p , render_info = false , render_points = false){
 
@@ -282,7 +42,7 @@ function render_coordinates(CTX = ctx , color = "white", p , render_info = false
     
 }
 
-function render_meshe( CTX = ctx , SHAPE , colors = true , just_line = false , debug = false){
+function render_mesh( CTX = ctx , SHAPE , colors = true , just_line = false , debug = false){
 
 
     for(let trig of SHAPE.trigs){
@@ -360,7 +120,7 @@ function ortho_calc( Point = new point() ){
     
 }
 
-function orthographic_projection( SHAPE = new meshe() ){
+function orthographic_projection( SHAPE = new mesh() ){
     //debugger
     let points = ['a','b','c'];
 
@@ -404,7 +164,7 @@ function z_clipping( p1 , p2 , p3 ){
     //debugger
     // check if all in
     if(p1.z < n && p2.z < n && p3.z < n){
-        return new tirangel(p1,p2,p3);
+        return new triangle(p1,p2,p3);
     }
     
     // check if all out
@@ -436,7 +196,7 @@ function clip_vs_tow( inp1 , outp1 , outp2 ){
     let new_p1 = new point( outp1.x , -(m * inp1.z) + outp1.y , n ); 
     let new_p2 = new point( outp2.x , -(m * inp1.z) + outp2.y , n ); 
 
-    return new tirangel(inp1 , new_p1 , new_p2);
+    return new triangle(inp1 , new_p1 , new_p2);
 }
 
 let speed = 1.4;
@@ -501,10 +261,15 @@ document.addEventListener("keydown" , (e) => {
     }
 
     pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
+    pshape.sort();
 
 });
 
 pshape = orthographic_projection(JSON.parse(JSON.stringify(shape)));
+
+
+let fps = new FPS();
+fps.start_calc_frames();
 
 function render(){
 
@@ -515,18 +280,20 @@ function render(){
         ctx.fillStyle = "black";
         ctx.fillRect(0,0,canvas.width,canvas.height);
 
-        shape.sort();
         // =============== triangle ============  
-        render_meshe(ctx , pshape , false , true , false );
+        render_mesh(ctx , pshape , false , true , false );
 
         // =============== FPS =================
-        fps_ms += 1;
-        ctx.fillStyle = "yellow";
-        ctx.font = "20px Tahoma";
-        ctx.fillText(`FPS   : ${fps_s}`,20,20);
+        if(fps.draw){
+            fps.fpms += 1; // count frame
+
+            ctx.fillStyle = "yellow"; // draw each 1 sec max fps
+            ctx.font = "20px Tahoma";
+            ctx.fillText(`FPS   : ${fps.sec}`,20,20);
+    }   
 
         requestAnimationFrame(render);
-    } , max_fps);
+    } , fps.max );
 
 }
 
