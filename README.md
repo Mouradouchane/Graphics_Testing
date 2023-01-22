@@ -1,37 +1,45 @@
 ## 3D_testing
-just a simple repo for testing and practice on 3D conceptes in HTML **2D canvas** pure JavaScript no libraries or frameworks .
+just a simple project for testing and practice on 3D conceptes in HTML **2D canvas** using pure JavaScript no lib's or frameworks .
 
 ## perview 
 
-
 ## tasks
 - [x] vec4d "class point"
+- [x] class point
+- [x] class line
 - [x] class triangle
 - [x] class mesh
 - [x] orthographic projection
 - [ ] perspective projection
-- [x] perspective divide
-- [x] NDC
-- [x] field of view
+- [x] NDC 
+- [x] field of view "FOV"
 - [x] aspect ratio 
 - [x] x y z movement
 - [x] x y z rotation
 - [ ] camera  
-- [ ] x y clipping
-- [ ] z near clipping
+- [ ] camera movement
+- [ ] 2D clipping
+- [ ] 3D clipping "z near"
 - [ ] back-face culling
-- [ ] 2D line's
-- [ ] 2D curves 
+- [ ] FPS control
+- [ ] V-Sync
 - [ ] rasterization
 - [ ] z-buffer
+- [ ] a-buffer
+- [ ] line drawing
+- [ ] triangle drawing
+- [ ] gradients
 - [ ] anti alias
+- [ ] 2D curves 
+- [ ] textures mapping
+- [ ] shadow mapping
+- [ ] lighting "directed" 
+- [ ] ambient light
+- [ ] shading
 - [ ] MSAA
 - [ ] SSAA
-- [ ] gradient
-- [ ] light
-- [ ] shading
-- [ ] shadow
-- [ ] ambient
 - [ ] reflections
+- [ ] refractions
 - [ ] glow
+- [ ] path tracing
 - [ ] ray tracing
