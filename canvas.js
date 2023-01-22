@@ -29,22 +29,21 @@ document.addEventListener("keydown" , (e) => {
 
 pshape = orthographic_projection(shape);
 
-const fps = new FPS();
+const fps = new FPS(30);
 fps.start_calc_frames();
 
 function render(){
 
     setTimeout(() =>{
-        //debugger
-        
+
         // =============== clear ===============
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0,0,canvas.width,canvas.height);
-
+        
         // =============== triangle ============  
         mesh.render(ctx , pshape , false , true , true);
-
+        
         // =============== FPS =================
         if(fps.draw){
             fps.fpms += 1; // count frame
@@ -52,11 +51,11 @@ function render(){
             ctx.fillStyle = "yellow"; // draw each 1 sec max fps
             ctx.font = "20px Tahoma";
             ctx.fillText(`FPS   : ${fps.sec}`,20,20);
-    }   
-
+        }
+      
         requestAnimationFrame(render);
     } , fps.max );
-
+    
 }
 
 render();
