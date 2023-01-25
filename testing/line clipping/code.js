@@ -1,6 +1,6 @@
 
-import { point } from "../point.js";
-import { line } from "../line.js";
+import { point } from "../../point.js";
+import { line } from "../../line.js";
 //import { triangle } from "../triangle.js"
 
 const canvas = document.querySelector("#canvas");
