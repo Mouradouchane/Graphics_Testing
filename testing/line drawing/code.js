@@ -59,11 +59,28 @@ export class draw {
         let delta_x = (point_b_x - point_a_x); 
         let delta_y = (point_b_y - point_a_y); 
 
-        
+        debugger;
+
+        width = Math.abs(width);
+        let width_mod = Math.floor(width) % 2;
+        width = Math.floor( width / 2 );
+
         if( delta_x == 0 ){ // if vertical line
 
+            // calc thickness range 
+            let start = Math.abs(point_a_x - width - width_mod);
+            let end   = Math.abs(point_a_x + width);
+            
+            // draw vertical line
             for(let y = point_a_y ; y <= point_b_y ; y += 1){
-                this.#set_pixle( canvas , point_a_x , y , color_a );
+
+                let s = start;
+                // fill line thickness
+                do{
+                    this.#set_pixle( canvas , s , y , color_a );
+                    s += 1;
+                }
+                while( s < end );
             }
 
             return true;
@@ -71,8 +88,20 @@ export class draw {
 
         if( delta_y == 0 ){ // if horizontal line
 
+            // calc thickness range 
+            let start = Math.abs(point_a_y - width - width_mod);
+            let end   = Math.abs(point_a_y + width);
+            
+            // draw horizontal line
             for(let x = point_a_x ; x <= point_b_x ; x += 1){
-                this.#set_pixle( canvas , x , point_a_y , color_a );
+
+                // fill line thickness
+                let s = start;
+                do{
+                    this.#set_pixle( canvas , x , s , color_a );
+                    s += 1;
+                }
+                while( s < end );
             }
 
             return true;
