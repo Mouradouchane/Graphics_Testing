@@ -51,19 +51,13 @@ export class draw {
         width = 1 , color_a = "cyan" ,  color_b = "cyan" , alpha_a = 1 , alpha_b = 1 , anti_alias = false
     ) {
 
-        if( point_a_x > point_b_x || point_a_y > point_b_y ){
-            [point_a_x , point_b_x] = [point_b_x , point_a_x];
-            [point_a_y , point_b_y] = [point_b_y , point_a_y];
-        }
-
         let delta_x = (point_b_x - point_a_x); 
         let delta_y = (point_b_y - point_a_y); 
-
-        debugger;
 
         width = Math.abs(width);
         let width_mod = Math.floor(width) % 2;
         width = Math.floor( width / 2 );
+
 
         if( delta_x == 0 ){ // if vertical line
 
@@ -108,34 +102,69 @@ export class draw {
         }
         
 
-        let slope = delta_y / delta_x;
-        let Y_intercept = point_a_y - ( slope * point_a_x );
+        let slope = delta_y / delta_x; // M
+        let Y_intercept = point_a_y - ( slope * point_a_x ); // B
 
         let new_x = 0;
         let new_y = 0;
 
-        this.#set_pixle( canvas , point_a_x , point_a_y  , color_a );
 
         // delta_x bigger => go in each x and solve for y  
         if( Math.abs(delta_x) >= Math.abs(delta_y) ){
+            
+            if( point_a_x > point_b_x ){
+                [point_a_x , point_b_x] = [point_b_x , point_a_x];
+                [point_a_y , point_b_y] = [point_b_y , point_a_y];
+            }
+    
 
-            for( let x = point_a_x + 1; x < point_b_x ; x += 1){
+            for( let x = point_a_x ; x <= point_b_x ; x += 1){
+
+                // calc new y position
                 new_y = (x * slope) + Y_intercept;
-                this.#set_pixle( canvas , x , new_y , color_a );
+    
+                // calc line thickness range 
+                let start = Math.abs(new_y - width - width_mod);
+                let end   = Math.abs(new_y + width);
+                
+                // fill line thickness 
+                do{
+                    this.#set_pixle( canvas , x , start , color_a );
+                    start += 1;
+                }
+                while(start < end);
             }
             
         }
         // delta_y bigger => go in each y and solve for x  
         else {
 
-            for(let y = point_a_y + 1 ; y < point_b_y ; y += 1){
+            if( point_a_y > point_b_y ){
+                [point_a_x , point_b_x] = [point_b_x , point_a_x];
+                [point_a_y , point_b_y] = [point_b_y , point_a_y];
+            }
+            
+            debugger;
+
+            for(let y = point_a_y ; y <= point_b_y ; y += 1){
+
+                // calc new x position
                 new_x = (y - Y_intercept) / slope;
-                this.#set_pixle( canvas , new_x , y , color_a );
+                
+                // calc line thickness range 
+                let start = Math.abs(new_x - width - width_mod);
+                let end   = Math.abs(new_x + width);
+                
+                // fill line thickness 
+                do{
+                    this.#set_pixle( canvas , start , y , color_a );
+                    start += 1;
+                }     
+                while(start < end);
+
             }
 
         }
-
-        this.#set_pixle( canvas , point_b_x , point_b_y  , color_a );
 
         return true;
 
