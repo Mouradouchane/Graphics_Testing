@@ -57,7 +57,6 @@ just a simple project for testing and practice on 3D conceptes in HTML **2D canv
 - [ ] Sampling
 - [ ] Z-buffer
 - [ ] A-buffer
-- [ ] preformance graph
 - [ ] FPS control
 - [ ] V-Sync
 
@@ -81,15 +80,18 @@ just a simple project for testing and practice on 3D conceptes in HTML **2D canv
 - [ ] mapping
 - [ ] filtering
 - [ ] MipMap 
-- [ ] bilinear
-- [ ] quadliniear 
-
 
 ### Shading : 
 - [ ] shading
 - [ ] shadow map
 - [ ] ray tracing shadow 
  
-# Ray-Tracing :
+### Ray-Tracing :
 - [ ] path tracing
 - [ ] ray casting
+
+### Benchmarking : 
+- [ ] Graph FPS
+- [ ] Graph Preformance Data
+- [ ] Uint-Testing
+- [ ] compare custom codes to others
