@@ -143,8 +143,8 @@ export class draw {
                 [point_a_x , point_b_x] = [point_b_x , point_a_x];
                 [point_a_y , point_b_y] = [point_b_y , point_a_y];
             }
-            
-            debugger;
+
+            //debugger;
 
             for(let y = point_a_y ; y <= point_b_y ; y += 1){
 

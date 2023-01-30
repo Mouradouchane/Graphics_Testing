@@ -1,5 +1,5 @@
 import {line} from "../../line.js";
-import { point } from "../../point.js";
+import {point} from "../../point.js";
 import {draw} from "./code.js";
 import {rgb} from "../../color.js";
 
