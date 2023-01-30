@@ -1,7 +1,7 @@
 import {line} from "../../line.js";
 import {point} from "../../point.js";
 import {draw} from "./code.js";
-import {rgb} from "../../color.js";
+import {RGBA} from "../../color.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -20,10 +20,10 @@ function clear_frame(){
 }
 
 function new_frame(){
-
-    draw.line_from_a_to_b(canvas , line_a.p1 , line_a.p2 , line_a.width , new rgb(255,255,0));
-    draw.line_from_a_to_b(canvas , line_b.p1 , line_b.p2 , line_b.width , new rgb(0,255,0) );
-    draw.line_from_a_to_b(canvas , line_c.p1 , line_c.p2 , line_c.width , new rgb(0,255,255) );
+    /*
+    draw.line_from_a_to_b(canvas , line_a.p1 , line_a.p2 , line_a.width , new RGBA(255,255,0));
+    draw.line_from_a_to_b(canvas , line_b.p1 , line_b.p2 , line_b.width , new RGBA(0,255,0) );
+    draw.line_from_a_to_b(canvas , line_c.p1 , line_c.p2 , line_c.width , new RGBA(0,255,255) );
 
     ctx.fillStyle = "red";
     ctx.strokeStyle = "red";
@@ -33,7 +33,24 @@ function new_frame(){
     ctx.moveTo(200,250);
     ctx.lineTo(400,400);
     ctx.stroke(); 
+    */
 
+    let c1 = new RGBA(50,150,50,0.7);
+    let c2 = new RGBA(144,144,105,0.8);
+
+    ctx.fillStyle = RGBA.to_string(c1);
+    ctx.fillRect( 10 , 10 , 100 , 100);
+
+    ctx.fillStyle = RGBA.to_string(c2);
+    ctx.fillRect( 10+50 , 10, 100 , 100);
+
+    
+    ctx.fillStyle = RGBA.to_string( RGBA.blend(c2,c1) );
+    ctx.fillRect( 10+100 , 10+100 , 100 , 100);
+
+    console.log( RGBA.to_string(c1) );
+    console.log( RGBA.to_string(c2) );
+    console.log( RGBA.to_string( RGBA.blend(c2,c1) ) );
 }
 
 function render(){

@@ -1,7 +1,7 @@
 
 import {point} from "../../point.js"
 import {line} from "../../line.js"
-import {rgb} from "../../color.js";
+import {RGBA} from "../../color.js";
 
 export class draw {
 
@@ -187,7 +187,7 @@ export class draw {
 
             return this.#line_drawing(
                 canvas , point_a.x , point_a.y  , point_b.x , point_b.y , 
-                width , rgb_color.to_string()
+                width , RGBA.to_string(rgb_color)
             );
 
         } 
@@ -217,13 +217,6 @@ export class draw {
 
     }
 
-    /* need work */ 
-    static line_from_xy1_to_xy2_with_gradient( 
-        canvas , x1 = 1 , y1 = 1 , x2 = 1 , y2 = 1 , 
-        color_a = "cyan" , color_b = "cyan" , alpha = 1 , anti_alias = false
-    ) {
-
-    }
 
 
 }
