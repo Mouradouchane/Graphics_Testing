@@ -48,7 +48,7 @@ export class draw {
     */
     static #line_drawing( 
         canvas , point_a_x = 1 , point_a_y = 1 , point_b_x = 1 , point_b_y = 1 , 
-        width = 1 , color_a = "cyan" ,  color_b = "cyan" , alpha_a = 1 , alpha_b = 1 , anti_alias = false
+        width = 1 , color_a = new RGBA() ,  color_b = null , anti_alias = false
     ) {
 
         let delta_x = (point_b_x - point_a_x); 
@@ -65,16 +65,49 @@ export class draw {
             let start = Math.abs(point_a_x - width - width_mod);
             let end   = Math.abs(point_a_x + width);
             
-            // draw vertical line
-            for(let y = point_a_y ; y <= point_b_y ; y += 1){
+            // draw vertical line process 
 
-                let s = start;
-                // fill line thickness
-                do{
-                    this.#set_pixle( canvas , s , y , color_a );
-                    s += 1;
+            // if none linear-gradient 
+            if( color_b == null || color_b == color_a ){
+                
+                for(let y = point_a_y ; y <= point_b_y ; y += 1){
+
+                    let s = start;
+                    // fill line thickness
+                    do{
+                        this.#set_pixle( canvas , s , y , RGBA.to_string(color_a) );
+                        s += 1;
+                    }
+                    while( s < end );
                 }
-                while( s < end );
+
+            }
+            else {
+
+                let delta_red = (color_a.red - color_b.red) / delta_y ;
+                let delta_green = (color_a.green  - color_b.green) / delta_y ;
+                let delta_blue =(color_a.blue - color_b.blue) / delta_y ;
+                let delta_alpha = (color_a.alpha - color_b.alpha) / delta_y;
+
+                let color = new RGBA(color_a.red , color_a.green , color_a.blue , color_a.alpha);
+
+                for(let y = point_a_y ; y <= point_b_y ; y += 1){
+
+                    let s = start;
+
+                    // fill line thickness
+                    do{
+                        this.#set_pixle( canvas , s , y , RGBA.to_string(color) );
+                        s += 1;
+                    }
+                    while( s < end );
+
+                    color.red -= delta_red;
+                    color.green -= delta_green;
+                    color.blue -= delta_blue;
+                    color.alpha -= delta_alpha;
+                }
+
             }
 
             return true;
@@ -86,16 +119,49 @@ export class draw {
             let start = Math.abs(point_a_y - width - width_mod);
             let end   = Math.abs(point_a_y + width);
             
-            // draw horizontal line
-            for(let x = point_a_x ; x <= point_b_x ; x += 1){
+            // draw horizontal line process 
 
-                // fill line thickness
-                let s = start;
-                do{
-                    this.#set_pixle( canvas , x , s , color_a );
-                    s += 1;
+            if( color_b == null || color_b == color_a ){
+
+                for(let x = point_a_x ; x <= point_b_x ; x += 1){
+
+                    // fill line thickness
+                    let s = start;
+                    do{
+                        this.#set_pixle( canvas , x , s , RGBA.to_string(color_a) );
+                        s += 1;
+                    }
+                    while( s < end );
+
                 }
-                while( s < end );
+
+            }
+            else {
+                // debugger
+
+                let delta_red = (color_a.red - color_b.red) / delta_x ;
+                let delta_green = (color_a.green  - color_b.green) / delta_x ;
+                let delta_blue = (color_a.blue - color_b.blue) / delta_x ;
+                let delta_alpha = (color_a.alpha - color_b.alpha) / delta_x;
+
+                let color = new RGBA(color_a.red , color_a.green , color_a.blue , color_a.alpha);
+
+                for(let x = point_a_x ; x <= point_b_x ; x += 1){
+
+                    // fill line thickness
+                    let s = start;
+                    do{
+                        this.#set_pixle( canvas , x , s , RGBA.to_string(color) );
+                        s += 1;
+                    }
+                    while( s < end );
+
+                    color.red -= delta_red;
+                    color.green -= delta_green;
+                    color.blue -= delta_blue;
+                    color.alpha -= delta_alpha;
+                }
+
             }
 
             return true;
@@ -108,7 +174,8 @@ export class draw {
         let new_x = 0;
         let new_y = 0;
 
-
+        debugger
+        
         // delta_x bigger => go in each x and solve for y  
         if( Math.abs(delta_x) >= Math.abs(delta_y) ){
             
@@ -116,23 +183,37 @@ export class draw {
                 [point_a_x , point_b_x] = [point_b_x , point_a_x];
                 [point_a_y , point_b_y] = [point_b_y , point_a_y];
             }
-    
 
+            if( color_b == null ) color_b = color_a;
+        
+            let delta_red   = (color_a.red   - color_b.red)   / delta_x ;
+            let delta_green = (color_a.green - color_b.green) / delta_x ;
+            let delta_blue  = (color_a.blue  - color_b.blue)  / delta_x ;
+            let delta_alpha = (color_a.alpha - color_b.alpha) / delta_x ;
+            
+            let color = new RGBA(color_a.red , color_a.green , color_a.blue , color_a.alpha);
+            
             for( let x = point_a_x ; x <= point_b_x ; x += 1){
 
                 // calc new y position
                 new_y = (x * slope) + Y_intercept;
-    
+
                 // calc line thickness range 
                 let start = Math.abs(new_y - width - width_mod);
                 let end   = Math.abs(new_y + width);
                 
                 // fill line thickness 
                 do{
-                    this.#set_pixle( canvas , x , start , color_a );
+                    this.#set_pixle( canvas , x , start , RGBA.to_string(color) );
                     start += 1;
                 }
                 while(start < end);
+
+                color.red -= delta_red;
+                color.green -= delta_green;
+                color.blue -= delta_blue;
+                color.alpha -= delta_alpha;
+
             }
             
         }
@@ -144,8 +225,17 @@ export class draw {
                 [point_a_y , point_b_y] = [point_b_y , point_a_y];
             }
 
-            //debugger;
+            debugger;
 
+            if( color_b == null ) color_b = color_a;
+        
+            let delta_red   = (color_a.red   - color_b.red)   / delta_y ;
+            let delta_green = (color_a.green - color_b.green) / delta_y ;
+            let delta_blue  = (color_a.blue  - color_b.blue)  / delta_y ;
+            let delta_alpha = (color_a.alpha - color_b.alpha) / delta_y ;
+            
+            let color = new RGBA(color_a.red , color_a.green , color_a.blue , color_a.alpha);
+            
             for(let y = point_a_y ; y <= point_b_y ; y += 1){
 
                 // calc new x position
@@ -157,10 +247,15 @@ export class draw {
                 
                 // fill line thickness 
                 do{
-                    this.#set_pixle( canvas , start , y , color_a );
+                    this.#set_pixle( canvas , start , y , RGBA.to_string(color) );
                     start += 1;
                 }     
                 while(start < end);
+
+                color.red -= delta_red;
+                color.green -= delta_green;
+                color.blue -= delta_blue;
+                color.alpha -= delta_alpha;
 
             }
 
@@ -178,16 +273,16 @@ export class draw {
     */
 
     /* need work */
-    static line_from_a_to_b( 
+    static line( 
         canvas , point_a = {} , point_b = {} , width = 1 ,
-        rgb_color = {} , anti_alias = false
+        rgb_color = new RGBA() , anti_alias = false
     ) { 
 
-        if(canvas) {
+        if(canvas && rgb_color instanceof RGBA ) {
 
             return this.#line_drawing(
                 canvas , point_a.x , point_a.y  , point_b.x , point_b.y , 
-                width , RGBA.to_string(rgb_color)
+                width , rgb_color , null , 1 , 1 , anti_alias
             );
 
         } 
@@ -195,10 +290,20 @@ export class draw {
     }
 
     /* need work */
-    static line_from_a_to_b_with_gradient( 
+    static line_with_linear_gradient( 
         canvas , point_a = {} , point_b = {} , width = 1 ,
-        rgb_color_1 = {} , rgb_color_2 = {} , anti_alias = false
+        color_1 = {} , color_2 = {} , anti_alias = false
     ) {
+
+        if(canvas && color_1 instanceof RGBA && color_2 instanceof RGBA) {
+
+            return this.#line_drawing(
+                canvas , point_a.x , point_a.y  , point_b.x , point_b.y , 
+                width , color_1 , color_2 , anti_alias
+            );
+
+        } 
+        else return false;
 
     }
 
@@ -208,15 +313,5 @@ export class draw {
     ) { 
 
     }
-
-    /* need work */
-    static line_from_xy1_to_xy2 (
-        canvas , x1 = 1 , y1 = 1 , x2 = 1 , y2 = 1 , 
-        rgb_color = "cyan" , alpha = 1 , anti_alias = false
-    ) { 
-
-    }
-
-
 
 }
