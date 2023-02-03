@@ -7,12 +7,13 @@ const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 var render_loop = 0;
-var anti_alias = false;
+var interval_testing = 0;
+var anti_alias = 0;
 
-var thick = 4;
-var line_a = new line( new point( (Math.random()*canvas.clientWidth) + 100 - 200 , 400) , new point(50,200) , thick); 
-var line_b = new line( new point(100,100) , new point(100,300) , thick); 
-var line_c = new line( new point(200,200) , new point(400,200) , thick); 
+var thickness = 2;
+var line_a = new line( new point(790,590) , new point(405,180) , thickness); 
+var line_b = new line( new point(100,100) , new point(100,300) , thickness); // horizontal line
+var line_c = new line( new point(200,200) , new point(400,200) , thickness); // vertical line
 
 function clear_frame(){
     ctx.fillStyle = "rgb(0,0,0)";
@@ -21,10 +22,6 @@ function clear_frame(){
 
 function new_frame(){
 
-    draw.line_with_linear_gradient(canvas , line_a.p1 , line_a.p2 , line_a.width , new RGBA(255,0,0,1), new RGBA(0,0,255,1));
-    draw.line_with_linear_gradient(canvas , line_b.p1 , line_b.p2 , line_b.width , new RGBA(144,50,145,1), new RGBA(133,150,250,0.5));
-    draw.line_with_linear_gradient(canvas , line_c.p1 , line_c.p2 , line_c.width , new RGBA(255,0,100,1), new RGBA(255,255,0,0.3) );
-    
     ctx.fillStyle = "red";
     ctx.strokeStyle = "red";
     
@@ -33,6 +30,10 @@ function new_frame(){
     ctx.moveTo(200,250);
     ctx.lineTo(400,400);
     ctx.stroke(); 
+    
+    draw.line(canvas , line_b.p1 , line_b.p2 , line_b.width , new RGBA(255,0,0,1));
+    draw.line(canvas , line_c.p1 , line_c.p2 , line_c.width , new RGBA(0,255,0,1));
+    draw.line(canvas , line_a.p1 , line_a.p2 , line_a.width , new RGBA(0,255,255,1));
     
     /*
     let c1 = new RGBA(50,150,50,0.7);
@@ -70,14 +71,34 @@ else ctx.imageSmoothingEnabled = false;
 
 if( render_loop ) render();
 else {
-    /*
+    
+    if( interval_testing ){
     setInterval(() => {
-    line_a = new line( new point(Math.random()*canvas.clientWidth + 10 ,50) , new point(50,200) , thick); 
-    line_b = new line( new point(200,100) , new point(130,Math.random()*canvas.clientHeight + 10) , thick); 
-    line_c = new line( new point(200,240) , new point(243,Math.random()*canvas.clientHeight + 10) , thick); 
-    }, 4000);
-    */
-    clear_frame()
+
+    line_a = new line( 
+        new point(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight ) , 
+        new point(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight )
+    , thickness); 
+    line_b = new line( 
+        new point(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight ) , 
+        new point(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight )
+    , thickness); 
+    line_c = new line( 
+        new point(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight ) , 
+        new point(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight )
+    , thickness); 
+    
+    clear_frame();
     new_frame();
+
+    }, 2000);
+
+    }
+    else{
+
+        clear_frame();
+        new_frame();
+
+    }
 
 }

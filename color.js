@@ -1,6 +1,7 @@
 
 export class RGBA{
 
+    // static private values for RGBA class usage
     static #RGB_MAX_VALUE = 255;
     static #RGB_MIN_VALUE = 0;
     static #ALPHA_MIN_VALUE = 0;
@@ -46,42 +47,42 @@ export class RGBA{
 
     static blend( fg_color = new RGBA() , bg_color = new RGBA() ){
 
-    if( fg_color instanceof RGBA && bg_color instanceof RGBA ){
-        
-        if( fg_color.alpha <= 0 ) return bg_color;
-        if( bg_color.alpha <= 0 ) return fg_color;
+        if( fg_color instanceof RGBA && bg_color instanceof RGBA ){
+            
+            if( fg_color.alpha <= 0 ) return bg_color;
+            if( bg_color.alpha <= 0 ) return fg_color;
 
-        // else => blend color a with b
+            // else => blend color a with b
 
-        let new_color = new RGBA(); // new color 
-        
-        // solve for "a" alpha first
-        // blend alpha's formula ======> a = af + ( 1 - af ) * ab
-        
-        let alpha_A = fg_color.alpha; // af
-        let alpha_B = bg_color.alpha; // ab
+            let new_color = new RGBA(); // new color 
+            
+            // solve for "a" alpha first
+            // blend alpha's formula ======> a = af + ( 1 - af ) * ab
+            
+            let alpha_A = fg_color.alpha; // af
+            let alpha_B = bg_color.alpha; // ab
 
-        new_color.alpha = alpha_A + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * alpha_B; // a
+            new_color.alpha = alpha_A + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * alpha_B; // a
 
-        // blend colors
-        /* ============== formula =======================
-                   af * cf + ( 1 - af ) * cb 
-            c = _______________________________
-                             a
-        */
-        for( let color of ["red","green","blue"] ){
-            RGBA.set[color]( 
-                new_color , 
-                Math.round( 
-                    ( alpha_A * fg_color[color] + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * bg_color[color] ) / new_color.alpha  
-                )
-            );
+            // blend colors
+            /* ============== formula =======================
+                    af * cf + ( 1 - af ) * cb 
+                c = _______________________________
+                                a
+            */
+            for( let color of ["red","green","blue"] ){
+                RGBA.set[color]( 
+                    new_color , 
+                    Math.round( 
+                        ( alpha_A * fg_color[color] + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * bg_color[color] ) / new_color.alpha  
+                    )
+                );
+            }
+
+            return new_color;
+            
         }
-
-        return new_color;
-        
-    }
-    else return null;
+        else return null;
 
     }
 
