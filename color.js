@@ -86,6 +86,17 @@ export class RGBA{
 
     }
 
+    static random_color( random_alpha = false){
+
+        return new RGBA(
+            Math.floor( Math.random() * 255 ), 
+            Math.floor( Math.random() * 255 ),
+            Math.floor( Math.random() * 255 ),
+            (random_alpha) ? Math.random() * 1 : 1
+        );
+
+    }
+
     static set = {
 
         red( RGBA_color_object = new RGBA() , red_value = 0 ){

@@ -1,6 +1,6 @@
 
-import {point} from "../../point.js"
-import {line} from "../../line.js"
+import {point2D} from "../../point.js"
+import {line , line_with_colors } from "../../line.js"
 import {RGBA} from "../../color.js";
 
 export class draw {
@@ -24,31 +24,15 @@ export class draw {
 
     }
 
-    /* need work */
-    static #blend_colors( color_1 = "cyan" , color_2 = "cyan" ) {
-
-    }
-
-    /* need work */
-    static #is_point_out(canvas , point_x = 1 , point_y = 1 ){
-   
-    }
-    
-    /* 
-        - need work 
-        - if tow points is out in same direction then the line will be rejected 
-    */
-    static #is_rejected_line(canvas , point_a_x, point_a_y , point_b_x , point_b_y ){
-
-    }
-
     // ****** stable ******
-    static #CUSTOM_LINE_DRAW_GRADIENT(
+    // mine algorithm for drawing lines with gradient
+    static #C_DRAW_LINE_WITH_GRADIENT(
         canvas , 
-        point_a = new point() , point_b = new point() , width = 1 ,
+        point_a = new point2D() , point_b = new point2D() , width = 1 ,
         color_a = new RGBA()  , color_b = new RGBA()  ,
         anti_alias = false
     ){
+
 
         width = Math.abs(width);
         let width_mod = Math.floor(width) % 2;
@@ -78,7 +62,7 @@ export class draw {
             [point_a.y , point_b.y] = [point_b.y , point_a.y];
         }
       
-        let new_p = (slope == 0) ? point_a[(x_or_y) ? "x" : "y"] : 0;
+        let new_p = (Math.abs(slope) == 0) ? point_a[(!x_or_y) ? "x" : "y"] : 0;
         
         for( let position = point_a[(x_or_y) ? "x" : "y"]; position <= point_b[(x_or_y) ? "x" : "y"] ; position += 1 ){
 
@@ -114,12 +98,12 @@ export class draw {
     } 
 
     // ****** stable ******
-    static #CUSTOM_LINE_DRAW_NO_GRADIENT( 
-        canvas , point_a = new point() , point_b = new point() , 
+    // mine algorithm for drawing lines without gradient
+    static #C_DRAW_LINE_NO_GRADIENT( 
+        canvas , point_a = new point2D() , point_b = new point2D() , 
         width = 1 , color = new RGBA() , anti_alias = false
     ) {
 
-        
         width = Math.abs(width);
         let width_mod = Math.floor(width) % 2;
         width = Math.floor( width / 2 );
@@ -133,6 +117,8 @@ export class draw {
         let Y_intercept = point_a.y - ( slope * point_a.x );   // B
 
         let x_or_y = Math.abs(delta_x) >= Math.abs(delta_y); 
+        
+        // debugger;
 
         // sort point for proper drawing 
         if( x_or_y && point_a.x > point_b.x || !x_or_y && point_a.y > point_b.y) {
@@ -140,8 +126,8 @@ export class draw {
             [point_a.y , point_b.y] = [point_b.y , point_a.y];
         }
       
-        let new_p = (slope == 0) ? point_a[(x_or_y) ? "x" : "y"] : 0;
-        
+        let new_p = (Math.abs(slope) == 0) ? point_a[(!x_or_y) ? "x" : "y"] : 0;
+    
         for( let position = point_a[(x_or_y) ? "x" : "y"]; position <= point_b[(x_or_y) ? "x" : "y"] ; position += 1 ){
 
             // calc new position if slope not 0
@@ -190,18 +176,16 @@ export class draw {
 
     // ****** stable ******
     static line( 
-        canvas , point_a = {} , point_b = {} , width = 1 ,
-        color = new RGBA() , anti_alias = false
+        canvas , line_object = new line() , anti_alias = false
     ) { 
 
         if(
-            canvas && color instanceof RGBA && 
-            (point_a instanceof point && point_b instanceof point) 
+            canvas && line_object instanceof line 
         ){
 
-            this.#CUSTOM_LINE_DRAW_NO_GRADIENT(
-                canvas , point_a , point_b , 
-                width , color , anti_alias
+            this.#C_DRAW_LINE_NO_GRADIENT(
+                canvas , line_object.p1 , line_object.p2 , 
+                line_object.width , line_object.color , anti_alias
             );
 
         } 
@@ -209,31 +193,23 @@ export class draw {
     }
     
     // ****** stable ******
-    static line_with_linear_gradient( 
-        canvas , point_a = {} , point_b = {} , width = 1 ,
-        color_1 = {} , color_2 = {} , anti_alias = false
+    static line_with_gradient( 
+        canvas , line_object = new line_with_colors() , anti_alias = false
     ) {
 
         if( 
-            canvas &&
-            (point_a instanceof point && point_b instanceof point) &&
-            (color_1 instanceof RGBA  && color_2 instanceof RGBA)
+            canvas && line_object instanceof line_with_colors
         ){
 
-            this.#CUSTOM_LINE_DRAW_GRADIENT(
-                canvas , point_a , point_b , width , color_1 , color_2 , anti_alias
+            this.#C_DRAW_LINE_WITH_GRADIENT(
+                canvas , 
+                line_object.p1 , line_object.p2 , line_object.width , 
+                line_object.p1.color , line_object.p2.color , anti_alias
             );
-                    
-              
+    
         } 
 
     }
 
-    /* need work */
-    static line_object(
-        canvas , line_object = {} , rgb_a_color = {} , anti_alias = false
-    ) { 
-
-    }
 
 }

@@ -1,22 +1,41 @@
 
-import { point } from "./point.js";
+import { RGBA }  from "./color.js";
+import { point2D , point2D_with_color } from "./point.js";
 
 export class line{
 
-    constructor(point1 = new point() , point2 = new point() , width_by_pixel = 1){
+    constructor(point_a = new point2D() , point_b = new point2D() , thickness = 1 , color_a = new RGBA()){
 
-        this.p1 = point1;
-        this.p2 = point2;
-        this.width = width_by_pixel;
+        this.p1 = point_a;
+        this.p2 = point_b;
+        this.width = thickness;
+        this.color = color_a;
 
     }
 
     
     static copy( ln = new line() ) {
 
-        let copy_line = new line( ln.p1.copy() , ln.p2.copy() );
+        return new line( ln.p1.copy() , ln.p2.copy() , this.width );
 
-        return copy_line;
+    }
+    
+}
+
+export class line_with_colors{
+
+    constructor(point_a = new point2D_with_color() , point_b = new point2D_with_color() , thickness = 1){
+
+        this.p1 = point_a;
+        this.p2 = point_b;
+        this.width = thickness;
+
     }
 
+    static copy( ln = new line() ) {
+
+        return new line_with_colors( ln.p1.copy() , ln.p2.copy() , this.width );
+
+    }
+    
 }
