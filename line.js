@@ -13,13 +13,33 @@ export class line{
 
     }
 
-    
     static copy( ln = new line() ) {
 
         return new line( ln.p1.copy() , ln.p2.copy() , this.width );
 
     }
     
+    static random_line( max_width = 1 , max_height = 1 , thickness = 2){
+
+        return new line(
+
+            new point2D(
+                Math.floor( Math.random() * max_width  ),
+                Math.floor( Math.random() * max_height )
+            ),
+
+            new point2D(
+                Math.floor( Math.random() * max_width  ),
+                Math.floor( Math.random() * max_height )
+            ),
+
+            thickness,
+
+            RGBA.random_color()
+        );
+        
+    }
+
 }
 
 export class line_with_colors{
@@ -38,4 +58,24 @@ export class line_with_colors{
 
     }
     
+    static random_line( max_width = 1 , max_height = 1 , thickness = 2 ){
+
+        return new line_with_colors(
+
+            new point2D_with_color(
+                Math.floor( Math.random() * max_width  ),
+                Math.floor( Math.random() * max_height ),
+                RGBA.random_color() 
+            ),
+
+            new point2D_with_color(
+                Math.floor( Math.random() * max_width  ),
+                Math.floor( Math.random() * max_height ),
+                RGBA.random_color() 
+            ),
+
+            thickness
+        );
+        
+    }
 }

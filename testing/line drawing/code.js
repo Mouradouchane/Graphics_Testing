@@ -157,6 +157,54 @@ export class draw {
     }
 
     // ****** need work ******
+    static #C_INCREMENT_DRAW_LINE_VERSION_NO_GRADIENT(
+        canvas , line_object = new line() , anti_alias = false
+    ){
+        debugger;
+        if( 
+            line_object.p1.x > line_object.p2.x || line_object.p1.y > line_object.p2.y
+        ){
+            [line_object.p1.x , line_object.p2.x] = [line_object.p2.x , line_object.p1.x];
+            [line_object.p1.y , line_object.p2.y] = [line_object.p2.y , line_object.p1.y];
+        }
+        
+        let delta_x = (line_object.p2.x - line_object.p1.x) | 1;
+        let delta_y = line_object.p2.y - line_object.p1.y ;
+        let slope   = delta_y / delta_x;
+        let x_or_y  = ( Math.abs(delta_x) > Math.abs(delta_y) );
+        
+        let M = 1 / slope;
+        let new_p;
+
+        //let inc_x = (slope >)
+        if(Math.abs(slope) <= 1){
+
+            new_p = line_object.p1.y;
+
+            for(let X = line_object.p1.x; X <= line_object.p2.x ; X += 1){
+
+                new_p = new_p + slope;
+                this.#set_pixle(canvas , X , new_p , RGBA.to_string(line_object.color));
+                
+            }
+
+        }
+        else{
+
+            new_p = line_object.p1.x;
+
+            for(let Y = line_object.p1.y; Y <= line_object.p2.y ; Y += 1){
+
+                new_p = new_p + M;
+                this.#set_pixle(canvas , new_p , Y , RGBA.to_string(line_object.color));
+                
+            }
+
+        }
+
+    }
+
+    // ****** need work ******
     static #DDA_LINE_DRAW_NO_GRADIENT(){
     }
 
@@ -192,6 +240,21 @@ export class draw {
 
     }
     
+    // ****** need work ******
+    static line_inc(
+        canvas , line_object = new line() , anti_alias = false
+    ){
+        
+        if( canvas && line_object instanceof line ){
+
+            this.#C_INCREMENT_DRAW_LINE_VERSION_NO_GRADIENT(
+                canvas , line_object , anti_alias
+            )
+
+        }
+
+    }
+
     // ****** stable ******
     static line_with_gradient( 
         canvas , line_object = new line_with_colors() , anti_alias = false

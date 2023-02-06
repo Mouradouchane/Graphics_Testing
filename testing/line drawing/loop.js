@@ -8,45 +8,55 @@ const ctx = canvas.getContext("2d");
 
 var render_loop = 0;
 var interval_testing = 0;
+var interval_time = 2000;
 var anti_alias = 0;
-var gradient = 1;
+var gradient = 0;
 var thickness = 2;
 
+var lines = [ 
+    new line(new point2D(200,200), new point2D(200,400)) ,
+    new line(new point2D(420,570), new point2D(620,20))  ,
+    new line(new point2D(10,10)  , new point2D(100,100)) ,
+    new line(new point2D(220,210), new point2D(230,400)) ,
+    new line(new point2D(120,120), new point2D(320,120)) ,
+];
+var lines_g = generate_lines(6,true);
 
-var line_a = new line( new point2D(600,500) , new point2D(10,10) , thickness , RGBA.random_color()); 
-var line_b = new line( new point2D(20,300)  , new point2D(2,300) , thickness , RGBA.random_color()); 
-var line_c = new line( new point2D(200,200) , new point2D(400,200) , thickness , RGBA.random_color()); 
+function generate_lines( amount = 1 , gradient = false){
 
-var line_ag = new line_with_colors( 
-    new point2D_with_color(100,190,RGBA.random_color() ) , 
-    new point2D_with_color(500,244,RGBA.random_color()) ,
-    thickness
-); 
-var line_bg = new line_with_colors( 
-    new point2D_with_color(120,450,RGBA.random_color()) , 
-    new point2D_with_color(407,370,RGBA.random_color()) ,
-    thickness 
-); 
-var line_cg = new line_with_colors( 
-    new point2D_with_color(310,111,RGBA.random_color()) , 
-    new point2D_with_color(58,220,RGBA.random_color()) ,
-    thickness 
-); 
+    amount = Math.abs( amount );
+    var arr = [];
+
+    for( let i = 0 ; i < amount ; i += 1){
+        arr[i] = (gradient) ? 
+            line_with_colors.random_line(canvas.clientWidth , canvas.clientHeight , thickness) 
+        :
+            line.random_line(canvas.clientWidth , canvas.clientHeight , thickness)
+        ;
+    }
+
+    return arr;
+
+}
 
 function check_line( LINE = new line() ){
 
     ctx.fillStyle = (LINE instanceof line ) ? "yellow" : "cyan";
+    /*
+    ctx.fillRect(LINE.p1.x, LINE.p1.y, 1,1);
+    */
     ctx.beginPath();
-
     ctx.arc(LINE.p1.x, LINE.p1.y, 2 , 0, Math.PI * 2);
     ctx.arc(LINE.p2.x, LINE.p2.y, 2 , 0, Math.PI * 2);
-    
     ctx.fill();
+
 }
 
 function clear_frame(){
+
     ctx.fillStyle = "rgb(0,0,0)";
     ctx.fillRect( 0 , 0 , canvas.clientWidth , canvas.clientHeight );
+
 }
 
 function new_frame(){
@@ -56,26 +66,21 @@ function new_frame(){
    
     if(gradient){
         
-        draw.line_with_gradient( canvas , line_ag );
-        draw.line_with_gradient( canvas , line_bg );
-        draw.line_with_gradient( canvas , line_cg );
- 
-        check_line( line_ag );
-        check_line( line_bg );
-        check_line( line_cg );
+        for(let ln of lines_g){
+            draw.line_with_gradient( canvas , ln );
+            check_line( ln );
+        }
+
     }
     else {
+   
+        for(let ln of lines){
+            draw.line_inc( canvas , ln );
+            check_line( ln );
+        }
 
-        draw.line( canvas , line_b );
-        draw.line( canvas , line_c );
-        draw.line( canvas , line_a );
-
-        check_line( line_a );
-        check_line( line_b );
-        check_line( line_c );
     }
     
-
 }
 
 function render(){
@@ -115,7 +120,7 @@ else {
     clear_frame();
     new_frame();
 
-    }, 1000);
+    }, interval_time);
 
     }
     else{
