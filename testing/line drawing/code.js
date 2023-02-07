@@ -157,10 +157,11 @@ export class draw {
     }
 
     // ****** need work ******
-    static #C_INCREMENT_DRAW_LINE_VERSION_NO_GRADIENT(
+    static #DDA_LINE_DRAW(
         canvas , line_object = new line() , anti_alias = false
     ){
-        debugger;
+
+        // sort points 
         if( 
             line_object.p1.x > line_object.p2.x || line_object.p1.y > line_object.p2.y
         ){
@@ -168,44 +169,57 @@ export class draw {
             [line_object.p1.y , line_object.p2.y] = [line_object.p2.y , line_object.p1.y];
         }
         
-        let delta_x = (line_object.p2.x - line_object.p1.x) | 1;
-        let delta_y = line_object.p2.y - line_object.p1.y ;
-        let slope   = delta_y / delta_x;
+        // calc delta of X & Y
+        let delta_x = line_object.p2.x - line_object.p1.x;
+        let delta_y = line_object.p2.y - line_object.p1.y;
+
+        // steps will be the bigger delta 
         let x_or_y  = ( Math.abs(delta_x) > Math.abs(delta_y) );
+        let steps   = ( Math.abs(delta_x) > Math.abs(delta_y) ) ? Math.abs(delta_x) : Math.abs(delta_y);
         
-        let M = 1 / slope;
-        let new_p;
+        // calc increment values for X & Y
+        let inc_X = delta_x / steps;
+        let inc_Y = delta_y / steps;
 
-        //let inc_x = (slope >)
-        if(Math.abs(slope) <= 1){
+        // from "point 1" and start drawing to "point 2"
+        //debugger;
 
-            new_p = line_object.p1.y;
+        let x =  line_object.p1.x;
+        let y =  line_object.p1.y;
 
-            for(let X = line_object.p1.x; X <= line_object.p2.x ; X += 1){
+        let isodd = (line_object.width % 2) == 0;
+        let half_width = Math.floor(line_object.width / 2);
 
-                new_p = new_p + slope;
-                this.#set_pixle(canvas , X , new_p , RGBA.to_string(line_object.color));
-                
+        for(let i = 1; i <= steps ; i += 1){
+
+            let sT = ( ( x_or_y ? y : x ) - half_width );
+            let eT = ( ( x_or_y ? y : x ) + half_width - (isodd ? 1 : 0));
+
+            if(x_or_y){
+
+                do{
+                    this.#set_pixle(canvas , Math.round(x) , Math.round(sT) , RGBA.to_string(line_object.color));
+                    sT += 1;
+                }
+                while( sT <= eT );
+
+            }
+            else {
+
+                do{
+                    this.#set_pixle(canvas , Math.round(sT) , Math.round(y) , RGBA.to_string(line_object.color));
+                    sT += 1;
+                }
+                while( sT <= eT );
+
             }
 
-        }
-        else{
-
-            new_p = line_object.p1.x;
-
-            for(let Y = line_object.p1.y; Y <= line_object.p2.y ; Y += 1){
-
-                new_p = new_p + M;
-                this.#set_pixle(canvas , new_p , Y , RGBA.to_string(line_object.color));
-                
-            }
-
+            // calc next position
+            x += inc_X;
+            y += inc_Y;
         }
 
-    }
-
-    // ****** need work ******
-    static #DDA_LINE_DRAW_NO_GRADIENT(){
+        
     }
 
     // ****** need work ******
@@ -247,7 +261,7 @@ export class draw {
         
         if( canvas && line_object instanceof line ){
 
-            this.#C_INCREMENT_DRAW_LINE_VERSION_NO_GRADIENT(
+            this.#DDA_LINE_DRAW(
                 canvas , line_object , anti_alias
             )
 

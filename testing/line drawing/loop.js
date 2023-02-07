@@ -8,21 +8,24 @@ const ctx = canvas.getContext("2d");
 
 var render_loop = 0;
 var interval_testing = 0;
-var interval_time = 2000;
+var interval_time = 4000;
 var anti_alias = 0;
 var gradient = 0;
-var thickness = 2;
+var thickness = 1;
 
 var lines = [ 
-    new line(new point2D(200,200), new point2D(200,400)) ,
-    new line(new point2D(420,570), new point2D(620,20))  ,
-    new line(new point2D(10,10)  , new point2D(100,100)) ,
-    new line(new point2D(220,210), new point2D(230,400)) ,
-    new line(new point2D(120,120), new point2D(320,120)) ,
+    new line(new point2D(200,200), new point2D(200,400) , thickness , RGBA.random_color()) ,
+    new line(new point2D(420,570), new point2D(620,20)  , thickness , RGBA.random_color()) ,
+    new line(new point2D(10,10)  , new point2D(100,100) , thickness , RGBA.random_color()) ,
+    new line(new point2D(220,210), new point2D(230,400) , thickness , RGBA.random_color()) ,
+    new line(new point2D(120,120), new point2D(320,120) , thickness , RGBA.random_color()) ,
+    new line(new point2D(200,420), new point2D(400,410) , thickness , RGBA.random_color()) ,
 ];
+
 var lines_g = generate_lines(6,true);
 
-function generate_lines( amount = 1 , gradient = false){
+
+function generate_lines( amount = 1 , gradient = false ){
 
     amount = Math.abs( amount );
     var arr = [];
@@ -42,9 +45,7 @@ function generate_lines( amount = 1 , gradient = false){
 function check_line( LINE = new line() ){
 
     ctx.fillStyle = (LINE instanceof line ) ? "yellow" : "cyan";
-    /*
-    ctx.fillRect(LINE.p1.x, LINE.p1.y, 1,1);
-    */
+
     ctx.beginPath();
     ctx.arc(LINE.p1.x, LINE.p1.y, 2 , 0, Math.PI * 2);
     ctx.arc(LINE.p2.x, LINE.p2.y, 2 , 0, Math.PI * 2);
@@ -73,7 +74,7 @@ function new_frame(){
 
     }
     else {
-   
+        
         for(let ln of lines){
             draw.line_inc( canvas , ln );
             check_line( ln );
@@ -102,25 +103,15 @@ if( render_loop ) render();
 else {
     
     if( interval_testing ){
-    setInterval(() => {
 
-    line_a = new line( 
-        new point2D(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight ) , 
-        new point2D(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight )
-    , thickness); 
-    line_b = new line( 
-        new point2D(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight ) , 
-        new point2D(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight )
-    , thickness); 
-    line_c = new line( 
-        new point2D(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight ) , 
-        new point2D(Math.random()*canvas.clientWidth , Math.random()*canvas.clientHeight )
-    , thickness); 
-    
-    clear_frame();
-    new_frame();
+        setInterval(() => {
 
-    }, interval_time);
+            lines = generate_lines(6,false);
+        
+            clear_frame();
+            new_frame();
+
+        }, interval_time);
 
     }
     else{

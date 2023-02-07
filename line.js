@@ -8,7 +8,7 @@ export class line{
 
         this.p1 = point_a;
         this.p2 = point_b;
-        this.width = thickness;
+        this.width = thickness < 1 ? 1 : thickness;
         this.color = color_a;
 
     }
@@ -48,7 +48,7 @@ export class line_with_colors{
 
         this.p1 = point_a;
         this.p2 = point_b;
-        this.width = thickness;
+        this.width = thickness < 1 ? 1 : thickness;
 
     }
 
