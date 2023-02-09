@@ -9,8 +9,7 @@ import { RGBA } from "./color.js";
 */
 
 
-
-export class rectangle{ // without gradient support  
+export class rectangle{ // no gradient support  
 
     constructor(
         x = 1, y = 1, width = 1, height = 1, rectangle_color = new RGBA() , 
@@ -20,25 +19,26 @@ export class rectangle{ // without gradient support
         this.position = new point2D(x , y);
         this.width  = (width < 1) ? 1 : width ;
         this.height = (height < 1) ? 1 : height ;
-        this.fill   = (typeof(fill)   == "boolean") ? fill : false;
+        this.fill   = (typeof(fill) == "boolean") ? fill : false;
         this.border = (border < 0) ? 0 : border;
-        this.rect_color   = ( rectangle_color instanceof RGBA ) ? rectangle_color : new RGBA();
+        this.color  = ( rectangle_color instanceof RGBA ) ? rectangle_color : new RGBA();
         this.border_color = ( border_color instanceof RGBA ) ? border_color : new RGBA();
 
     }
 
-    static random_rectangle(max_x = 1, max_y = 1, max_width = 1, max_hegith = 1, color = undefined){
+    static random_rectangle(max_width = 1, max_hegith = 1, color = undefined){
 
-        // generate random rectangle 
+        // the process of generate random rectangle 
         return new rectangle(
 
-            Math.random() * max_x ,
-            Math.random() * max_y ,
-            Math.random() * max_width ,
-            Math.random() * max_hegith ,
-            (color instanceof RGBA) ? color : RGBA.random_color() ,
-            Math.round(Math.random()*1)
-
+            Math.round( Math.random() * max_width  ), // x
+            Math.round( Math.random() * max_hegith ), // y
+            Math.round( Math.random() * max_width  ), // width
+            Math.round( Math.random() * max_hegith ), // height
+            ( color instanceof RGBA ) ? color : RGBA.random_color() ,
+            true , // Math.ceil( Math.random() * 1 ) , // fill
+            Math.round( Math.random() * 12), // border
+            RGBA.random_color() // border color
         );
 
     }
@@ -46,7 +46,7 @@ export class rectangle{ // without gradient support
 }
 
 
-export class rectangle_with_gradient{ // without border's support 
+export class rectangle_with_gradient{ // no border support 
  
     constructor(   
         x = 1, y = 1, width = 1, height = 1 , 

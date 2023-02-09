@@ -1,6 +1,7 @@
 
 import {point2D} from "../../point.js"
 import {line , line_with_colors} from "../../line.js"
+import { rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT } from "../../rectangle.js";
 import {RGBA} from "../../color.js";
 
 export class draw {
@@ -227,14 +228,28 @@ export class draw {
     static #BRESENHAM_ALGORITHM(){
     }
 
+    static #FILL_RECT(
+        canvas , x = 1 , y = 1 , width = 1 , height = 1 , color = new RGBA()
+    ){
+        let str_color = RGBA.to_string(color);
+        
+        for(let X = x ; X <= width ; X += 1){
+            
+            for(let Y = y ; Y <= height ; Y += 1){
+                
+                draw.#set_pixle( canvas , X , Y , str_color);
+                
+            }
+            
+        }
 
-
+    }
+    
     /*
         ==============================================================
-                           PUBLIC FUCNTIONS TO USE 
+                        PUBLIC FUCNTIONS FOR DRAWING 
         ==============================================================
     */
-
 
     static line( 
         canvas , line_object = new line() , anti_alias = false
@@ -251,7 +266,6 @@ export class draw {
 
     }
     
-
     static line_with_gradient( 
         canvas , line_object = new line_with_colors() , anti_alias = false
     ) {
@@ -270,7 +284,36 @@ export class draw {
 
     }
 
-    // famous drawing algorithms  
+    static rectangle( canvas , rectangle_obejct = new RECT() ){
+
+        // debugger
+        if( canvas && rectangle_obejct instanceof RECT ){
+
+            if( rectangle_obejct.fill ){
+
+                // fill rectangle 
+                draw.#FILL_RECT(
+                    canvas,
+                    rectangle_obejct.position.x , rectangle_obejct.position.y , 
+                    rectangle_obejct.width , rectangle_obejct.height , rectangle_obejct.color
+                );
+
+            }
+
+            // if rectangle want border around
+            if( rectangle_obejct.border > 0){
+
+                // fill border process
+
+                // calc border values
+
+            }
+
+        }
+
+    }
+
+    // object contain the famous drawing algorithms . 
     static algorithms = {
 
         DDA_LINE_DRAW(
@@ -300,5 +343,6 @@ export class draw {
         }
         
     }
+
 
 }
