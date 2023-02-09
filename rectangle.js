@@ -38,7 +38,7 @@ export class rectangle{ // no gradient support
             ( color instanceof RGBA ) ? color : RGBA.random_color() ,
             true , // Math.ceil( Math.random() * 1 ) , // fill
             Math.round( Math.random() * 12), // border
-            RGBA.random_color() // border color
+            RGBA.random_color(true) // border color
         );
 
     }

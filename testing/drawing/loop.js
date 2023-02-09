@@ -30,10 +30,11 @@ var lines = [
     new line(new point2D(200,420), new point2D(400,410) , thickness , RGBA.random_color()) ,
 ];
 
-var lines_g = generate.random.lines(canvas.clientWidth , canvas.clientHeight,6,thickness,true);
+var lines_g = generate.random.lines(canvas.clientWidth , canvas.clientHeight , 6 , thickness , true);
 
-var rectangles = [ //generate.random.rectangles(canvas.clientWidth , canvas.clientHeight ,6);
-    new rectangle(400,300,400+8,300+8 ,new RGBA(255,0,255),true),
+var rectangles = [ 
+    new rectangle(250,340,350,50 , new RGBA(0,255,210,1), true , 5 , new RGBA(255,150,140,0.9)) , 
+    // ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
 ]; 
 
 /*
@@ -52,26 +53,27 @@ function check_line( LINE = new line() , point_size = 2){
 
 function check_rectangle( rect = new rectangle() , point_size = 2){
 
-    debugger
-
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(rect.position.x, rect.position.y , point_size , 0 , Math.PI * 2);
-    ctx.fill();
+    //debugger
+    let x = rect.position.x;
+    let y = rect.position.y;
+    let w = rect.width;
+    let h = rect.height;
 
     ctx.fillStyle = "cyan";
     ctx.beginPath();
-    ctx.arc(rect.position.x + rect.width , rect.position.y , point_size , 0 , Math.PI * 2);
-    ctx.fill();
- 
-    ctx.fillStyle = "yellow";
-    ctx.beginPath();
-    ctx.arc(rect.position.x , rect.position.y + rect.height , point_size , 0 , Math.PI * 2);
+    ctx.arc( x , y , point_size , 0 , Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "pink";
     ctx.beginPath();
-    ctx.arc(rect.position.x + rect.width , rect.position.y + rect.height , point_size , 0 , Math.PI * 2);
+    ctx.arc( x+w , y , point_size , 0 , Math.PI * 2);
+    ctx.fill();
+ 
+    ctx.beginPath();
+    ctx.arc( x , y+h , point_size , 0 , Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc( x+w , y+h , point_size , 0 , Math.PI * 2);
     ctx.fill();
 
 
@@ -111,7 +113,7 @@ function new_frame(){
 
     for(let rect of rectangles){
         draw.rectangle( canvas , rect );
-        check_rectangle( rect );
+        // check_rectangle( rect );
     }
     
 }

@@ -229,17 +229,45 @@ export class draw {
     }
 
     static #FILL_RECT(
-        canvas , x = 1 , y = 1 , width = 1 , height = 1 , color = new RGBA()
+        canvas , X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
     ){
+        //debugger;
+
         let str_color = RGBA.to_string(color);
-        
-        for(let X = x ; X <= width ; X += 1){
+        let w = X + width;
+        let h = Y + height;
+
+        for(let x = X ; x <= w ; x += 1){
             
-            for(let Y = y ; Y <= height ; Y += 1){
+            for(let y = Y ; y <= h ; y += 1){
                 
-                draw.#set_pixle( canvas , X , Y , str_color);
+                draw.#set_pixle( canvas , x , y , str_color );
                 
             }
+            
+        }
+
+    }
+
+    static #FILL_RECT_BORDER(
+        canvas , X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
+    ){
+        debugger
+        
+        let str_color = RGBA.to_string(color);
+
+        let ranges = [
+            { x : (X - B) , y : (Y - B) , w : (X + W + B) , h : Y               },
+            { x : (X - B) , y : (Y + H) , w : (X + W + B) , h : ( Y + H + B )   },
+            { x : (X - B) , y :  Y      , w :  X          , h : (Y + H)         },
+            { x : (X + W) , y :  Y      , w : (X + W + B) , h : (Y + H)         },
+        ];
+
+        for(let range of ranges){
+
+            for(let x = range.x; x < range.w ; x += 1)
+                for(let y = range.y; y < range.h; y += 1)
+                    draw.#set_pixle( canvas , x , y , str_color);
             
         }
 
@@ -303,9 +331,16 @@ export class draw {
             // if rectangle want border around
             if( rectangle_obejct.border > 0){
 
-                // fill border process
-
-                // calc border values
+                // draw border process in "FILL_RECT_BORDER"
+                draw.#FILL_RECT_BORDER( 
+                    canvas,
+                    rectangle_obejct.position.x,
+                    rectangle_obejct.position.y,
+                    rectangle_obejct.width,
+                    rectangle_obejct.height,
+                    rectangle_obejct.border,
+                    rectangle_obejct.border_color
+                ); 
 
             }
 
