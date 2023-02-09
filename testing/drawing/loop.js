@@ -76,7 +76,7 @@ function new_frame(){
     else {
         
         for(let ln of lines){
-            draw.line_inc( canvas , ln );
+            draw.algorithms.DDA_LINE_DRAW( canvas , ln );
             check_line( ln );
         }
 

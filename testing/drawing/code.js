@@ -1,6 +1,6 @@
 
 import {point2D} from "../../point.js"
-import {line , line_with_colors } from "../../line.js"
+import {line , line_with_colors} from "../../line.js"
 import {RGBA} from "../../color.js";
 
 export class draw {
@@ -24,9 +24,8 @@ export class draw {
 
     }
 
-    // ****** stable ******
-    // mine algorithm for drawing lines with gradient
-    static #C_DRAW_LINE_WITH_GRADIENT(
+    // standard line draw 
+    static #CUSTOM_LINE_WITH_GRADIENT(
         canvas , 
         point_a = new point2D() , point_b = new point2D() , width = 1 ,
         color_a = new RGBA()  , color_b = new RGBA()  ,
@@ -97,9 +96,8 @@ export class draw {
             
     } 
 
-    // ****** stable ******
-    // mine algorithm for drawing lines without gradient
-    static #C_DRAW_LINE_NO_GRADIENT( 
+    // standard line draw 
+    static #CUSTOM_LINE_NO_GRADIENT( 
         canvas , point_a = new point2D() , point_b = new point2D() , 
         width = 1 , color = new RGBA() , anti_alias = false
     ) {
@@ -157,7 +155,7 @@ export class draw {
     }
 
     // ****** need work ******
-    static #DDA_LINE_DRAW(
+    static #DDA_ALGORITHM(
         canvas , line_object = new line() , anti_alias = false
     ){
 
@@ -218,17 +216,18 @@ export class draw {
             x += inc_X;
             y += inc_Y;
         }
-
-        
+ 
     }
 
     // ****** need work ******
-    static #GUPTA_SPROULL_LINE_DRAW(){
+    static #GUPTA_SPROULL_ALGORITHM(){
     }
 
     // ****** need work ******
-    static #BRESENHAM_LINE_DRAW(){
+    static #BRESENHAM_ALGORITHM(){
     }
+
+
 
     /*
         ==============================================================
@@ -236,16 +235,14 @@ export class draw {
         ==============================================================
     */
 
-    // ****** stable ******
+
     static line( 
         canvas , line_object = new line() , anti_alias = false
     ) { 
 
-        if(
-            canvas && line_object instanceof line 
-        ){
+        if( canvas && line_object instanceof line ){
 
-            this.#C_DRAW_LINE_NO_GRADIENT(
+            this.#CUSTOM_LINE_NO_GRADIENT(
                 canvas , line_object.p1 , line_object.p2 , 
                 line_object.width , line_object.color , anti_alias
             );
@@ -254,22 +251,7 @@ export class draw {
 
     }
     
-    // ****** need work ******
-    static line_inc(
-        canvas , line_object = new line() , anti_alias = false
-    ){
-        
-        if( canvas && line_object instanceof line ){
 
-            this.#DDA_LINE_DRAW(
-                canvas , line_object , anti_alias
-            )
-
-        }
-
-    }
-
-    // ****** stable ******
     static line_with_gradient( 
         canvas , line_object = new line_with_colors() , anti_alias = false
     ) {
@@ -278,7 +260,7 @@ export class draw {
             canvas && line_object instanceof line_with_colors
         ){
 
-            this.#C_DRAW_LINE_WITH_GRADIENT(
+            this.#CUSTOM_LINE_WITH_GRADIENT(
                 canvas , 
                 line_object.p1 , line_object.p2 , line_object.width , 
                 line_object.p1.color , line_object.p2.color , anti_alias
@@ -288,5 +270,35 @@ export class draw {
 
     }
 
+    // famous drawing algorithms  
+    static algorithms = {
+
+        DDA_LINE_DRAW(
+            canvas , line_object = new line() , anti_alias = false
+        ){
+            
+            if( canvas && line_object instanceof line ){
+    
+                draw.#DDA_ALGORITHM(
+                    canvas , line_object , anti_alias
+                )
+    
+            }
+    
+        } ,
+
+        GUPTA_SPROULL_LINE_DRAW(
+            canvas , line_object = new line() , anti_alias = false
+        ){
+
+        } ,
+
+        BRESENHAM_LINE_DRAW(
+            canvas , line_object = new line() , anti_alias = false
+        ){
+
+        }
+        
+    }
 
 }

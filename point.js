@@ -9,8 +9,8 @@ export class point2D{
 
     constructor(x = 0 , y = 0){
 
-        this.x = x;
-        this.y = y;
+        this.x = (typeof(x) == "number") ? x : 0;
+        this.y = (typeof(y) == "number") ? y : 0;
 
     }
 
