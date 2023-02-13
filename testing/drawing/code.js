@@ -8,29 +8,58 @@ export class draw {
 
     /*
         ==============================================================
-                    PRIVATE FUCNTIONS FOR GENERAL PURPOSE
+                    PRIVATE STUFF FOR CLASS DRAW 
         ==============================================================
     */
 
-    /* need work */
-    static #set_pixle( canvas , x , y , pixle_color = "cyan" ) {
-        let ctx = canvas.getContext("2d");
-
-        ctx.fillStyle = pixle_color;
-        ctx.fillRect( x , y , 1 , 1 );
+    static #ERRORS = {
+        canvas : {
+            missing : () => console.error(
+                "no canvas defined yet to draw in , define canvas using SET_CANVAS !"
+            ),
+            invalid : () => console.error(
+                "invalid canvas parameter !"
+            ),
+        },
+        ctx : {
+            missing : () => console.error(
+                "no context defined yet to draw in , define canvas using SET_CANVAS !"
+            ),
+            invalid : () => console.error(
+                "invalid context object !"
+            ),
+        },
+        object : {
+            invalid : () => console.error(
+                "invalid object to render"
+            ),
+        }
     }
 
-    /* need work */
-    static #get_pixle( canvas , x , y , pixle_color = "cyan" ) {
+
+    static #canvas = undefined;
+    static #ctx = undefined;
+    static #anti_alise = false;
+
+    static #CHECK_CANVAS(){
+        return ( draw.#canvas != undefined && draw.#ctx  != undefined );
+    }
+
+    static #set_pixle( x , y , pixle_color = "white" ) {
+
+        draw.#ctx.fillStyle = pixle_color;
+        draw.#ctx.fillRect( x , y , 1 , 1 );
+
+    }
+
+    static #get_pixle( x , y , pixle_color = "cyan" ) {
 
     }
 
     // standard line draw 
     static #CUSTOM_LINE_WITH_GRADIENT(
-        canvas , 
         point_a = new point2D() , point_b = new point2D() , width = 1 ,
-        color_a = new RGBA()  , color_b = new RGBA()  ,
-        anti_alias = false
+        color_a = new RGBA()  , color_b = new RGBA()
     ){
 
 
@@ -55,7 +84,6 @@ export class draw {
         let delta_alpha = (color_b.alpha - color_a.alpha) / g_delta;
         let color = new RGBA(color_a.red , color_a.green , color_a.blue , color_a.alpha);
 
-
         // sort point for proper drawing 
         if( x_or_y && point_a.x > point_b.x || !x_or_y && point_a.y > point_b.y) {
             [point_a.x , point_b.x] = [point_b.x , point_a.x];
@@ -76,17 +104,25 @@ export class draw {
             let end   = Math.abs(new_p + width);
             
             // fill the thickness of the line 
-            do{
+            if(x_or_y){
 
-                if(x_or_y)
-                    this.#set_pixle( canvas , position , start , RGBA.to_string(color) );
-                else
-                    this.#set_pixle( canvas , start , position , RGBA.to_string(color) );
+                do{
+                    this.#set_pixle( position , start , RGBA.to_string(color) );
+                    start += 1;
+                }
+                while(start < end);
 
-                start += 1;
             }
-            while(start < end);
+            else {
 
+                do{
+                    this.#set_pixle( start , position , RGBA.to_string(color) );
+                    start += 1;
+                }
+                while(start < end);
+
+            }
+            
             // update gradient color
             color.red   += delta_red;
             color.green += delta_green;
@@ -99,8 +135,8 @@ export class draw {
 
     // standard line draw 
     static #CUSTOM_LINE_NO_GRADIENT( 
-        canvas , point_a = new point2D() , point_b = new point2D() , 
-        width = 1 , color = new RGBA() , anti_alias = false
+        point_a = new point2D() , point_b = new point2D() , 
+        width = 1 , color = new RGBA()
     ) {
 
         width = Math.abs(width);
@@ -120,7 +156,7 @@ export class draw {
         // debugger;
 
         // sort point for proper drawing 
-        if( x_or_y && point_a.x > point_b.x || !x_or_y && point_a.y > point_b.y) {
+        if( x_or_y && point_a.x > point_b.x || !x_or_y && point_a.y > point_b.y ) {
             [point_a.x , point_b.x] = [point_b.x , point_a.x];
             [point_a.y , point_b.y] = [point_b.y , point_a.y];
         }
@@ -139,16 +175,24 @@ export class draw {
             let end   = Math.abs(new_p + width);
             
             // fill the thickness of the line 
-            do{
+            if(x_or_y){
 
-                if(x_or_y)
-                    this.#set_pixle( canvas , position , start , RGBA.to_string(color) );
-                else
-                    this.#set_pixle( canvas , start , position , RGBA.to_string(color) );
+                do{
+                    this.#set_pixle( position , start , RGBA.to_string(color) );
+                    start += 1;
+                }
+                while(start < end);
 
-                start += 1;
             }
-            while(start < end);
+            else {
+
+                do{
+                    this.#set_pixle( start , position , RGBA.to_string(color) );
+                    start += 1;
+                }
+                while(start < end);
+
+            }
 
         }
             
@@ -157,7 +201,7 @@ export class draw {
 
     // ****** need work ******
     static #DDA_ALGORITHM(
-        canvas , line_object = new line() , anti_alias = false
+        line_object = new line()
     ){
 
         // sort points 
@@ -197,7 +241,7 @@ export class draw {
             if(x_or_y){
 
                 do{
-                    this.#set_pixle(canvas , Math.round(x) , Math.round(sT) , RGBA.to_string(line_object.color));
+                    this.#set_pixle(Math.round(x) , Math.round(sT) , RGBA.to_string(line_object.color));
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -206,7 +250,7 @@ export class draw {
             else {
 
                 do{
-                    this.#set_pixle(canvas , Math.round(sT) , Math.round(y) , RGBA.to_string(line_object.color));
+                    this.#set_pixle(Math.round(sT) , Math.round(y) , RGBA.to_string(line_object.color));
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -229,7 +273,7 @@ export class draw {
     }
 
     static #FILL_RECT(
-        canvas , X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
+        X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
     ){
         //debugger;
 
@@ -241,7 +285,7 @@ export class draw {
             
             for(let y = Y ; y <= h ; y += 1){
                 
-                draw.#set_pixle( canvas , x , y , str_color );
+                draw.#set_pixle( x , y , str_color );
                 
             }
             
@@ -250,9 +294,8 @@ export class draw {
     }
 
     static #FILL_RECT_BORDER(
-        canvas , X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
+        X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
     ){
-        debugger
         
         let str_color = RGBA.to_string(color);
 
@@ -267,7 +310,7 @@ export class draw {
 
             for(let x = range.x; x < range.w ; x += 1)
                 for(let y = range.y; y < range.h; y += 1)
-                    draw.#set_pixle( canvas , x , y , str_color);
+                    draw.#set_pixle( x , y , str_color);
             
         }
 
@@ -279,49 +322,74 @@ export class draw {
         ==============================================================
     */
 
+    static set_canvas( canvas_object = undefined ){
+
+        if( canvas_object && canvas_object.tagName == "CANVAS" ){
+
+            draw.#canvas = canvas_object;
+            draw.#ctx = draw.#canvas.getContext("2d");
+
+        }
+        else draw.#ERRORS.canvas.invalid();
+
+    }
+
     static line( 
-        canvas , line_object = new line() , anti_alias = false
+        line_object = new line()
     ) { 
 
-        if( canvas && line_object instanceof line ){
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (line_object instanceof line);
+
+        if( f1 && f2 ){
 
             this.#CUSTOM_LINE_NO_GRADIENT(
-                canvas , line_object.p1 , line_object.p2 , 
-                line_object.width , line_object.color , anti_alias
+                line_object.p1 , line_object.p2 , 
+                line_object.width , line_object.color , line_object.anti_alias
             );
 
         } 
-
+        else {
+            if(!f1) draw.#ERRORS.canvas.missing();
+            if(!f2) draw.#ERRORS.object.invalid();
+        }
+        
     }
     
     static line_with_gradient( 
-        canvas , line_object = new line_with_colors() , anti_alias = false
+        line_object = new line_with_colors()
     ) {
 
-        if( 
-            canvas && line_object instanceof line_with_colors
-        ){
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (line_object instanceof line_with_colors);
+
+        if( f1 && f2 ){
 
             this.#CUSTOM_LINE_WITH_GRADIENT(
-                canvas , 
                 line_object.p1 , line_object.p2 , line_object.width , 
-                line_object.p1.color , line_object.p2.color , anti_alias
+                line_object.p1.color , line_object.p2.color , line_object.anti_alias
             );
     
         } 
+        else {
+            if(!f1) draw.#ERRORS.canvas.missing();
+            if(!f2) draw.#ERRORS.object.invalid();
+        }
 
     }
 
-    static rectangle( canvas , rectangle_obejct = new RECT() ){
+    static rectangle( rectangle_obejct = new RECT() ){
+
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (rectangle_obejct instanceof RECT);
 
         // debugger
-        if( canvas && rectangle_obejct instanceof RECT ){
+        if( f1 && f2 ){
 
             if( rectangle_obejct.fill ){
 
                 // fill rectangle 
                 draw.#FILL_RECT(
-                    canvas,
                     rectangle_obejct.position.x , rectangle_obejct.position.y , 
                     rectangle_obejct.width , rectangle_obejct.height , rectangle_obejct.color
                 );
@@ -333,7 +401,6 @@ export class draw {
 
                 // draw border process in "FILL_RECT_BORDER"
                 draw.#FILL_RECT_BORDER( 
-                    canvas,
                     rectangle_obejct.position.x,
                     rectangle_obejct.position.y,
                     rectangle_obejct.width,
@@ -345,35 +412,36 @@ export class draw {
             }
 
         }
+        else {
+            if(!f1) draw.#ERRORS.canvas.missing();
+            if(!f2) draw.#ERRORS.object.invalid();
+        }
 
     }
 
     // object contain the famous drawing algorithms . 
     static algorithms = {
 
-        DDA_LINE_DRAW(
-            canvas , line_object = new line() , anti_alias = false
-        ){
-            
-            if( canvas && line_object instanceof line ){
-    
-                draw.#DDA_ALGORITHM(
-                    canvas , line_object , anti_alias
-                )
-    
+        DDA_LINE_DRAW( line_object = new line() ){
+
+            let f1 = draw.#CHECK_CANVAS();
+            let f2 = (line_object instanceof line );
+
+            if( f1 && f2 ){
+                draw.#DDA_ALGORITHM( line_object );
             }
-    
-        } ,
-
-        GUPTA_SPROULL_LINE_DRAW(
-            canvas , line_object = new line() , anti_alias = false
-        ){
+            else{
+                if(!f1) draw.#ERRORS.canvas.missing();
+                if(!f2) draw.#ERRORS.object.invalid();
+            }
 
         } ,
 
-        BRESENHAM_LINE_DRAW(
-            canvas , line_object = new line() , anti_alias = false
-        ){
+        GUPTA_SPROULL_LINE_DRAW( line_object = new line() ){
+
+        } ,
+
+        BRESENHAM_LINE_DRAW( line_object = new line() ){
 
         }
         

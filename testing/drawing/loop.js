@@ -30,12 +30,14 @@ var lines = [
     new line(new point2D(200,420), new point2D(400,410) , thickness , RGBA.random_color()) ,
 ];
 
-var lines_g = generate.random.lines(canvas.clientWidth , canvas.clientHeight , 6 , thickness , true);
+var lines_g = generate.random.lines(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness , true);
 
 var rectangles = [ 
-    new rectangle(250,340,350,50 , new RGBA(0,255,210,1), true , 5 , new RGBA(255,150,140,0.9)) , 
+    new rectangle(250,340,350,50 , new RGBA(0,255,210,0.8), true ) , 
     // ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
 ]; 
+
+draw.set_canvas( canvas );
 
 /*
     testing/check functions
@@ -96,24 +98,24 @@ function new_frame(){
    
     if(gradient){
         
-        for(let ln of lines_g){
-            draw.line_with_gradient( canvas , ln );
-            check_line( ln );
+        for(let line of lines_g){
+            draw.line_with_gradient( line );
+            check_line( line );
         }
 
     }
     else {
         
-        for(let ln of lines){
-            draw.algorithms.DDA_LINE_DRAW( canvas , ln );
-            check_line( ln );
+        for(let line of lines){
+            draw.line( line );
+            check_line( line );
         }
 
     }
 
     for(let rect of rectangles){
-        draw.rectangle( canvas , rect );
-        // check_rectangle( rect );
+        draw.rectangle( rect );
+        //check_rectangle( rect );
     }
     
 }
@@ -141,12 +143,12 @@ else {
 
         setInterval(() => {
 
-            lines = generate_lines(6,false);
+            lines = generate.random.lines(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness);
         
             clear_frame();
             new_frame();
 
-        }, interval_time);
+        } , interval_time );
 
     }
     else{
