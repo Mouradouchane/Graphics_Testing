@@ -1,8 +1,9 @@
+import {RGBA} from "../../color.js";
 import {line , line_with_colors } from "../../line.js";
 import {point2D, point2D_with_color} from "../../point.js";
-import { rectangle , rectangle_with_gradient } from "../../rectangle.js";
-import { generate } from "../../generators.js";
-import {RGBA} from "../../color.js";
+import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
+import {triangle2D} from "../../triangle.js";
+import {generate} from "../../generators.js";
 import {draw} from "./code.js";
 
 const canvas = document.querySelector("#canvas");
@@ -36,6 +37,8 @@ var rectangles = [
     new rectangle(250,340,350,50 , new RGBA(0,255,210,0.8), true ) , 
     // ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
 ]; 
+
+var triangles = generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 , 3 , thickness)
 
 draw.set_canvas( canvas );
 
@@ -95,7 +98,7 @@ function new_frame(){
 
     ctx.fillStyle = "red";
     ctx.strokeStyle = "red";
-   
+   /*
     if(gradient){
         
         for(let line of lines_g){
@@ -112,10 +115,15 @@ function new_frame(){
         }
 
     }
+    */
 
     for(let rect of rectangles){
         draw.rectangle( rect );
         //check_rectangle( rect );
+    }
+
+    for(let trig of triangles){
+        draw.triangle(trig);
     }
     
 }

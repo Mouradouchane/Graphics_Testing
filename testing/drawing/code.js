@@ -1,8 +1,9 @@
 
 import {point2D} from "../../point.js"
 import {line , line_with_colors} from "../../line.js"
-import { rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT } from "../../rectangle.js";
+import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../../rectangle.js";
 import {RGBA} from "../../color.js";
+import {triangle2D} from "../../triangle.js";
 
 export class draw {
 
@@ -293,7 +294,7 @@ export class draw {
 
     }
 
-    static #FILL_RECT_BORDER(
+    static #DRAW_RECT_BORDER(
         X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
     ){
         
@@ -316,6 +317,21 @@ export class draw {
 
     }
     
+    static #FILL_TRIANGLE(){
+
+    }
+
+    static #DRAW_TRIANGLE(
+        a = new point2D() , b = new point2D() , c = new point2D(),
+        thickness = 1 , color = new RGBA()
+    ){
+        // debugger;
+        draw.#CUSTOM_LINE_NO_GRADIENT(a,b,thickness,color);
+        draw.#CUSTOM_LINE_NO_GRADIENT(a,c,thickness,color);
+        draw.#CUSTOM_LINE_NO_GRADIENT(c,b,thickness,color);
+
+    }
+
     /*
         ==============================================================
                         PUBLIC FUCNTIONS FOR DRAWING 
@@ -353,7 +369,7 @@ export class draw {
             if(!f1) draw.#ERRORS.canvas.missing();
             if(!f2) draw.#ERRORS.object.invalid();
         }
-        
+
     }
     
     static line_with_gradient( 
@@ -400,7 +416,7 @@ export class draw {
             if( rectangle_obejct.border > 0){
 
                 // draw border process in "FILL_RECT_BORDER"
-                draw.#FILL_RECT_BORDER( 
+                draw.#DRAW_RECT_BORDER( 
                     rectangle_obejct.position.x,
                     rectangle_obejct.position.y,
                     rectangle_obejct.width,
@@ -413,6 +429,32 @@ export class draw {
 
         }
         else {
+            if(!f1) draw.#ERRORS.canvas.missing();
+            if(!f2) draw.#ERRORS.object.invalid();
+        }
+
+    }
+
+    static triangle( triangle_object = new triangle2D() ){
+
+        // check canvas and triangle
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (triangle_object instanceof triangle2D);
+        
+        if( f1 && f2 ){
+
+            // copy triangle 
+            let copy = triangle2D.copy(triangle_object);
+
+            // sort points depend on Y-axis
+            triangle2D.sort_by_y_axis(copy);
+
+            draw.#CUSTOM_LINE_NO_GRADIENT( copy.a , copy.b , copy.thickness , copy.color );
+            draw.#CUSTOM_LINE_NO_GRADIENT( copy.a , copy.c , copy.thickness , copy.color );
+            draw.#CUSTOM_LINE_NO_GRADIENT( copy.c , copy.b , copy.thickness , copy.color );
+
+        }
+        else{
             if(!f1) draw.#ERRORS.canvas.missing();
             if(!f2) draw.#ERRORS.object.invalid();
         }

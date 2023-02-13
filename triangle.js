@@ -1,8 +1,75 @@
-import {point} from "./point.js"
+import { RGBA } from "./color.js";
+import { point2D } from "./point.js"
 
-export class triangle{
+export class triangle2D{
 
-    constructor( a = new point() , b = new point() , c = new point() , color = "white"){
+    constructor(
+        point_a = new point2D() , point_b = new point2D() , point_c = new point2D() , 
+        thickness = 1 , color = new RGBA() , border_color = undefined 
+    ){
+
+        this.a = (point_a instanceof point2D) ? point_a : new point2D();
+        this.b = (point_b instanceof point2D) ? point_b : new point2D();
+        this.c = (point_c instanceof point2D) ? point_c : new point2D();
+        this.thickness = thickness;
+        this.color = (color instanceof RGBA) ? color : new RGBA();
+        this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
+
+    }
+
+    static copy( triangle2D_obj = new triangle2D() ){
+
+        if(triangle2D_obj instanceof triangle2D){
+
+            return new triangle2D(
+                point2D.copy(triangle2D_obj.a),
+                point2D.copy(triangle2D_obj.b),
+                point2D.copy(triangle2D_obj.c),
+                Number.parseInt(triangle2D_obj.thickness),
+                RGBA.copy(triangle2D_obj.color),
+                RGBA.copy(triangle2D_obj.border_color)
+            );
+            
+        }
+        else return null;
+
+    }
+    
+    static random_triangle( 
+        max_width = 1 , max_height = 1 , thickness = 1, color = undefined , border_color = undefined
+    ){
+
+        return new triangle2D(
+            new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
+            new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
+            new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
+            thickness,
+            (color instanceof RGBA) ? color : RGBA.random_color(),
+            (border_color instanceof RGBA) ? border_color : undefined ,
+        );
+    
+    }
+
+    static sort_by_y_axis( trig = new triangle2D() ){
+
+        if( trig.a.y > trig.b.y ) point2D.swap( trig.a , trig.b );
+        if( trig.a.y > trig.c.y ) point2D.swap( trig.a , trig.c );
+        if( trig.b.y > trig.c.y ) point2D.swap( trig.b , trig.c );
+
+    }
+
+}
+
+
+/*
+    need refactor
+*/
+
+/*
+
+export class triangle3D{
+
+    constructor( a = new point2D() , b = new point2D() , c = new point2D() , color = "white"){
         
         this.x = 0;
         this.y = 0;
@@ -16,7 +83,7 @@ export class triangle{
 
         this.scale_factor = 1;
 
-        this.scale_point_by = ( point = new point() , scale_factor = 1  ) => {
+        this.scale_point_by = ( point = new point2D() , scale_factor = 1  ) => {
            
             point.x = point.x * scale_factor + this.x;
             point.y = point.y * scale_factor + this.y;
@@ -65,3 +132,4 @@ export class triangle{
         }
     }
 }
+*/

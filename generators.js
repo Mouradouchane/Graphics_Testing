@@ -2,6 +2,7 @@ import {RGBA} from "./color.js";
 import {point2D , point2D_with_color} from "./point.js";
 import {line , line_with_colors } from "./line.js";
 import {rectangle , rectangle_with_gradient} from "./rectangle.js";
+import { triangle2D } from "./triangle.js";
 
 export class generate {
    
@@ -42,6 +43,19 @@ export class generate {
             
         },
 
+        triangles(
+            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , color = undefined , border_color = undefined
+        ){
+
+            amount = Math.abs(amount);
+            var arr = [];
+
+            for( let i = 0 ; i < amount ; i += 1 ){
+                arr[i] = triangle2D.random_triangle(max_width , max_height , thickness , color , border_color);
+            }
+
+            return arr;
+        },
 
     }
 

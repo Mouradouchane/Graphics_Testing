@@ -15,7 +15,18 @@ export class point2D{
     }
 
     static copy( POINT = new point2D() ){
-        return new point2D(POINT.x, POINT.y);
+        return POINT.valueOf();
+    }
+
+    static swap( point_a = new point2D() , point_b = new point2D() ){
+
+        if( (point_a instanceof point2D) && (point_b instanceof point2D) ){
+
+            [point_a.x , point_b.x] = [point_b.x , point_a.x];
+            [point_a.y , point_b.y] = [point_b.y , point_a.y];
+
+        }
+
     }
 
 }
