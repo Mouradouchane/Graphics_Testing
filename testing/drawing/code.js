@@ -321,15 +321,69 @@ export class draw {
 
     }
 
-    static #DRAW_TRIANGLE(
-        a = new point2D() , b = new point2D() , c = new point2D(),
-        thickness = 1 , color = new RGBA()
-    ){
-        // debugger;
-        draw.#CUSTOM_LINE_NO_GRADIENT(a,b,thickness,color);
-        draw.#CUSTOM_LINE_NO_GRADIENT(a,c,thickness,color);
-        draw.#CUSTOM_LINE_NO_GRADIENT(c,b,thickness,color);
+    /* need work */
+    static #DRAW_HORIZONTAL_LINE( x = 1 , y1 = 1 , y2 = 1 , color = new RGBA() ){
 
+        for( let y = y1 ; y <= y2 ; y += 1){
+
+            this.#set_pixle( x , y , color);
+
+        }
+
+    }
+
+    static #DRAW_TRIANGLE(
+        p1 = new point2D() , p2 = new point2D() , thickness = 1 , color = new RGBA()
+    ) {
+
+        // calc delta of X & Y
+        let delta_x = p2.x - p1.x;
+        let delta_y = p2.y - p1.y;
+
+        // steps will be the bigger delta 
+        let x_or_y  = ( Math.abs(delta_x) > Math.abs(delta_y) );
+        let steps   = ( Math.abs(delta_x) > Math.abs(delta_y) ) ? Math.abs(delta_x) : Math.abs(delta_y);
+        
+        // calc increment values for X & Y
+        let inc_X = delta_x / steps;
+        let inc_Y = delta_y / steps;
+
+        let x = p1.x;
+        let y = p1.y;
+
+        let isodd = (thickness % 2) == 0;
+        let half_width = Math.floor(thickness / 2);
+
+        for(let i = 1; i <= steps ; i += 1){
+
+            let sT = ( ( x_or_y ? y : x ) - half_width );
+            let eT = ( ( x_or_y ? y : x ) + half_width - (isodd ? 1 : 0));
+
+            if(x_or_y){
+
+                do{
+                    this.#set_pixle(Math.round(x) , Math.round(sT) , RGBA.to_string(color));
+                    sT += 1;
+                }
+                while( sT <= eT );
+
+            }
+            else {
+
+                do{
+                    this.#set_pixle(Math.round(sT) , Math.round(y) , RGBA.to_string(color));
+                    sT += 1;
+                }
+                while( sT <= eT );
+
+            }
+
+            // calc next position
+            x += inc_X;
+            y += inc_Y;
+        }
+    
+    
     }
 
     /*
@@ -449,9 +503,9 @@ export class draw {
             // sort points depend on Y-axis
             triangle2D.sort_by_y_axis(copy);
 
-            draw.#CUSTOM_LINE_NO_GRADIENT( copy.a , copy.b , copy.thickness , copy.color );
-            draw.#CUSTOM_LINE_NO_GRADIENT( copy.a , copy.c , copy.thickness , copy.color );
-            draw.#CUSTOM_LINE_NO_GRADIENT( copy.c , copy.b , copy.thickness , copy.color );
+            draw.#DRAW_TRIANGLE( copy.a , copy.b , copy.thickness , copy.color );
+            draw.#DRAW_TRIANGLE( copy.a , copy.c , copy.thickness , copy.color );
+            draw.#DRAW_TRIANGLE( copy.b , copy.c , copy.thickness , copy.color );
 
         }
         else{

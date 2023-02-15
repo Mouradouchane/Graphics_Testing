@@ -1,5 +1,5 @@
 import {RGBA} from "../../color.js";
-import {line , line_with_colors } from "../../line.js";
+import {line , line_with_colors} from "../../line.js";
 import {point2D, point2D_with_color} from "../../point.js";
 import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
 import {triangle2D} from "../../triangle.js";
@@ -13,11 +13,11 @@ const ctx = canvas.getContext("2d");
     rendering/drawing sitting 
 */
 var render_loop = 0;
-var interval_testing = 0;
-var interval_time = 4000;
+var interval_testing = 1;
+var interval_time = 3000;
 var anti_alias = 0;
-var gradient = 0;
-var thickness = 1;
+var shape_type = 3;
+var thickness = 2;
 
 /*
     shapes for testing
@@ -45,6 +45,16 @@ draw.set_canvas( canvas );
 /*
     testing/check functions
 */
+function check_point2D( point = new point2D() , point_size = 2){
+
+    ctx.fillStyle = "cyan";
+
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, point_size , 0, Math.PI * 2);
+    ctx.fill();
+
+}
+
 function check_line( LINE = new line() , point_size = 2){
 
     ctx.fillStyle = (LINE instanceof line ) ? "yellow" : "cyan";
@@ -84,6 +94,14 @@ function check_rectangle( rect = new rectangle() , point_size = 2){
 
 }
 
+function check_triangle( triangle = new triangle2D() ){
+
+    check_point2D( triangle.a );
+    check_point2D( triangle.b );
+    check_point2D( triangle.c );
+
+}
+
 /*
     render/frame functions
 */
@@ -98,32 +116,40 @@ function new_frame(){
 
     ctx.fillStyle = "red";
     ctx.strokeStyle = "red";
-   /*
-    if(gradient){
-        
-        for(let line of lines_g){
-            draw.line_with_gradient( line );
-            check_line( line );
+   
+    switch( shape_type ){
+
+        // line 
+        case 1 : {
+                
+            for(let line of lines){
+                draw.line( line );
+                check_line( line );
+            }
+
         }
 
-    }
-    else {
-        
-        for(let line of lines){
-            draw.line( line );
-            check_line( line );
+        // rectangle
+        case 2 : {
+
+            for(let rect of rectangles){
+                draw.rectangle( rect );
+                check_rectangle( rect );
+            }
+
+        } break;
+
+        // triangle 
+        case 3 : {
+
+            for(let trig of triangles){
+                draw.triangle(trig);
+                check_triangle(trig);
+                
+            }
+            
         }
 
-    }
-    */
-
-    for(let rect of rectangles){
-        draw.rectangle( rect );
-        //check_rectangle( rect );
-    }
-
-    for(let trig of triangles){
-        draw.triangle(trig);
     }
     
 }
@@ -152,6 +178,7 @@ else {
         setInterval(() => {
 
             lines = generate.random.lines(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness);
+            triangles = generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 ,3,thickness);
         
             clear_frame();
             new_frame();

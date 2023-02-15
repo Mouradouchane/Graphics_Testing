@@ -22,8 +22,13 @@ export class point2D{
 
         if( (point_a instanceof point2D) && (point_b instanceof point2D) ){
 
-            [point_a.x , point_b.x] = [point_b.x , point_a.x];
-            [point_a.y , point_b.y] = [point_b.y , point_a.y];
+            let temp = new point2D(point_b.x , point_b.y);
+
+            point_b.x = point_a.x;
+            point_b.y = point_a.y;
+
+            point_a.x = temp.x;
+            point_a.y = temp.y;
 
         }
 
