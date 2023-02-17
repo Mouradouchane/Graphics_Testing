@@ -34,6 +34,11 @@ export class point2D{
 
     }
 
+    static random_point( width = 1 , height = 1 ){
+        return new point2D(
+            Math.random() * width , Math.random() * height
+        );
+    }
 }
 
 export class point2D_with_color extends point2D{

@@ -44,7 +44,7 @@ export class generate {
         },
 
         triangles(
-            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , color = undefined , border_color = undefined
+            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , color = true , border_color = false
         ){
 
             amount = Math.abs(amount);
@@ -55,6 +55,7 @@ export class generate {
             }
 
             return arr;
+            
         },
 
     }

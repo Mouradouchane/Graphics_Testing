@@ -13,11 +13,11 @@ const ctx = canvas.getContext("2d");
     rendering/drawing sitting 
 */
 var render_loop = 0;
-var interval_testing = 1;
+var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
 var shape_type = 3;
-var thickness = 2;
+var thickness = 1;
 
 /*
     shapes for testing
@@ -38,7 +38,9 @@ var rectangles = [
     // ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
 ]; 
 
-var triangles = generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 , 3 , thickness)
+var triangles = [ 
+    ...generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness , true ),
+];
 
 draw.set_canvas( canvas );
 

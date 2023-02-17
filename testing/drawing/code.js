@@ -316,19 +316,20 @@ export class draw {
         }
 
     }
-    
-    static #FILL_TRIANGLE(){
 
-    }
+    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , color = new RGBA() ){
 
-    /* need work */
-    static #DRAW_HORIZONTAL_LINE( x = 1 , y1 = 1 , y2 = 1 , color = new RGBA() ){
+        if( x1 > x2 ) [x1 , x2] = [x2 , x1];
 
-        for( let y = y1 ; y <= y2 ; y += 1){
+        for( let x = x1 ; x <= x2 ; x += 1 ){
 
-            this.#set_pixle( x , y , color);
+            this.#set_pixle( x , y , RGBA.to_string(color) );
 
         }
+
+    }
+    
+    static #FILL_TRIANGLE(){
 
     }
 
@@ -336,15 +337,12 @@ export class draw {
         p1 = new point2D() , p2 = new point2D() , thickness = 1 , color = new RGBA()
     ) {
 
-        // calc delta of X & Y
         let delta_x = p2.x - p1.x;
         let delta_y = p2.y - p1.y;
 
-        // steps will be the bigger delta 
         let x_or_y  = ( Math.abs(delta_x) > Math.abs(delta_y) );
         let steps   = ( Math.abs(delta_x) > Math.abs(delta_y) ) ? Math.abs(delta_x) : Math.abs(delta_y);
         
-        // calc increment values for X & Y
         let inc_X = delta_x / steps;
         let inc_Y = delta_y / steps;
 
@@ -378,7 +376,6 @@ export class draw {
 
             }
 
-            // calc next position
             x += inc_X;
             y += inc_Y;
         }
@@ -497,15 +494,74 @@ export class draw {
         
         if( f1 && f2 ){
 
-            // copy triangle 
+            // make copy for drawing usage 
             let copy = triangle2D.copy(triangle_object);
 
             // sort points depend on Y-axis
             triangle2D.sort_by_y_axis(copy);
 
-            draw.#DRAW_TRIANGLE( copy.a , copy.b , copy.thickness , copy.color );
-            draw.#DRAW_TRIANGLE( copy.a , copy.c , copy.thickness , copy.color );
-            draw.#DRAW_TRIANGLE( copy.b , copy.c , copy.thickness , copy.color );
+            if( copy.color instanceof RGBA ){
+                // fill triangle 
+
+                // calc needed values
+                
+                // A-B
+                let D_AB_X = (copy.a.x - copy.b.x);
+                let D_AB_Y = (copy.a.y - copy.b.y);
+                let slope_AB = D_AB_X != 0 ? ( D_AB_Y / D_AB_X ) : 0;
+                let intercept_AB = copy.a.y - (slope_AB * copy.a.x);
+
+                // A-C
+                let D_AC_X = (copy.a.x - copy.c.x);
+                let D_AC_Y = (copy.a.y - copy.c.y);
+                let slope_AC = D_AC_X != 0 ? ( D_AC_Y / D_AC_X ) : 0;
+                let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
+
+                let x_start = 0;
+                let x_end = 0;
+                let y = copy.a.y;
+
+                // fill from A to B
+                for( ; y <= copy.b.y ; y += 1 ){
+
+                    // find X's
+                    x_start = Math.round( (y - intercept_AC) / slope_AC );
+                    x_end   = Math.round( (y - intercept_AB) / slope_AB );
+                    
+                    // fill range
+                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
+
+                }
+
+                
+                // B-C
+                let D_BC_X = (copy.b.x - copy.c.x);
+                let D_BC_Y = (copy.b.y - copy.c.y);
+                let slope_BC = D_BC_X != 0 ? ( D_BC_Y / D_BC_X ) : 0;
+                let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
+                
+                y = copy.b.y;
+
+                // fill from B to C
+                for( ; y <= copy.c.y ; y += 1 ){
+
+                    x_start = Math.round( (y - intercept_AC) / slope_AC );
+                    x_end   = Math.round( (y - intercept_BC) / slope_BC );
+
+                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
+
+                }
+
+            }
+
+            if( copy.border_color instanceof RGBA ){
+                
+                // draw triangle border
+                draw.#DRAW_TRIANGLE( copy.a , copy.b , copy.thickness , copy.border_color );
+                draw.#DRAW_TRIANGLE( copy.a , copy.c , copy.thickness , copy.border_color );
+                draw.#DRAW_TRIANGLE( copy.b , copy.c , copy.thickness , copy.border_color );
+
+            }
 
         }
         else{

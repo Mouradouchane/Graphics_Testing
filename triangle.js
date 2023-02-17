@@ -1,18 +1,18 @@
 import { RGBA } from "./color.js";
-import { point2D } from "./point.js"
+import { point2D } from "./point.js";
 
 export class triangle2D{
 
     constructor(
         point_a = new point2D() , point_b = new point2D() , point_c = new point2D() , 
-        thickness = 1 , color = new RGBA() , border_color = undefined 
+        thickness = 1 , color = undefined , border_color = undefined 
     ){
 
         this.a = (point_a instanceof point2D) ? point_a : new point2D();
         this.b = (point_b instanceof point2D) ? point_b : new point2D();
         this.c = (point_c instanceof point2D) ? point_c : new point2D();
         this.thickness = thickness;
-        this.color = (color instanceof RGBA) ? color : new RGBA();
+        this.color = (color instanceof RGBA) ? color : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
 
     }
@@ -26,8 +26,8 @@ export class triangle2D{
                 point2D.copy(triangle2D_obj.b),
                 point2D.copy(triangle2D_obj.c),
                 Number.parseInt(triangle2D_obj.thickness),
-                RGBA.copy(triangle2D_obj.color),
-                RGBA.copy(triangle2D_obj.border_color)
+                (triangle2D_obj.color instanceof RGBA ) ? RGBA.copy(triangle2D_obj.color) : undefined ,
+                (triangle2D_obj.border_color instanceof RGBA) ? RGBA.copy(triangle2D_obj.border_color) : undefined ,
             );
             
         }
@@ -36,16 +36,18 @@ export class triangle2D{
     }
     
     static random_triangle( 
-        max_width = 1 , max_height = 1 , thickness = 1, color = undefined , border_color = undefined
+        max_width = 1 , max_height = 1 , thickness = 1, color = false , border_color = false
     ){
 
         return new triangle2D(
+
             new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
             new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
             new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
             thickness,
-            (color instanceof RGBA) ? color : RGBA.random_color(),
-            (border_color instanceof RGBA) ? border_color : undefined ,
+            (color) ? RGBA.random_color() : undefined,
+            (border_color) ? RGBA.random_color() : undefined 
+
         );
     
     }
