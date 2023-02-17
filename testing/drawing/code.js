@@ -4,6 +4,7 @@ import {line , line_with_colors} from "../../line.js"
 import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../../rectangle.js";
 import {RGBA} from "../../color.js";
 import {triangle2D} from "../../triangle.js";
+import {circle2D} from "../../circle.js";
 
 export class draw {
 
@@ -383,6 +384,53 @@ export class draw {
     
     }
 
+    static #DRAW_ALL_QUADS(
+        X = 1 , Y = 1 , x = 1 , y = 1 , thickness = 1 , color_ = "white"
+    ){
+        draw.#set_pixle( (X+x)  , (Y+y)  , color_ );
+        draw.#set_pixle( (X+x)  , (-Y+y) , color_ );
+        draw.#set_pixle( (-X+x) , (Y+y)  , color_ );
+        draw.#set_pixle( (-X+x) , (-Y+y) , color_ );
+
+        draw.#set_pixle( (Y+x)  , (X+y)  , color_ );
+        draw.#set_pixle( (Y+x)  , (-X+y)  , color_ );
+        draw.#set_pixle( (-Y+x)  , (X+y)  , color_ );
+        draw.#set_pixle( (-Y+x)  , (-X+y)  , color_ );
+    }
+
+    static #DRAW_CIRCLE_BORDER(
+        x = 1 , y = 1 , r = 1 , thickness = 1 , color = new RGBA()
+    ){
+
+        // let rq = r * r; // r²
+        let d = 1 - r;  // decision parameter
+
+        let X = 0;
+        let Y = r;
+        let color_ = RGBA.to_string( color );
+
+        draw.#DRAW_ALL_QUADS(X,Y,x,y,thickness,color_);
+
+        //debugger;
+        do{
+
+            if( d < 0) {
+                X += 1;
+                d = d + (2*X) + 3;
+            }
+            else{
+                X += 1 , Y -= 1;
+                d = d + 2*(X-Y) + 5;
+            } 
+
+            // draw in all the QUAD's
+            draw.#DRAW_ALL_QUADS(X,Y,x,y,thickness,color_);
+        
+        }
+        while( Y > X );
+
+    }
+
     /*
         ==============================================================
                         PUBLIC FUCNTIONS FOR DRAWING 
@@ -532,8 +580,7 @@ export class draw {
                     draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
 
                 }
-
-                
+  
                 // B-C
                 let D_BC_X = (copy.b.x - copy.c.x);
                 let D_BC_Y = (copy.b.y - copy.c.y);
@@ -561,6 +608,29 @@ export class draw {
                 draw.#DRAW_TRIANGLE( copy.a , copy.c , copy.thickness , copy.border_color );
                 draw.#DRAW_TRIANGLE( copy.b , copy.c , copy.thickness , copy.border_color );
 
+            }
+
+        }
+        else{
+            if(!f1) draw.#ERRORS.canvas.missing();
+            if(!f2) draw.#ERRORS.object.invalid();
+        }
+
+    }
+
+    static circle( circle_object = new circle2D() ){
+
+        // check canvas and circle
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (circle_object instanceof circle2D);
+
+        if( f1 && f2 ){
+            
+            let copy = circle2D.copy( circle_object );
+
+            if( copy.border_color instanceof RGBA ){
+
+                draw.#DRAW_CIRCLE_BORDER( copy.x , copy.y , copy.r , copy.thickness ,copy.border_color)
             }
 
         }

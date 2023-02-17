@@ -5,41 +5,39 @@ import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
 import {triangle2D} from "../../triangle.js";
 import {generate} from "../../generators.js";
 import {draw} from "./code.js";
+import {circle2D} from "../../circle.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 /*
-    rendering/drawing sitting 
+    rendering/drawing "sitting"
 */
 var render_loop = 0;
 var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
-var shape_type = 3;
+var shape_type = 4;
 var thickness = 1;
 
 /*
-    shapes for testing
+    generate/create "shapes for testing"
 */
 var lines = [ 
-    new line(new point2D(200,200), new point2D(200,400) , thickness , RGBA.random_color()) ,
-    new line(new point2D(420,570), new point2D(620,20)  , thickness , RGBA.random_color()) ,
-    new line(new point2D(10,10)  , new point2D(100,100) , thickness , RGBA.random_color()) ,
-    new line(new point2D(220,210), new point2D(230,400) , thickness , RGBA.random_color()) ,
-    new line(new point2D(120,120), new point2D(320,120) , thickness , RGBA.random_color()) ,
-    new line(new point2D(200,420), new point2D(400,410) , thickness , RGBA.random_color()) ,
+    ...generate.random.lines(canvas.clientWidth-20 , canvas.clientHeight-20 , 4 , thickness )
 ];
 
-var lines_g = generate.random.lines(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness , true);
-
-var rectangles = [ 
-    new rectangle(250,340,350,50 , new RGBA(0,255,210,0.8), true ) , 
-    // ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
+var rectangles = [
+    ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
 ]; 
 
 var triangles = [ 
     ...generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness , true ),
+];
+
+var circles = [
+    // new circle2D( 200 , 200 , 50 , new RGBA(255,0,255) , 1 , new RGBA(255,0,255)),
+    ...generate.random.cicrles(canvas.clientWidth-100 , canvas.clientHeight-100 , 6 , thickness , false , true)
 ];
 
 draw.set_canvas( canvas );
@@ -104,6 +102,13 @@ function check_triangle( triangle = new triangle2D() ){
 
 }
 
+function check_circle( circle = new circle2D() ){
+
+    check_point2D( new point2D(circle.x , circle.y) );
+    check_point2D( new point2D(circle.x , circle.y + circle.r) );
+
+}
+
 /*
     render/frame functions
 */
@@ -121,7 +126,7 @@ function new_frame(){
    
     switch( shape_type ){
 
-        // line 
+        // lines
         case 1 : {
                 
             for(let line of lines){
@@ -131,7 +136,7 @@ function new_frame(){
 
         }
 
-        // rectangle
+        // rectangles
         case 2 : {
 
             for(let rect of rectangles){
@@ -141,7 +146,7 @@ function new_frame(){
 
         } break;
 
-        // triangle 
+        // triangles 
         case 3 : {
 
             for(let trig of triangles){
@@ -150,7 +155,17 @@ function new_frame(){
                 
             }
             
-        }
+        } break;
+
+        // cicrles
+        case 4 : {
+
+            for(let circle of circles ){
+                draw.circle(circle);
+                check_circle(circle);
+            } 
+
+        } break;
 
     }
     
