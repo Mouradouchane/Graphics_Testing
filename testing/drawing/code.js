@@ -268,16 +268,18 @@ export class draw {
 
     // ****** need work ******
     static #GUPTA_SPROULL_ALGORITHM(){
+
     }
 
     // ****** need work ******
     static #BRESENHAM_ALGORITHM(){
+        
     }
 
     static #FILL_RECT(
         X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
     ){
-        //debugger;
+        // debugger;
 
         let str_color = RGBA.to_string(color);
         let w = X + width;
@@ -318,19 +320,81 @@ export class draw {
 
     }
 
-    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , color = new RGBA() ){
+    // fast and direct function for filling shapes line by line horizontaly  
+    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , str_color = "white" ){
 
         if( x1 > x2 ) [x1 , x2] = [x2 , x1];
 
         for( let x = x1 ; x <= x2 ; x += 1 ){
 
-            this.#set_pixle( x , y , RGBA.to_string(color) );
+            this.#set_pixle( x , y , str_color );
 
         }
 
     }
     
-    static #FILL_TRIANGLE(){
+    // fast and direct function for filling shapes line by line verticaly  
+    static #DRAW_VERTICAL_LINE( x = 1 , y1 = 1 , y2 = 1 , str_color = "white" ){
+
+        if( y1 > y2 ) [y1 , y2] = [y2 , y1];
+
+        for( let y = y1 ; y <= y2 ; y += 1 ){
+
+            this.#set_pixle( x , y , str_color );
+
+        }
+
+    }
+    
+    static #FILL_TRIANGLE( copy = new triangle2D() ){
+
+        // calc needed values
+                
+        // A-B
+        let D_AB_X = (copy.a.x - copy.b.x);
+        let D_AB_Y = (copy.a.y - copy.b.y);
+        let slope_AB = D_AB_X != 0 ? ( D_AB_Y / D_AB_X ) : 0;
+        let intercept_AB = copy.a.y - (slope_AB * copy.a.x);
+
+        // A-C
+        let D_AC_X = (copy.a.x - copy.c.x);
+        let D_AC_Y = (copy.a.y - copy.c.y);
+        let slope_AC = D_AC_X != 0 ? ( D_AC_Y / D_AC_X ) : 0;
+        let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
+
+        let x_start = 0;
+        let x_end = 0;
+        let y = copy.a.y;
+
+        // fill from A to B
+        for( ; y <= copy.b.y ; y += 1 ){
+
+            // find X's
+            x_start = Math.round( (y - intercept_AC) / slope_AC );
+            x_end   = Math.round( (y - intercept_AB) / slope_AB );
+            
+            // fill range
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
+
+        }
+
+        // B-C
+        let D_BC_X = (copy.b.x - copy.c.x);
+        let D_BC_Y = (copy.b.y - copy.c.y);
+        let slope_BC = D_BC_X != 0 ? ( D_BC_Y / D_BC_X ) : 0;
+        let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
+        
+        y = copy.b.y;
+
+        // fill from B to C
+        for( ; y <= copy.c.y ; y += 1 ){
+
+            x_start = Math.round( (y - intercept_AC) / slope_AC );
+            x_end   = Math.round( (y - intercept_BC) / slope_BC );
+
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
+
+        }
 
     }
 
@@ -357,11 +421,12 @@ export class draw {
 
             let sT = ( ( x_or_y ? y : x ) - half_width );
             let eT = ( ( x_or_y ? y : x ) + half_width - (isodd ? 1 : 0));
+            let str_color = RGBA.to_string(color);
 
             if(x_or_y){
 
                 do{
-                    this.#set_pixle(Math.round(x) , Math.round(sT) , RGBA.to_string(color));
+                    this.#set_pixle(Math.round(x) , Math.round(sT) , str_color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -370,7 +435,7 @@ export class draw {
             else {
 
                 do{
-                    this.#set_pixle(Math.round(sT) , Math.round(y) , RGBA.to_string(color));
+                    this.#set_pixle(Math.round(sT) , Math.round(y) , str_color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -385,21 +450,33 @@ export class draw {
     }
 
     static #DRAW_ALL_QUADS(
-        X = 1 , Y = 1 , x = 1 , y = 1 , thickness = 1 , color_ = "white"
+        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , thickness = 1 , color_ = "white"
     ){
-        draw.#set_pixle( (X+x)  , (Y+y)  , color_ );
-        draw.#set_pixle( (X+x)  , (-Y+y) , color_ );
-        draw.#set_pixle( (-X+x) , (Y+y)  , color_ );
-        draw.#set_pixle( (-X+x) , (-Y+y) , color_ );
+        draw.#set_pixle( (X+x_org)  , (Y+y_org)  , color_ );
+        draw.#set_pixle( (X+x_org)  , (-Y+y_org) , color_ );
+        draw.#set_pixle( (-X+x_org) , (Y+y_org)  , color_ );
+        draw.#set_pixle( (-X+x_org) , (-Y+y_org) , color_ );
 
-        draw.#set_pixle( (Y+x)  , (X+y)  , color_ );
-        draw.#set_pixle( (Y+x)  , (-X+y)  , color_ );
-        draw.#set_pixle( (-Y+x)  , (X+y)  , color_ );
-        draw.#set_pixle( (-Y+x)  , (-X+y)  , color_ );
+        draw.#set_pixle( (Y+x_org)  , (X+y_org)  , color_ );
+        draw.#set_pixle( (Y+x_org)  , (-X+y_org)  , color_ );
+        draw.#set_pixle( (-Y+x_org)  , (X+y_org)  , color_ );
+        draw.#set_pixle( (-Y+x_org)  , (-X+y_org)  , color_ );
     }
 
-    static #DRAW_CIRCLE_BORDER(
-        x = 1 , y = 1 , r = 1 , thickness = 1 , color = new RGBA()
+    static #FILL_ALL_QUADS(
+        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
+    ){
+
+        draw.#DRAW_HORIZONTAL_LINE( (X+x_org) , (-X+x_org) , (Y+y_org) , color_ ); // S
+        draw.#DRAW_HORIZONTAL_LINE( (X+x_org) , (-X+x_org) , (-Y+y_org) , color_ );
+
+        draw.#DRAW_VERTICAL_LINE( (Y+x_org) , (X+y_org) , (-X+y_org) , color_ );
+        draw.#DRAW_VERTICAL_LINE( (-Y+x_org) , (X+y_org) , (-X+y_org)  , color_ ); // E
+
+    }
+
+    static #DRAW_CIRCLE(
+        x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
     ){
 
         // let rq = r * r; // r²
@@ -407,11 +484,12 @@ export class draw {
 
         let X = 0;
         let Y = r;
-        let color_ = RGBA.to_string( color );
+        let str_fill_color   = (fill_color   instanceof RGBA) ? RGBA.to_string( fill_color )   : undefined ;
+        let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
 
-        draw.#DRAW_ALL_QUADS(X,Y,x,y,thickness,color_);
+        if( str_border_color ) draw.#DRAW_ALL_QUADS( X,Y, x_org,y_org , thickness , str_border_color );
+        if( str_fill_color   ) draw.#FILL_ALL_QUADS( X,Y, x_org,y_org , str_border_color );
 
-        //debugger;
         do{
 
             if( d < 0) {
@@ -423,11 +501,16 @@ export class draw {
                 d = d + 2*(X-Y) + 5;
             } 
 
-            // draw in all the QUAD's
-            draw.#DRAW_ALL_QUADS(X,Y,x,y,thickness,color_);
+            // draw or fill in all the QUAD's
+
+            if( str_fill_color   ) draw.#FILL_ALL_QUADS( X,Y ,x_org,y_org, str_fill_color );
+            if( str_border_color ) draw.#DRAW_ALL_QUADS( X,Y ,x_org,y_org, thickness , str_border_color );
         
         }
         while( Y > X );
+
+        // fill the empty square inside the circle  
+        if( str_fill_color ) draw.#FILL_RECT( x_org-X , y_org-Y , X+X , Y+Y , fill_color);
 
     }
 
@@ -549,61 +632,15 @@ export class draw {
             triangle2D.sort_by_y_axis(copy);
 
             if( copy.color instanceof RGBA ){
-                // fill triangle 
 
-                // calc needed values
+                // fill triangle  
+                draw.#FILL_TRIANGLE( copy );
                 
-                // A-B
-                let D_AB_X = (copy.a.x - copy.b.x);
-                let D_AB_Y = (copy.a.y - copy.b.y);
-                let slope_AB = D_AB_X != 0 ? ( D_AB_Y / D_AB_X ) : 0;
-                let intercept_AB = copy.a.y - (slope_AB * copy.a.x);
-
-                // A-C
-                let D_AC_X = (copy.a.x - copy.c.x);
-                let D_AC_Y = (copy.a.y - copy.c.y);
-                let slope_AC = D_AC_X != 0 ? ( D_AC_Y / D_AC_X ) : 0;
-                let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
-
-                let x_start = 0;
-                let x_end = 0;
-                let y = copy.a.y;
-
-                // fill from A to B
-                for( ; y <= copy.b.y ; y += 1 ){
-
-                    // find X's
-                    x_start = Math.round( (y - intercept_AC) / slope_AC );
-                    x_end   = Math.round( (y - intercept_AB) / slope_AB );
-                    
-                    // fill range
-                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
-
-                }
-  
-                // B-C
-                let D_BC_X = (copy.b.x - copy.c.x);
-                let D_BC_Y = (copy.b.y - copy.c.y);
-                let slope_BC = D_BC_X != 0 ? ( D_BC_Y / D_BC_X ) : 0;
-                let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
-                
-                y = copy.b.y;
-
-                // fill from B to C
-                for( ; y <= copy.c.y ; y += 1 ){
-
-                    x_start = Math.round( (y - intercept_AC) / slope_AC );
-                    x_end   = Math.round( (y - intercept_BC) / slope_BC );
-
-                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
-
-                }
-
             }
 
             if( copy.border_color instanceof RGBA ){
                 
-                // draw triangle border
+                // draw border for triangle
                 draw.#DRAW_TRIANGLE( copy.a , copy.b , copy.thickness , copy.border_color );
                 draw.#DRAW_TRIANGLE( copy.a , copy.c , copy.thickness , copy.border_color );
                 draw.#DRAW_TRIANGLE( copy.b , copy.c , copy.thickness , copy.border_color );
@@ -628,11 +665,12 @@ export class draw {
             
             let copy = circle2D.copy( circle_object );
 
-            if( copy.border_color instanceof RGBA ){
+            if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
 
-                draw.#DRAW_CIRCLE_BORDER( copy.x , copy.y , copy.r , copy.thickness ,copy.border_color)
+                draw.#DRAW_CIRCLE( copy.x , copy.y , copy.r , copy.border , copy.fill_color , copy.border_color);
+
             }
-
+        
         }
         else{
             if(!f1) draw.#ERRORS.canvas.missing();
@@ -665,7 +703,7 @@ export class draw {
 
         BRESENHAM_LINE_DRAW( line_object = new line() ){
 
-        }
+        } ,
         
     }
 

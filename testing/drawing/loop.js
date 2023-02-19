@@ -161,8 +161,16 @@ function new_frame(){
         case 4 : {
 
             for(let circle of circles ){
+
                 draw.circle(circle);
-                check_circle(circle);
+                // check_circle(circle);
+
+                ctx.strokeStyle = RGBA.to_string( circle.border_color );
+                ctx.beginPath();
+                ctx.arc( circle.x + circle.r*2 +10, circle.y, circle.r , 0 , Math.PI * 2);
+                ctx.stroke();
+
+
             } 
 
         } break;
