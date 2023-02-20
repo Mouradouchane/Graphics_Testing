@@ -37,7 +37,7 @@ var triangles = [
 
 var circles = [
     // new circle2D( 200 , 200 , 50 , new RGBA(255,0,255) , 1 , new RGBA(255,0,255)),
-    ...generate.random.cicrles(canvas.clientWidth-100 , canvas.clientHeight-100 , 6 , thickness , true , false)
+    ...generate.random.cicrles(canvas.clientWidth-100 , canvas.clientHeight-100 , 6 , thickness , false , true)
 ];
 
 draw.set_canvas( canvas );
@@ -162,7 +162,7 @@ function new_frame(){
 
             for(let circle of circles ){
 
-                circle.fill_color.alpha = 0.5;
+                // circle.fill_color.alpha = 0.5;
                 draw.circle(circle);
                 check_circle(circle);
 
