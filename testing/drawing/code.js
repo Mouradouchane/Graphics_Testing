@@ -202,7 +202,7 @@ export class draw {
     }
 
     // ****** need work ******
-    static #DDA_ALGORITHM(
+    static #DDA_LINE_DRAW_ALGORITHM(
         line_object = new line()
     ){
 
@@ -267,12 +267,12 @@ export class draw {
     }
 
     // ****** need work ******
-    static #GUPTA_SPROULL_ALGORITHM(){
+    static #GUPTA_SPROULL_LINE_DRAW_ALGORITHM(){
 
     }
 
     // ****** need work ******
-    static #BRESENHAM_ALGORITHM(){
+    static #BRESENHAM_LINE_DRAW_ALGORITHM(){
         
     }
 
@@ -450,7 +450,7 @@ export class draw {
     }
 
     static #DRAW_ALL_QUADS(
-        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , radius = 1 , thickness = 1 , color_ = "white"
+        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , thickness = 1 , color_ = "white"
     ){
 
         draw.#set_pixle( (X+x_org)  , (Y+y_org)  , color_ );
@@ -458,8 +458,8 @@ export class draw {
         draw.#set_pixle( (-X+x_org) , (Y+y_org)  , color_ );
         draw.#set_pixle( (-X+x_org) , (-Y+y_org) , color_ );
         
-        draw.#set_pixle( (Y+x_org) , (X+y_org)  , color_ );
-        draw.#set_pixle( (Y+x_org) , (-X+y_org) , color_ );
+        draw.#set_pixle( (Y+x_org)  , (X+y_org)  , color_ );
+        draw.#set_pixle( (Y+x_org)  , (-X+y_org) , color_ );
         draw.#set_pixle( (-Y+x_org) , (X+y_org)  , color_ );
         draw.#set_pixle( (-Y+x_org) , (-X+y_org) , color_ );
 
@@ -490,46 +490,19 @@ export class draw {
 
     }
 
-    static #DRAW_CIRCLE(
-        x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
+
+    //   mid point algorithm with :
+    // - no support to border thickness
+    // - no support to fill    
+    static #MID_POINT_CIRCLE_DRAW(
+        x_org = 1 , y_org = 1 , r = 1 , border_color = undefined
     ){
-        
-        /*
+          
         let d = 1 - r;  // decision parameter
 
         let X = 0;
         let Y = r;
-        */
-
-        let str_fill_color   = (fill_color   instanceof RGBA) ? RGBA.to_string( fill_color )   : undefined ;
-        let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
-
-        let rsqr = r*r;
-        let y = r;
-        let x = 0;
-
-        for(let y = -r ; y <= r ; y++){
-
-            let ysqr = y*y;
-
-            for(let x = -r; x <= r; x++ ){
-
-                if( x*x + ysqr <= rsqr ){
-
-                    draw.#set_pixle( x_org+x , y_org+y , str_border_color );
-                    draw.#set_pixle( x_org-x , y_org+y , str_border_color );
-
-                    draw.#set_pixle( x_org-y , y_org+x , str_border_color );
-                    draw.#set_pixle( x_org-y , y_org-x , str_border_color );
-
-                    break;
-                } 
-                
-            }
-
-        }       
-    
-        /*
+        
         do{
 
             if( d < 0) {
@@ -543,11 +516,73 @@ export class draw {
             
             // draw or fill in all the QUAD's
             if( str_border_color ) 
-                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , r , thickness , str_border_color );
+                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , 1 , border_color );
             
         }
         while( Y > X );
-        */
+
+    }
+
+    // draw circle using soultion of mix bettween "mid-point" and "scan-line" 
+    static #DRAW_CIRCLE(
+        x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
+    ){
+        let str_fill_color   = (fill_color   instanceof RGBA) ? RGBA.to_string( fill_color )   : undefined ;
+        let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
+        
+        if( str_border_color ){
+
+            let rsqr = r * r;
+            let trsqr = (r+thickness); trsqr *= trsqr;
+
+            for( let y = -r ;  y <= r  ; y++ ){
+
+                let ysqr = y*y;
+
+                for(let x = -r ;  x <= r  ; x++ ){
+
+                    if( ( x * x ) + ysqr <= rsqr ){
+
+                        draw.#set_pixle( x_org + x , y_org + y , str_border_color );
+                        draw.#set_pixle( x_org - x , y_org + y , str_border_color );
+
+                        draw.#set_pixle( x_org - y , y_org + x , str_border_color );
+                        draw.#set_pixle( x_org - y , y_org - x , str_border_color );
+
+                        break;
+                    } 
+
+                }
+
+            }
+
+            r += thickness;
+
+            for( let y = -r ;  y <= r  ; y++ ){
+                
+                let ysqr = y*y;
+                
+                for( let x = -r ;  x <= r  ; x++ ){
+
+                    if( ( x * x ) + ysqr <= trsqr ){
+
+                        draw.#set_pixle( x_org + x , y_org + y , str_border_color );
+                        
+                        draw.#set_pixle( x_org - x , y_org + y , str_border_color );
+
+                        draw.#set_pixle( x_org - y , y_org + x , str_border_color );
+                        draw.#set_pixle( x_org - y , y_org - x , str_border_color );
+                        
+
+                        break;
+                    } 
+
+                }
+
+            }
+               
+
+        }
 
         if( str_fill_color ) draw.#FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
 
@@ -720,16 +755,20 @@ export class draw {
 
     }
 
+
+
     // object contain the famous drawing algorithms . 
     static algorithms = {
+
+        // line algorithms 
 
         DDA_LINE_DRAW( line_object = new line() ){
 
             let f1 = draw.#CHECK_CANVAS();
-            let f2 = (line_object instanceof line );
+            let f2 = ( line_object instanceof line );
 
             if( f1 && f2 ){
-                draw.#DDA_ALGORITHM( line_object );
+                draw.#DDA_LINE_DRAW_ALGORITHM( line_object );
             }
             else{
                 if(!f1) draw.#ERRORS.canvas.missing();
@@ -746,6 +785,12 @@ export class draw {
 
         } ,
         
+        // circle algorithms
+
+        MID_POINT_CIRCLE_DRAW( circle2D_object = new circle2D() ){
+
+        }
+
     }
 
 

@@ -18,7 +18,7 @@ var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
 var shape_type = 4;
-var thickness = 4;
+var thickness = 6;
 
 /*
     generate/create "shapes for testing"
