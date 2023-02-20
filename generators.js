@@ -60,14 +60,14 @@ export class generate {
         },
 
         cicrles( 
-            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , color = false , border_color = true 
+            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , fill_color = true , border_color = true 
         ){
 
             amount = Math.abs(amount);
             var arr = [];
-
+            
             for( let i = 0 ; i < amount ; i += 1 ){
-                arr[i] = circle2D.random_circle( max_width , max_height , thickness , color , border_color );
+                arr[i] = circle2D.random_circle( max_width , max_height , thickness , fill_color , border_color );
             }
 
             return arr;

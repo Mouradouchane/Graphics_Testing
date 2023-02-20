@@ -3,7 +3,7 @@ import { RGBA } from "./color.js";
 export class circle2D {
 
     constructor( 
-        x = 1 , y = 1 , radius = 1 , Fill_color = undefined , border_thickness = 1 , border_color = new RGBA()
+        x = 1 , y = 1 , radius = 1 , Fill_color = undefined , border_thickness = 1 , border_color = undefined
     ){
 
         this.x = x;

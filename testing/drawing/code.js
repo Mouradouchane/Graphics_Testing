@@ -452,33 +452,47 @@ export class draw {
     static #DRAW_ALL_QUADS(
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , thickness = 1 , color_ = "white"
     ){
+
         draw.#set_pixle( (X+x_org)  , (Y+y_org)  , color_ );
         draw.#set_pixle( (X+x_org)  , (-Y+y_org) , color_ );
         draw.#set_pixle( (-X+x_org) , (Y+y_org)  , color_ );
         draw.#set_pixle( (-X+x_org) , (-Y+y_org) , color_ );
-
+        
         draw.#set_pixle( (Y+x_org)  , (X+y_org)  , color_ );
-        draw.#set_pixle( (Y+x_org)  , (-X+y_org)  , color_ );
-        draw.#set_pixle( (-Y+x_org)  , (X+y_org)  , color_ );
-        draw.#set_pixle( (-Y+x_org)  , (-X+y_org)  , color_ );
+        draw.#set_pixle( (Y+x_org)  , (-X+y_org) , color_ );
+        draw.#set_pixle( (-Y+x_org) , (X+y_org)  , color_ );
+        draw.#set_pixle( (-Y+x_org) , (-X+y_org) , color_ );
+
     }
 
     static #FILL_ALL_QUADS(
-        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
+        x_org = 1 , y_org = 1 , radius = 1 , color_ = "white"
     ){
 
-        draw.#DRAW_HORIZONTAL_LINE( (X+x_org) , (-X+x_org) , (Y+y_org) , color_ ); // S
-        draw.#DRAW_HORIZONTAL_LINE( (X+x_org) , (-X+x_org) , (-Y+y_org) , color_ );
+        let rsqr = radius*radius;
+        
+        for(let y = -radius ; y <= radius ; y++){
 
-        draw.#DRAW_VERTICAL_LINE( (Y+x_org) , (X+y_org) , (-X+y_org) , color_ );
-        draw.#DRAW_VERTICAL_LINE( (-Y+x_org) , (X+y_org) , (-X+y_org)  , color_ ); // E
+            let ysqr = y*y;
+
+            for(let x = -radius; x <= radius; x++ ){
+
+                if( x*x + ysqr <= rsqr ){
+
+                    draw.#DRAW_HORIZONTAL_LINE(x_org+x ,  x_org-x , y_org+y , color_ );
+
+                    break;
+                } 
+                
+            }
+
+        }
 
     }
 
     static #DRAW_CIRCLE(
         x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
     ){
-
         // let rq = r * r; // r²
         let d = 1 - r;  // decision parameter
 
@@ -488,8 +502,7 @@ export class draw {
         let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
 
         if( str_border_color ) draw.#DRAW_ALL_QUADS( X,Y, x_org,y_org , thickness , str_border_color );
-        if( str_fill_color   ) draw.#FILL_ALL_QUADS( X,Y, x_org,y_org , str_border_color );
-
+        
         do{
 
             if( d < 0) {
@@ -500,18 +513,14 @@ export class draw {
                 X += 1 , Y -= 1;
                 d = d + 2*(X-Y) + 5;
             } 
-
+            
             // draw or fill in all the QUAD's
-
-            if( str_fill_color   ) draw.#FILL_ALL_QUADS( X,Y ,x_org,y_org, str_fill_color );
-            if( str_border_color ) draw.#DRAW_ALL_QUADS( X,Y ,x_org,y_org, thickness , str_border_color );
-        
+            if( str_border_color ) draw.#DRAW_ALL_QUADS( X,Y , x_org,y_org , thickness , str_border_color );
+            
         }
         while( Y > X );
-
-        // fill the empty square inside the circle  
-        if( str_fill_color ) draw.#FILL_RECT( x_org-X , y_org-Y , X+X , Y+Y , fill_color);
-
+        
+        if( str_fill_color ) draw.#FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
     }
 
     /*
