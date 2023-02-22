@@ -18,7 +18,7 @@ var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
 var shape_type = 4;
-var thickness = 6;
+var thickness = 5;
 
 /*
     generate/create "shapes for testing"
@@ -37,7 +37,7 @@ var triangles = [
 
 var circles = [
     // new circle2D( 200 , 200 , 50 , new RGBA(255,0,255) , 1 , new RGBA(255,0,255)),
-    ...generate.random.cicrles(canvas.clientWidth-100 , canvas.clientHeight-100 , 6 , thickness , false , true)
+    ...generate.random.cicrles(canvas.clientWidth-100 , canvas.clientHeight-100 , 6 , thickness , true , true)
 ];
 
 draw.set_canvas( canvas );
@@ -162,7 +162,8 @@ function new_frame(){
 
             for(let circle of circles ){
 
-                // circle.fill_color.alpha = 0.5;
+                circle.fill_color.alpha  = 0.8;
+                circle.border_color.alpha = 0.5;
                 draw.circle(circle);
                 check_circle(circle);
 

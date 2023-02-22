@@ -527,61 +527,66 @@ export class draw {
     static #DRAW_CIRCLE(
         x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
     ){
+
         let str_fill_color   = (fill_color   instanceof RGBA) ? RGBA.to_string( fill_color )   : undefined ;
         let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
         
         if( str_border_color ){
 
-            let rsqr = r * r;
-            let trsqr = (r+thickness); trsqr *= trsqr;
+            let R_sqr = r * r;
 
-            for( let y = -r ;  y <= r  ; y++ ){
+            let t  = r + thickness;
+            let T_sqr = t * t;
 
-                let ysqr = y*y;
+            let find_t = true;
+            let start = 0;
+            let end = 0;
 
-                for(let x = -r ;  x <= r  ; x++ ){
+            for( 
+                let y = -t , ty = -t    ;  ty <= t ;   y++ , ty++ 
+            ){
+                
+                let y_sqr = y*y;
+                let ty_sqr = ty*ty;
+                
+                for(
+                    let x = -r , tx = -t    ;  tx <= t ;   x++  , tx++
+                ){
 
-                    if( ( x * x ) + ysqr <= rsqr ){
+                    if( find_t) {
 
-                        draw.#set_pixle( x_org + x , y_org + y , str_border_color );
-                        draw.#set_pixle( x_org - x , y_org + y , str_border_color );
+                        if ( ( tx * tx ) + ty_sqr <= T_sqr ){
+                            //debugger;
+                            start = Math.round(tx);
+                            find_t = false;
+                        } 
 
-                        draw.#set_pixle( x_org - y , y_org + x , str_border_color );
-                        draw.#set_pixle( x_org - y , y_org - x , str_border_color );
+                    }
+
+                    if( ( x * x ) + y_sqr <= R_sqr ){
+                        end = Math.round(x);
 
                         break;
                     } 
 
                 }
 
+                // fill left half and right half
+                draw.#DRAW_HORIZONTAL_LINE( x_org + start , x_org + end - 1, y_org + ty , str_border_color);
+                draw.#DRAW_HORIZONTAL_LINE( x_org - start -1, x_org - end , y_org + ty , str_border_color);
+
+                find_t = true;
+                start = 0;
+                end = 0;
             }
+        
+            /*
+            draw.#set_pixle( x_org + x , y_org + y , str_border_color );
+            draw.#set_pixle( x_org - x , y_org + y , str_border_color );
 
-            r += thickness;
-
-            for( let y = -r ;  y <= r  ; y++ ){
-                
-                let ysqr = y*y;
-                
-                for( let x = -r ;  x <= r  ; x++ ){
-
-                    if( ( x * x ) + ysqr <= trsqr ){
-
-                        draw.#set_pixle( x_org + x , y_org + y , str_border_color );
-                        
-                        draw.#set_pixle( x_org - x , y_org + y , str_border_color );
-
-                        draw.#set_pixle( x_org - y , y_org + x , str_border_color );
-                        draw.#set_pixle( x_org - y , y_org - x , str_border_color );
-                        
-
-                        break;
-                    } 
-
-                }
-
-            }
-               
-
+            draw.#set_pixle( x_org - y , y_org + x , str_border_color );
+            draw.#set_pixle( x_org - y , y_org - x , str_border_color );
+            */
         }
 
         if( str_fill_color ) draw.#FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
