@@ -1,47 +1,48 @@
-## 3D_testing
-just a simple project for testing and practice on 3D conceptes in HTML **2D canvas** using pure JavaScript no lib's or frameworks .
+# Graphics_Testing
+
+project for educational purposes **"2D/3D" , "Drawing/Rendering"** using **HTML-CANVAS** and **JavaScript** .
+
 
 ## TO-DO-LIST :
 
 ### Math :
-- [x] vectors
+- [x] Vectors 
 - [x] Matrices
 - [x] orthographic projection
-- [ ] perspective projection
-- [x] movement matrices 2D/3D
-- [x] rotation matrices 2D/3D 
+- [ ] perspective  projection
+- [x] 2D/3D movement 
+- [x] 2D/3D rotation  
 - [ ] camera => rotation/movement 3D
 
 ### Structures :
-- [x] class point
+- [ ] class buffer
 - [x] class line
-- [x] class triangle
-- [ ] class rectangle
-- [ ] class circle
-- [x] class vec2D
-- [x] class vec3D
-- [x] class vec4D
+- [ ] class curve
+- [x] class triangle2D
+- [ ] class triangle3D
+- [x] class rectangle2D
+- [x] class circle2D
+- [x] class point2D
+- [x] class point3D
+- [x] class point4D
 - [x] class NDC 
 - [x] class mesh
-- [x] class RGB
-- [ ] class RGBA
+- [x] class RGBA
 - [ ] class camera
 
-### Drawing :
+### 2D Drawing :
 - [x] line drawing
-- [ ] navie line drawing
-- [ ] DDA line drawing
+- [x] circle drawing
+- [x] triangle drawing
+- [x] rectangle drawing
+- [ ] curved line drawing
+- [x] colors
+- [x] gradients
+- [x] RGB with alpha blending
+- [x] DDA line drawing
 - [ ] gupta sproull line drawing
 - [ ] bresenham line drawing
-- [x] curved line drawing
-- [ ] point drawing
-- [ ] circle drawing
-- [ ] triangle drawing
-- [ ] rectangle drawing
-- [ ] colors
-- [ ] gradients
-- [ ] alpha blending
-- [ ] transparency
+- [x] mid-point circle drawing
 
 ### Clipping/Culling : 
 - [x] point clipping 2D
@@ -52,11 +53,11 @@ just a simple project for testing and practice on 3D conceptes in HTML **2D canv
 
 ### rasterization :
 - [x] none buffer
-- [x] field of view "FOV"
-- [x] aspect ratio 
-- [ ] Sampling
 - [ ] Z-buffer
 - [ ] A-buffer
+- [ ] Sampling
+- [x] field of view "FOV"
+- [x] aspect ratio 
 - [ ] FPS control
 - [ ] V-Sync
 
@@ -90,7 +91,7 @@ just a simple project for testing and practice on 3D conceptes in HTML **2D canv
 - [ ] path tracing
 - [ ] ray casting
 
-### Benchmarking : 
+### Benchmarking/Testing : 
 - [ ] Graph FPS
 - [ ] Graph Preformance Data
 - [ ] Uint-Testing

@@ -14,6 +14,7 @@ const ctx = canvas.getContext("2d");
     rendering/drawing "sitting"
 */
 var render_loop = 0;
+var testing = 0;
 var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
@@ -131,7 +132,7 @@ function new_frame(){
                 
             for(let line of lines){
                 draw.line( line );
-                check_line( line );
+                if( testing ) check_line( line );
             }
 
         }
@@ -141,7 +142,7 @@ function new_frame(){
 
             for(let rect of rectangles){
                 draw.rectangle( rect );
-                check_rectangle( rect );
+                if( testing ) check_rectangle( rect );
             }
 
         } break;
@@ -151,8 +152,7 @@ function new_frame(){
 
             for(let trig of triangles){
                 draw.triangle(trig);
-                check_triangle(trig);
-                
+                if( testing )  check_triangle(trig);
             }
             
         } break;
@@ -162,20 +162,22 @@ function new_frame(){
 
             for(let circle of circles ){
 
-                circle.fill_color.alpha  = 0.5;
-                circle.border_color.alpha = 0.7;
                 draw.circle(circle);
+
+                if( testing ) {
+                    circle.fill_color.alpha  = 0.5;
+                    circle.border_color.alpha = 0.7;
                 
-                //check_circle(circle);
-                
-                ctx.lineWidth = thickness;
-                ctx.strokeStyle = RGBA.to_string( circle.border_color );
-                ctx.beginPath();
-                ctx.arc( circle.x + circle.r*2 + thickness*2 + 4, circle.y, circle.r , 0 , Math.PI * 2);
-                ctx.fillStyle = RGBA.to_string( circle.fill_color );
-                ctx.fill();
-                ctx.stroke();
-                
+                    //check_circle(circle);
+                    
+                    ctx.lineWidth = thickness;
+                    ctx.strokeStyle = RGBA.to_string( circle.border_color );
+                    ctx.beginPath();
+                    ctx.arc( circle.x + circle.r*2 + thickness*2 + 4, circle.y, circle.r , 0 , Math.PI * 2);
+                    ctx.fillStyle = RGBA.to_string( circle.fill_color );
+                    ctx.fill();
+                    ctx.stroke();
+                }
 
             } 
 

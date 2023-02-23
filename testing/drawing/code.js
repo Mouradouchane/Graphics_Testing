@@ -495,7 +495,7 @@ export class draw {
     // - no support to border thickness
     // - no support to fill    
     static #MID_POINT_CIRCLE_DRAW(
-        x_org = 1 , y_org = 1 , r = 1 , border_color = undefined
+        x_org = 1 , y_org = 1 , r = 1 , str_border_color = undefined
     ){
           
         let d = 1 - r;  // decision parameter
@@ -516,7 +516,7 @@ export class draw {
             
             // draw or fill in all the QUAD's
             if( str_border_color ) 
-                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , border_color );
+                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , str_border_color );
             
         }
         while( Y > X );
@@ -817,7 +817,27 @@ export class draw {
         
         // circle algorithms
 
-        MID_POINT_CIRCLE_DRAW( circle2D_object = new circle2D() ){
+        MID_POINT_CIRCLE_DRAW( circle_object = new circle2D() ){
+
+            // check canvas and circle
+            let f1 = draw.#CHECK_CANVAS();
+            let f2 = (circle_object instanceof circle2D);
+
+            if( f1 && f2 ){
+                
+                let copy = circle2D.copy( circle_object );
+
+                if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
+
+                    draw.#MID_POINT_CIRCLE_DRAW( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , RGBA.to_string(copy.border_color) );
+
+                }
+            
+            }
+            else{
+                if(!f1) draw.#ERRORS.canvas.missing();
+                if(!f2) draw.#ERRORS.object.invalid();
+            }
 
         }
 
