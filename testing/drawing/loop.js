@@ -18,7 +18,7 @@ var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
 var shape_type = 4;
-var thickness = 5;
+var thickness  = 8;
 
 /*
     generate/create "shapes for testing"
@@ -162,17 +162,20 @@ function new_frame(){
 
             for(let circle of circles ){
 
-                circle.fill_color.alpha  = 0.8;
-                circle.border_color.alpha = 0.5;
+                circle.fill_color.alpha  = 0.5;
+                circle.border_color.alpha = 0.7;
                 draw.circle(circle);
-                check_circle(circle);
-
-                /*
+                
+                //check_circle(circle);
+                
+                ctx.lineWidth = thickness;
                 ctx.strokeStyle = RGBA.to_string( circle.border_color );
                 ctx.beginPath();
-                ctx.arc( circle.x + circle.r*2 +10, circle.y, circle.r , 0 , Math.PI * 2);
+                ctx.arc( circle.x + circle.r*2 + thickness*2 + 4, circle.y, circle.r , 0 , Math.PI * 2);
+                ctx.fillStyle = RGBA.to_string( circle.fill_color );
+                ctx.fill();
                 ctx.stroke();
-                */
+                
 
             } 
 

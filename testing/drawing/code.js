@@ -450,7 +450,7 @@ export class draw {
     }
 
     static #DRAW_ALL_QUADS(
-        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , thickness = 1 , color_ = "white"
+        X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
     ){
 
         draw.#set_pixle( (X+x_org)  , (Y+y_org)  , color_ );
@@ -471,15 +471,15 @@ export class draw {
 
         let rsqr = radius*radius;
         
-        for(let y = -radius ; y <= radius ; y++){
+        for( let y = -radius ; y <= radius ; y++ ){
 
             let ysqr = y*y;
 
-            for(let x = -radius; x <= radius; x++ ){
+            for( let x = -radius ; x <= radius ; x++ ){
 
                 if( x*x + ysqr <= rsqr ){
 
-                    draw.#DRAW_HORIZONTAL_LINE( x_org+x , x_org-x , y_org+y , color_ );
+                    draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org + y , color_ );
 
                     break;
                 } 
@@ -516,7 +516,7 @@ export class draw {
             
             // draw or fill in all the QUAD's
             if( str_border_color ) 
-                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , 1 , border_color );
+                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , border_color );
             
         }
         while( Y > X );
@@ -528,67 +528,92 @@ export class draw {
         x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
     ){
 
+        // convert colors to strings
         let str_fill_color   = (fill_color   instanceof RGBA) ? RGBA.to_string( fill_color )   : undefined ;
         let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
         
+        // in case "draw cicle border" wanted
         if( str_border_color ){
 
+            // define needed variables for drawing border with thickness
             let R_sqr = r * r;
 
             let t  = r + thickness;
             let T_sqr = t * t;
 
-            let find_t = true;
+            // thoese to detecte border start and end range to fill it 
+            let find_start = true;
             let start = 0;
             let end = 0;
 
+            // just to fill first part of the border
+            for( let y = -t ; y < -r ; y++ ){
+
+                let ysqr = y*y;
+
+                for( let x = -t ; x <= 0 ; x++ ){
+                    if( (x * x) + ysqr <= T_sqr ){
+                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org + y , str_border_color);
+                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org - y , str_border_color);
+                        break;
+                    }
+                }
+
+            }
+
+            // here fill border process using "scan-line"
+            // ty t... "t stans for thickness"
             for( 
-                let y = -t , ty = -t    ;  ty <= t ;   y++ , ty++ 
+                let y = -r , ty = -r   ;  ty <= r  ;   y++ , ty++ 
             ){
                 
                 let y_sqr = y*y;
                 let ty_sqr = ty*ty;
                 
                 for(
-                    let x = -r , tx = -t    ;  tx <= t ;   x++  , tx++
+                    let x = -t , tx = -t   ;  tx <= t  ;   x++ , tx++
                 ){
 
-                    if( find_t) {
+                    // try to find "border start"  
+                    if( find_start ) {
 
                         if ( ( tx * tx ) + ty_sqr <= T_sqr ){
-                            //debugger;
-                            start = Math.round(tx);
-                            find_t = false;
+                            start = tx;
+                            find_start = false;
                         } 
 
                     }
 
+                    // then try to find border end 
                     if( ( x * x ) + y_sqr <= R_sqr ){
-                        end = Math.round(x);
+                        end = x;
 
                         break;
                     } 
 
                 }
 
-                // fill left half and right half
-                draw.#DRAW_HORIZONTAL_LINE( x_org + start , x_org + end - 1, y_org + ty , str_border_color);
-                draw.#DRAW_HORIZONTAL_LINE( x_org - start -1, x_org - end , y_org + ty , str_border_color);
+                // after getting start/end 
+                // fill in it in left and right side of circle
 
-                find_t = true;
+                draw.#DRAW_HORIZONTAL_LINE( 
+                    x_org + start , x_org + end -1, y_org + ty , str_border_color
+                );
+                
+                draw.#DRAW_HORIZONTAL_LINE( 
+                    x_org - start , x_org - end +1, y_org + ty , str_border_color
+                );
+                
+                // reset for next step
+                find_start = true;
                 start = 0;
                 end = 0;
+
             }
         
-            /*
-            draw.#set_pixle( x_org + x , y_org + y , str_border_color );
-            draw.#set_pixle( x_org - x , y_org + y , str_border_color );
-
-            draw.#set_pixle( x_org - y , y_org + x , str_border_color );
-            draw.#set_pixle( x_org - y , y_org - x , str_border_color );
-            */
         }
 
+        // in case "fill circle" wanted
         if( str_fill_color ) draw.#FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
 
     }
@@ -748,7 +773,7 @@ export class draw {
 
             if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
 
-                draw.#DRAW_CIRCLE( copy.x , copy.y , copy.r , copy.border , copy.fill_color , copy.border_color);
+                draw.#DRAW_CIRCLE( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , Math.round(copy.border) , copy.fill_color , copy.border_color);
 
             }
         
