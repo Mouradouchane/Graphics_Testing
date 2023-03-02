@@ -5,43 +5,73 @@ import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from 
 import {RGBA} from "../../color.js";
 import {triangle2D} from "../../triangle.js";
 import {circle2D} from "../../circle.js";
+import {ellpise2D} from "../../ellipse.js";
+import {buffer} from "../../buffers.js";
 
-export class draw {
+
+export class draw {     // CLASS LIKE NAMESPACE :)
 
     /*
         ==============================================================
-                    PRIVATE STUFF FOR CLASS DRAW 
+                    PRIVATE FUNCTIONS/STUFF FOR DRAW API 
         ==============================================================
     */
 
-    static #ERRORS = {
-        canvas : {
-            missing : () => console.error(
-                "no canvas defined yet to draw in , define canvas using SET_CANVAS !"
-            ),
-            invalid : () => console.error(
-                "invalid canvas parameter !"
-            ),
+    static #LOG = {
+
+        ERROR : {
+            buffer : {
+                missing :() => console.error(
+                    "no buffer defined yet to draw in , define buffer using set_buffer function !"
+                ), 
+                invalid : () => console.error(
+                    "invalid buffer parameter !"
+                ),
+            },
+            canvas : {
+                missing : () => console.error(
+                    "no canvas defined yet to draw in , define canvas using set_canvas function !"
+                ),
+                invalid : () => console.error(
+                    "invalid canvas parameter !"
+                ),
+            },
+            ctx : {
+                missing : () => console.error(
+                    "no context defined yet to draw in , define canvas using SET_CANVAS !"
+                ),
+                invalid : () => console.error(
+                    "invalid context object !"
+                ),
+            },
+            object : {
+                invalid : () => console.error(
+                    "invalid object to render !"
+                ),
+            }
         },
-        ctx : {
-            missing : () => console.error(
-                "no context defined yet to draw in , define canvas using SET_CANVAS !"
-            ),
-            invalid : () => console.error(
-                "invalid context object !"
-            ),
+
+        WARN :{
+            canvas : {
+                out_of_range : () => console.warn("the given X or Y coordiantes is out of canvas range !") ,
+            },
+            buffer : {
+                out_of_range : () => console.warn("the given X or Y coordiantes is out of buffer range !") ,
+            },
+
         },
-        object : {
-            invalid : () => console.error(
-                "invalid object to render"
-            ),
+
+        HINT : {
+
         }
+
     }
 
-
+    // to-do : add option object 
+    static #buffer = undefined;
     static #canvas = undefined;
     static #ctx = undefined;
-    static #anti_alise = false;
+    static Anti_Alising = false;
 
     static #CHECK_CANVAS(){
         return ( draw.#canvas != undefined && draw.#ctx  != undefined );
@@ -57,6 +87,8 @@ export class draw {
     static #get_pixle( x , y , pixle_color = "cyan" ) {
 
     }
+
+    // LINE DRAW FUNCTIONS
 
     // standard line draw 
     static #CUSTOM_LINE_WITH_GRADIENT(
@@ -276,6 +308,36 @@ export class draw {
         
     }
 
+    // fast and direct function for filling shapes line by line horizontaly  
+    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , str_color = "white" ){
+
+        if( x1 > x2 ) [x1 , x2] = [x2 , x1];
+
+        for( let x = x1 ; x <= x2 ; x += 1 ){
+
+            this.#set_pixle( x , y , str_color );
+
+        }
+
+    }
+    
+    // fast and direct function for filling shapes line by line verticaly  
+    static #DRAW_VERTICAL_LINE( x = 1 , y1 = 1 , y2 = 1 , str_color = "white" ){
+
+        if( y1 > y2 ) [y1 , y2] = [y2 , y1];
+
+        for( let y = y1 ; y <= y2 ; y += 1 ){
+
+            this.#set_pixle( x , y , str_color );
+
+        }
+
+    }
+    
+
+
+    // RECTANGLE PRIVATE FUNCTIONS
+
     static #FILL_RECT(
         X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
     ){
@@ -320,32 +382,8 @@ export class draw {
 
     }
 
-    // fast and direct function for filling shapes line by line horizontaly  
-    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , str_color = "white" ){
+    // TRIANGLE PRIVATE FUNCTIONS
 
-        if( x1 > x2 ) [x1 , x2] = [x2 , x1];
-
-        for( let x = x1 ; x <= x2 ; x += 1 ){
-
-            this.#set_pixle( x , y , str_color );
-
-        }
-
-    }
-    
-    // fast and direct function for filling shapes line by line verticaly  
-    static #DRAW_VERTICAL_LINE( x = 1 , y1 = 1 , y2 = 1 , str_color = "white" ){
-
-        if( y1 > y2 ) [y1 , y2] = [y2 , y1];
-
-        for( let y = y1 ; y <= y2 ; y += 1 ){
-
-            this.#set_pixle( x , y , str_color );
-
-        }
-
-    }
-    
     static #FILL_TRIANGLE( copy = new triangle2D() ){
 
         // calc needed values
@@ -449,6 +487,9 @@ export class draw {
     
     }
 
+
+    // CIRCLE PRIVATE FUNCTIONS
+
     static #DRAW_ALL_QUADS(
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
     ){
@@ -489,7 +530,6 @@ export class draw {
         }
 
     }
-
 
     //   mid point algorithm with :
     // - no support to border thickness
@@ -617,12 +657,33 @@ export class draw {
         if( str_fill_color ) draw.#FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
 
     }
+    
 
 
+    // ELLPISE PRIVATE FUNCTIONS
+
+    static #FILL_ELLIPSE_QUADS_X(){
+
+    }
+    static #FILL_ELLIPSE_QUADS_Y(){
+
+    }
+
+    static #DRAW_ELLIPSE_DDA(){
+
+    }
+
+    static #DRAW_ELLIPSE_MID_POINT(){
+
+    }
+
+    static #DRAW_ELLIPSE_SCANLINE(){
+
+    }
 
     /*
         ==============================================================
-                        PUBLIC FUCNTIONS FOR DRAWING 
+                PUBLIC FUCNTIONS AS INTERFACE FOR DRAWING API 
         ==============================================================
     */
 
@@ -634,7 +695,12 @@ export class draw {
             draw.#ctx = draw.#canvas.getContext("2d");
 
         }
-        else draw.#ERRORS.canvas.invalid();
+        else draw.#LOG.ERROR.canvas.invalid();
+
+    }
+
+    /* need work */
+    static set_buffer( buffer_object = new buffer() ){
 
     }
 
@@ -654,8 +720,8 @@ export class draw {
 
         } 
         else {
-            if(!f1) draw.#ERRORS.canvas.missing();
-            if(!f2) draw.#ERRORS.object.invalid();
+            if(!f1) draw.#LOG.ERROR.canvas.missing();
+            if(!f2) draw.#LOG.ERROR.object.invalid();
         }
 
     }
@@ -676,8 +742,8 @@ export class draw {
     
         } 
         else {
-            if(!f1) draw.#ERRORS.canvas.missing();
-            if(!f2) draw.#ERRORS.object.invalid();
+            if(!f1) draw.#LOG.ERROR.canvas.missing();
+            if(!f2) draw.#LOG.ERROR.object.invalid();
         }
 
     }
@@ -717,8 +783,8 @@ export class draw {
 
         }
         else {
-            if(!f1) draw.#ERRORS.canvas.missing();
-            if(!f2) draw.#ERRORS.object.invalid();
+            if(!f1) draw.#LOG.ERROR.canvas.missing();
+            if(!f2) draw.#LOG.ERROR.object.invalid();
         }
 
     }
@@ -755,8 +821,8 @@ export class draw {
 
         }
         else{
-            if(!f1) draw.#ERRORS.canvas.missing();
-            if(!f2) draw.#ERRORS.object.invalid();
+            if(!f1) draw.#LOG.ERROR.canvas.missing();
+            if(!f2) draw.#LOG.ERROR.object.invalid();
         }
 
     }
@@ -779,16 +845,32 @@ export class draw {
         
         }
         else{
-            if(!f1) draw.#ERRORS.canvas.missing();
-            if(!f2) draw.#ERRORS.object.invalid();
+            if(!f1) draw.#LOG.ERROR.canvas.missing();
+            if(!f2) draw.#LOG.ERROR.object.invalid();
         }
 
     }
 
+    static ellipse( ellipse_object = new ellpise2D() ){
+
+        // check canvas and circle
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (ellipse_object instanceof ellpise2D);
+
+        if( f1 && f2 ){
+        
+        }
+        else{
+            if(!f1) draw.#LOG.ERROR.canvas.missing();
+            if(!f2) draw.#LOG.ERROR.object.invalid();
+        }
+
+    } 
 
 
     // object contain the famous drawing algorithms . 
     static algorithms = {
+
 
         // line algorithms 
 
@@ -801,8 +883,8 @@ export class draw {
                 draw.#DDA_LINE_DRAW_ALGORITHM( line_object );
             }
             else{
-                if(!f1) draw.#ERRORS.canvas.missing();
-                if(!f2) draw.#ERRORS.object.invalid();
+                if(!f1) draw.#LOG.ERROR.canvas.missing();
+                if(!f2) draw.#LOG.ERROR.object.invalid();
             }
 
         } ,
@@ -815,6 +897,7 @@ export class draw {
 
         } ,
         
+
         // circle algorithms
 
         MID_POINT_CIRCLE_DRAW( circle_object = new circle2D() ){
@@ -835,11 +918,18 @@ export class draw {
             
             }
             else{
-                if(!f1) draw.#ERRORS.canvas.missing();
-                if(!f2) draw.#ERRORS.object.invalid();
+                if(!f1) draw.#LOG.ERROR.canvas.missing();
+                if(!f2) draw.#LOG.ERROR.object.invalid();
             }
 
-        }
+        } ,
+
+
+        // ellipse algorithms
+
+        ELLIPSE_MID_POINT_ALGORITHM( ellipse_object = new ellpise2D() ){
+
+        } ,
 
     }
 

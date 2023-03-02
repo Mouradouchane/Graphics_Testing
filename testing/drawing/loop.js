@@ -6,6 +6,7 @@ import {triangle2D} from "../../triangle.js";
 import {generate} from "../../generators.js";
 import {draw} from "./code.js";
 import {circle2D} from "../../circle.js";
+import {ellpise2D} from "../../ellipse.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");

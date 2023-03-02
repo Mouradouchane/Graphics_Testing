@@ -3,25 +3,16 @@ import { RGBA } from "./color.js";
 // normal buffer with no specification's
 export class buffer{
 
-    static #LOGS = {
+    // PRIVATE PROPERTIES 
+    #width;
+    #height = 1;
+    #type   = undefined; // buffer type : "Z,A,SSAA,..."
+    #buffer = undefined;
+    #length = {
+        x : undefined , y : undefined
+    };
 
-        invalid : (param_name) => {
-            console.error(`invalid parameter ${param_name} .`);
-        },
-        def_value : (param_name) => {
-            console.warn(`because the passed parameter ${param_name} invalid the default value gonna replace it .`);
-        }
-
-    }
-
-    constructor( buffer_width = 1 , buffer_height = 1 ){
-
-        this.#width  = 1;
-        this.#height = 1;
-        this.#buffer = undefined;
-        this.#length = {
-            x : undefined , y : undefined
-        };
+    constructor( buffer_width = 1 , buffer_height = 1 , buffer_type = undefined ){
 
         if( buffer_width > 0 ) this.#width = new Number(buffer_width);
         else {
@@ -50,6 +41,21 @@ export class buffer{
             this.#buffer[y] = new Array( this.#width );
         }
 
+    }
+
+
+
+    // STATIC PRIVATE/PUBLIC FUNCTION'S
+
+    static #LOGS = {
+    
+        invalid : (param_name) => {
+            console.error(`invalid parameter ${param_name} .`);
+        },
+        def_value : (param_name) => {
+            console.warn(`because the passed parameter ${param_name} invalid the default value gonna replace it .`);
+        }
+    
     }
 
 }
