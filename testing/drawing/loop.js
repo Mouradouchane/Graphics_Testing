@@ -7,6 +7,7 @@ import {generate} from "../../generators.js";
 import {draw} from "./code.js";
 import {circle2D} from "../../circle.js";
 import {ellpise2D} from "../../ellipse.js";
+import {check} from "../../check.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -15,101 +16,41 @@ const ctx = canvas.getContext("2d");
     rendering/drawing "sitting"
 */
 var render_loop = 0;
-var testing = 0;
+var testing = 1;
 var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
-var shape_type = 4;
-var thickness  = 8;
+var shape_type = 5;
+var thickness  = 2;
+var max_width  = canvas.clientWidth-20;
+var max_height = canvas.clientHeight-20;
 
 /*
-    generate/create "shapes for testing"
+    generate random "shapes for testing"
 */
 var lines = [ 
-    ...generate.random.lines(canvas.clientWidth-20 , canvas.clientHeight-20 , 4 , thickness )
+    ...generate.random.lines(max_width , max_height , 4 , thickness )
 ];
 
 var rectangles = [
-    ...generate.random.rectangles(canvas.clientWidth/2 , canvas.clientHeight/2 ,6)
+    ...generate.random.rectangles(max_width , max_height , 6 )
 ]; 
 
 var triangles = [ 
-    ...generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness , true ),
+    ...generate.random.triangles(max_width , max_height , 6 , thickness , true , false),
 ];
 
 var circles = [
     // new circle2D( 200 , 200 , 50 , new RGBA(255,0,255) , 1 , new RGBA(255,0,255)),
-    ...generate.random.cicrles(canvas.clientWidth-100 , canvas.clientHeight-100 , 6 , thickness , true , true)
+    ...generate.random.cicrles(max_width , max_height , 6 , thickness , true , false)
+];
+
+var ellipses = [
+    new ellpise2D(200,200,120,40,0,new RGBA(255,255,0),new RGBA(255,0,255)) , 
 ];
 
 draw.set_canvas( canvas );
-
-/*
-    testing/check functions
-*/
-function check_point2D( point = new point2D() , point_size = 2){
-
-    ctx.fillStyle = "cyan";
-
-    ctx.beginPath();
-    ctx.arc(point.x, point.y, point_size , 0, Math.PI * 2);
-    ctx.fill();
-
-}
-
-function check_line( LINE = new line() , point_size = 2){
-
-    ctx.fillStyle = (LINE instanceof line ) ? "yellow" : "cyan";
-
-    ctx.beginPath();
-    ctx.arc(LINE.p1.x, LINE.p1.y, point_size , 0, Math.PI * 2);
-    ctx.arc(LINE.p2.x, LINE.p2.y, point_size , 0, Math.PI * 2);
-    ctx.fill();
-
-}
-
-function check_rectangle( rect = new rectangle() , point_size = 2){
-
-    //debugger
-    let x = rect.position.x;
-    let y = rect.position.y;
-    let w = rect.width;
-    let h = rect.height;
-
-    ctx.fillStyle = "cyan";
-    ctx.beginPath();
-    ctx.arc( x , y , point_size , 0 , Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc( x+w , y , point_size , 0 , Math.PI * 2);
-    ctx.fill();
- 
-    ctx.beginPath();
-    ctx.arc( x , y+h , point_size , 0 , Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc( x+w , y+h , point_size , 0 , Math.PI * 2);
-    ctx.fill();
-
-
-}
-
-function check_triangle( triangle = new triangle2D() ){
-
-    check_point2D( triangle.a );
-    check_point2D( triangle.b );
-    check_point2D( triangle.c );
-
-}
-
-function check_circle( circle = new circle2D() ){
-
-    check_point2D( new point2D(circle.x , circle.y) );
-    check_point2D( new point2D(circle.x , circle.y + circle.r) );
-
-}
+check.set.canvas( canvas );
 
 /*
     render/frame functions
@@ -123,8 +64,8 @@ function clear_frame(){
 
 function new_frame(){
 
-    ctx.fillStyle = "red";
-    ctx.strokeStyle = "red";
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "white";
    
     switch( shape_type ){
 
@@ -133,17 +74,17 @@ function new_frame(){
                 
             for(let line of lines){
                 draw.line( line );
-                if( testing ) check_line( line );
+                if( testing ) check.visual_check.line( line );
             }
 
-        }
+        } break;
 
         // rectangles
         case 2 : {
 
             for(let rect of rectangles){
                 draw.rectangle( rect );
-                if( testing ) check_rectangle( rect );
+                if( testing ) check.visual_check.rectangle( rect );
             }
 
         } break;
@@ -153,7 +94,7 @@ function new_frame(){
 
             for(let trig of triangles){
                 draw.triangle(trig);
-                if( testing )  check_triangle(trig);
+                if( testing )  check.visual_check.triangle(trig);
             }
             
         } break;
@@ -166,21 +107,23 @@ function new_frame(){
                 draw.circle(circle);
 
                 if( testing ) {
-                    circle.fill_color.alpha  = 0.5;
-                    circle.border_color.alpha = 0.7;
-                
-                    //check_circle(circle);
-                    
-                    ctx.lineWidth = thickness;
-                    ctx.strokeStyle = RGBA.to_string( circle.border_color );
-                    ctx.beginPath();
-                    ctx.arc( circle.x + circle.r*2 + thickness*2 + 4, circle.y, circle.r , 0 , Math.PI * 2);
-                    ctx.fillStyle = RGBA.to_string( circle.fill_color );
-                    ctx.fill();
-                    ctx.stroke();
+                    check.visual_check.circle( circle );
                 }
 
             } 
+
+        } break;
+
+
+        // ellipses
+        case 5 : {
+
+            for(let ellipse of ellipses){
+
+                draw.ellipse( ellipse );
+
+                if( testing ) check.visual_check.ellipse( ellipse );
+            }
 
         } break;
 
@@ -199,7 +142,7 @@ function render(){
 
 
 if( anti_alias )
-    ctx.imageSmoothingEnabled = true;//
+    ctx.imageSmoothingEnabled = true;
 else 
     ctx.imageSmoothingEnabled = false;
 
@@ -209,10 +152,10 @@ else {
     
     if( interval_testing ){
 
-        setInterval(() => {
+        setInterval( () => {
 
-            lines = generate.random.lines(canvas.clientWidth-10 , canvas.clientHeight-10 , 6 , thickness);
-            triangles = generate.random.triangles(canvas.clientWidth-10 , canvas.clientHeight-10 ,3,thickness);
+            lines = generate.random.lines( max_width , max_height , 6 , thickness );
+            triangles = generate.random.triangles( max_width , max_height , 3 , thickness );
         
             clear_frame();
             new_frame();

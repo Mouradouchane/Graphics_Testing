@@ -12,7 +12,7 @@ export class triangle2D{
         this.b = (point_b instanceof point2D) ? point_b : new point2D();
         this.c = (point_c instanceof point2D) ? point_c : new point2D();
         this.thickness = thickness;
-        this.color = (color instanceof RGBA) ? color : undefined;
+        this.fill_color = (color instanceof RGBA) ? color : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
 
     }
@@ -26,7 +26,7 @@ export class triangle2D{
                 point2D.copy(triangle2D_obj.b),
                 point2D.copy(triangle2D_obj.c),
                 Number.parseInt(triangle2D_obj.thickness),
-                (triangle2D_obj.color instanceof RGBA ) ? RGBA.copy(triangle2D_obj.color) : undefined ,
+                (triangle2D_obj.fill_color instanceof RGBA ) ? RGBA.copy(triangle2D_obj.fill_color) : undefined ,
                 (triangle2D_obj.border_color instanceof RGBA) ? RGBA.copy(triangle2D_obj.border_color) : undefined ,
             );
             

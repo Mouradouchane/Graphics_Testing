@@ -20,43 +20,43 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static #LOG = {
 
         ERROR : {
-            buffer : {
-                missing :() => console.error(
+            BUFFER : {
+                MISSING :() => console.error(
                     "no buffer defined yet to draw in , define buffer using set_buffer function !"
                 ), 
-                invalid : () => console.error(
+                INVALID : () => console.error(
                     "invalid buffer parameter !"
                 ),
             },
-            canvas : {
-                missing : () => console.error(
+            CANVAS : {
+                MISSING : () => console.error(
                     "no canvas defined yet to draw in , define canvas using set_canvas function !"
                 ),
-                invalid : () => console.error(
+                INVALID : () => console.error(
                     "invalid canvas parameter !"
                 ),
             },
-            ctx : {
-                missing : () => console.error(
+            CTX : {
+                MISSING : () => console.error(
                     "no context defined yet to draw in , define canvas using SET_CANVAS !"
                 ),
-                invalid : () => console.error(
+                INVALID : () => console.error(
                     "invalid context object !"
                 ),
             },
-            object : {
-                invalid : () => console.error(
+            OBJECT : {
+                INVALID : () => console.error(
                     "invalid object to render !"
                 ),
             }
         },
 
         WARN :{
-            canvas : {
-                out_of_range : () => console.warn("the given X or Y coordiantes is out of canvas range !") ,
+            CANVAS : {
+                OUT_OF_RANGE : () => console.warn("the given X or Y coordiantes is out of canvas range !") ,
             },
-            buffer : {
-                out_of_range : () => console.warn("the given X or Y coordiantes is out of buffer range !") ,
+            BUFFER : {
+                OUT_OF_RANGE : () => console.warn("the given X or Y coordiantes is out of buffer range !") ,
             },
 
         },
@@ -67,28 +67,42 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    // to-do : add option object 
-    static #buffer = undefined;
-    static #canvas = undefined;
-    static #ctx = undefined;
-    static Anti_Alising = false;
+    // object for needed "stuff,options,..." for drawing 
+    static #NEEDED = {
+
+        buffer : undefined,
+        canvas : undefined,
+        ctx : undefined,
+        anti_alising : false,
+        copy_object_for_drawing : false,
+
+    }
 
     static #CHECK_CANVAS(){
-        return ( draw.#canvas != undefined && draw.#ctx  != undefined );
+        return ( draw.#NEEDED.canvas != undefined && draw.#NEEDED.ctx  != undefined );
     }
 
     static #set_pixle( x , y , pixle_color = "white" ) {
 
-        draw.#ctx.fillStyle = pixle_color;
-        draw.#ctx.fillRect( x , y , 1 , 1 );
+        draw.#NEEDED.ctx.fillStyle = pixle_color;
+        draw.#NEEDED.ctx.fillRect( x , y , 1 , 1 );
 
     }
 
-    static #get_pixle( x , y , pixle_color = "cyan" ) {
+    // we need this for our color blending 
+    static #canvas_get_pixle( x , y ) {
+
+    }
+    static #buffer_get_pixle( x , y ) {
+
+    }
+    static #buffer_get_sample( x , y ) {
 
     }
 
-    // LINE DRAW FUNCTIONS
+    // =========================================================================
+    //                          LINE DRAW FUNCTIONS
+    // =========================================================================
 
     // standard line draw 
     static #CUSTOM_LINE_WITH_GRADIENT(
@@ -335,8 +349,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
     
 
-
-    // RECTANGLE PRIVATE FUNCTIONS
+    // =========================================================================
+    //                      RECTANGLE PRIVATE FUNCTIONS
+    // =========================================================================
 
     static #FILL_RECT(
         X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
@@ -382,7 +397,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    // TRIANGLE PRIVATE FUNCTIONS
+
+    // =========================================================================
+    //                      TRIANGLE PRIVATE FUNCTIONS
+    // =========================================================================
+
 
     static #FILL_TRIANGLE( copy = new triangle2D() ){
 
@@ -412,7 +431,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             x_end   = Math.round( (y - intercept_AB) / slope_AB );
             
             // fill range
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , RGBA.to_string(copy.fill_color) );
 
         }
 
@@ -430,7 +449,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             x_start = Math.round( (y - intercept_AC) / slope_AC );
             x_end   = Math.round( (y - intercept_BC) / slope_BC );
 
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.color );
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , RGBA.to_string(copy.fill_color) );
 
         }
 
@@ -487,8 +506,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
     }
 
-
-    // CIRCLE PRIVATE FUNCTIONS
+    // =========================================================================
+    //                         CIRCLE PRIVATE FUNCTIONS
+    // =========================================================================
 
     static #DRAW_ALL_QUADS(
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
@@ -659,8 +679,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
     
 
+    // =========================================================================
+    //                         ELLPISE PRIVATE FUNCTIONS
+    // =========================================================================
 
-    // ELLPISE PRIVATE FUNCTIONS
 
     static #FILL_ELLIPSE_QUADS_X(){
 
@@ -677,9 +699,44 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static #DRAW_ELLIPSE_SCANLINE(){
+    static #DRAW_ELLIPSE_SCANLINE(
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color_str = undefined , border_color_str = undefined
+    ){
+
+        let A_sqr = A*A;
+        let B_sqr = B*B;
+
+        if( A > B ){
+
+            for(let x = A ; x >= 0 ; x-- ){
+
+                let x_sqr = x*x;
+
+                for(let y = B; y >= 0 ; y-- ){
+
+                    if( (x_sqr / A_sqr) + ( (y*y) / B_sqr) <= 1 ){
+
+                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+
+                        break;
+                    }
+                }
+
+            }
+
+        }
+        else {
+
+
+
+        }
 
     }
+
+
 
     /*
         ==============================================================
@@ -691,11 +748,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         if( canvas_object && canvas_object.tagName == "CANVAS" ){
 
-            draw.#canvas = canvas_object;
-            draw.#ctx = draw.#canvas.getContext("2d");
+            draw.#NEEDED.canvas = canvas_object;
+            draw.#NEEDED.ctx = draw.#NEEDED.canvas.getContext("2d");
 
         }
-        else draw.#LOG.ERROR.canvas.invalid();
+        else draw.#LOG.ERROR.CANVAS.INVALID();
 
     }
 
@@ -720,8 +777,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         } 
         else {
-            if(!f1) draw.#LOG.ERROR.canvas.missing();
-            if(!f2) draw.#LOG.ERROR.object.invalid();
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
@@ -742,8 +799,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
         } 
         else {
-            if(!f1) draw.#LOG.ERROR.canvas.missing();
-            if(!f2) draw.#LOG.ERROR.object.invalid();
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
@@ -783,8 +840,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else {
-            if(!f1) draw.#LOG.ERROR.canvas.missing();
-            if(!f2) draw.#LOG.ERROR.object.invalid();
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
@@ -803,7 +860,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             // sort points depend on Y-axis
             triangle2D.sort_by_y_axis(copy);
 
-            if( copy.color instanceof RGBA ){
+            if( copy.fill_color instanceof RGBA ){
 
                 // fill triangle  
                 draw.#FILL_TRIANGLE( copy );
@@ -821,8 +878,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.canvas.missing();
-            if(!f2) draw.#LOG.ERROR.object.invalid();
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
@@ -845,8 +902,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         
         }
         else{
-            if(!f1) draw.#LOG.ERROR.canvas.missing();
-            if(!f2) draw.#LOG.ERROR.object.invalid();
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
@@ -859,10 +916,19 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         if( f1 && f2 ){
         
+            draw.#DRAW_ELLIPSE_SCANLINE( 
+                ellipse_object.x , 
+                ellipse_object.y , 
+                ellipse_object.width , 
+                ellipse_object.height , 
+                RGBA.to_string(ellipse_object.fill_color) , 
+                RGBA.to_string(ellipse_object.border_color) , 
+            );
+
         }
         else{
-            if(!f1) draw.#LOG.ERROR.canvas.missing();
-            if(!f2) draw.#LOG.ERROR.object.invalid();
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     } 
@@ -883,8 +949,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 draw.#DDA_LINE_DRAW_ALGORITHM( line_object );
             }
             else{
-                if(!f1) draw.#LOG.ERROR.canvas.missing();
-                if(!f2) draw.#LOG.ERROR.object.invalid();
+                if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+                if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
             }
 
         } ,
@@ -918,8 +984,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             
             }
             else{
-                if(!f1) draw.#LOG.ERROR.canvas.missing();
-                if(!f2) draw.#LOG.ERROR.object.invalid();
+                if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+                if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
             }
 
         } ,
