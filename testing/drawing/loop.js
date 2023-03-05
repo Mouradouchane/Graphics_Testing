@@ -18,7 +18,7 @@ const ctx = canvas.getContext("2d");
 var render_loop = 0;
 var testing = 1;
 var interval_testing = 0;
-var interval_time = 3000;
+var interval_time = 1000;
 var anti_alias = 0;
 var shape_type = 5;
 var thickness  = 2;
@@ -46,7 +46,8 @@ var circles = [
 ];
 
 var ellipses = [
-    new ellpise2D(200,200,120,40,0,new RGBA(255,255,0),new RGBA(255,0,255)) , 
+    new ellpise2D(200,200,120,40,0,new RGBA(255,255,0,0.5),new RGBA(255,0,255,0.7)) , 
+    new ellpise2D(400,300,40,120,0,new RGBA(255,255,0,0.5),new RGBA(255,0,255,0.7)) , 
 ];
 
 draw.set_canvas( canvas );
@@ -154,9 +155,6 @@ else {
 
         setInterval( () => {
 
-            lines = generate.random.lines( max_width , max_height , 6 , thickness );
-            triangles = generate.random.triangles( max_width , max_height , 3 , thickness );
-        
             clear_frame();
             new_frame();
 

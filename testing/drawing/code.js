@@ -703,18 +703,49 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color_str = undefined , border_color_str = undefined
     ){
 
-        let A_sqr = A*A;
-        let B_sqr = B*B;
+        let A_sqr = A*A; // A²
+        let B_sqr = B*B; // B²
 
-        if( A > B ){
+        let x = null;
+        let y = null;
+        let m = null; // slope
+        
+        let x_sqr = null; // x²
+        let y_sqr = null; // y²
 
-            for(let x = A ; x >= 0 ; x-- ){
+        if( A >= B ){
 
-                let x_sqr = x*x;
+            for( x = 0 ; x <= A ; x++ ){
 
-                for(let y = B; y >= 0 ; y-- ){
+                x_sqr = x*x;
 
-                    if( (x_sqr / A_sqr) + ( (y*y) / B_sqr) <= 1 ){
+                for( y = B; y >= 0 ; y-- ){
+
+                    if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
+                        
+                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+                        /*
+                        debugger
+                        */
+                        m = ( x * B_sqr ) / ( y * A_sqr ) ;
+                        break;
+                    }
+
+                }
+                if( m >= 1 ) break;
+
+            }
+
+            for( ; y >= 0 ; y-- ){
+                
+                y_sqr = y*y;
+
+                for( x = A; x > 0 ; x-- ){
+
+                    if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
                         draw.#set_pixle( x_org + x , y_org + y , border_color_str );
                         draw.#set_pixle( x_org - x , y_org + y , border_color_str );
@@ -728,9 +759,49 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             }
 
         }
-        else {
+        else { /* B > A */
+        
+            for( y = 0 ; y <= B ; y++ ){
 
+                y_sqr = y*y;
+                
+                for( x = A; x >= 0 ; x-- ){
 
+                    if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
+                        
+                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+                        
+                        m = ( x * B_sqr ) / ( y * A_sqr );
+                        break;
+                    }
+
+                }
+                if( m <= 1 ) break;
+
+            }
+
+            for(  ; x >= 0 ; x-- ){
+
+                x_sqr = x*x;
+
+                for( y = B ; y >= 0 ; y-- ){
+
+                    if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
+
+                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
+                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
+                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+                        
+                        break;
+                    }
+
+                }
+
+            }
 
         }
 
