@@ -8,6 +8,7 @@ import {draw} from "./code.js";
 import {circle2D} from "../../circle.js";
 import {ellpise2D} from "../../ellipse.js";
 import {check} from "../../check.js";
+import {rotate} from "../../rotate.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -46,10 +47,10 @@ var circles = [
 ];
 
 var ellipses = [
-    new ellpise2D(200,200,120,40, Math.PI/2 ,new RGBA(255,255,0,0.5),new RGBA(255,0,255,0.7)) , 
-    new ellpise2D(400,300,40,120,0,new RGBA(255,255,0,0.5),new RGBA(25,255,255,0.7)) , 
-    new ellpise2D(550,400,60,120,4,new RGBA(255,255,0,0.5),new RGBA(25,255,255,0.7)) , 
-    new ellpise2D(220,500,200,40,0,new RGBA(255,255,0,0.5),new RGBA(20,100,255,0.7)) , 
+    new ellpise2D(200,200,120,40, rotate.to_radian(145) ,new RGBA(255,255,0,0.5),new RGBA(255,100,25,0.7)) , 
+    new ellpise2D(400,300,40,120, rotate.to_radian(-22) ,new RGBA(255,255,0,0.5),new RGBA(25,255,255,0.7)) , 
+    new ellpise2D(550,400,60,120, rotate.to_radian(35)  ,new RGBA(255,255,0,0.5),new RGBA(250,25,25,0.7)) , 
+    new ellpise2D(220,350,200,40, rotate.to_radian(-45) ,new RGBA(200,185,50,0.5),new RGBA(120,40,255,0.7)) , 
 ];
 
 draw.set_canvas( canvas );
@@ -117,15 +118,14 @@ function new_frame(){
 
         } break;
 
-
         // ellipses
         case 5 : {
 
             for(let ellipse of ellipses){
-
+            
                 draw.ellipse( ellipse );
-
                 if( testing ) check.visual_check.ellipse( ellipse );
+
             }
 
         } break;

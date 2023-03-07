@@ -6,6 +6,7 @@ import {rectangle as RECTANGLE} from "./rectangle.js";
 import {triangle2D as TRIANGLE_2D} from "./triangle.js";
 import {circle2D as CIRCLE_2D} from "./circle.js";
 import {ellpise2D as ELLIPSE_2D} from "./ellipse.js";
+import {rotate} from "./rotate.js";
 
 /*
     ============================================================
@@ -256,11 +257,23 @@ export class check {
 
                 if( ellipse_object instanceof ELLIPSE_2D ){
 
-                    check.visual_check.point( new POINT_2D(ellipse_object.x , ellipse_object.y) , undefined , "white" );
-                    check.visual_check.point( new POINT_2D(ellipse_object.x , ellipse_object.y + ellipse_object.height) , undefined , "lightgreen"  );
-                    check.visual_check.point( new POINT_2D(ellipse_object.x , ellipse_object.y - ellipse_object.height) , undefined , "lightgreen"  );
-                    check.visual_check.point( new POINT_2D(ellipse_object.x + ellipse_object.width , ellipse_object.y) , undefined , "red" );
-                    check.visual_check.point( new POINT_2D(ellipse_object.x - ellipse_object.width , ellipse_object.y) , undefined , "red" );
+                    let reflected_values = [
+                        { X : 0, Y : 0 , color : "white"} ,
+                        { X :  ellipse_object.width , Y : 0 , color : "lightgreen"},
+                        { X : -ellipse_object.width , Y : 0 , color : "lightgreen"},
+                        { X : 0 , Y :  ellipse_object.height , color : "red"},
+                        { X : 0 , Y : -ellipse_object.height , color : "red"},
+                    ];
+
+                    for( let reflected of reflected_values ){
+                    
+                        let rt = rotate.z( reflected.X , reflected.Y , ellipse_object.angle );
+
+                        check.visual_check.point( 
+                            new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , reflected.color 
+                        );
+
+                    }
 
                 }
                 else {

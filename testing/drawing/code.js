@@ -7,6 +7,7 @@ import {triangle2D} from "../../triangle.js";
 import {circle2D} from "../../circle.js";
 import {ellpise2D} from "../../ellipse.js";
 import {buffer} from "../../buffers.js";
+import {rotate} from "../../rotate.js";
 
 
 export class draw {     // CLASS LIKE NAMESPACE :)
@@ -701,9 +702,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // draw ellipse border with z-rotate support 
     static #DRAW_ELLIPSE_SCANLINE(
-        x_org = 1 , y_org = 1 , A = 1 , B = 1 , deg = undefined , border_color_str = undefined
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = undefined , border_color_str = undefined 
     ){
-        deg = deg | 0;
 
         let A_sqr = A*A; // A²
         let B_sqr = B*B; // B²
@@ -716,12 +716,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let y = null;
         let y_sqr = null; // y²
 
-        let X = null , Y = null ;
-        let xc = null , yc = null; // x and y copy
-        let cos = null , sin = null; // sin and cos of degree
-        
         if( A >= B ){
 
+            // draw first part of the ellipse 
             for( x = 0 ; x <= A ; x++ ){
 
                 x_sqr = x*x;
@@ -730,33 +727,21 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
 
-                        xc = x , yc = y;
-                        cos = Math.cos(deg); sin = Math.sin(deg);
-
-                        X = ( cos * xc ) + -( sin * yc );
-                        Y = ( sin * xc ) +  ( cos * yc );
-
-                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
-
-                        xc = -x;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                        // needed values to draw ellipse using reflection 
+                        let reflected_values = [
+                            { X :  x    , Y :  y},
+                            { X : -x    , Y :  y},
+                            { X :  x    , Y : -y},
+                            { X : -x    , Y : -y},
+                        ];
                         
-                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+                        // draw ellipse using reflection values
+                        for( let reflecte of reflected_values ){
 
-                        xc = +x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
-
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
-
-                        xc = -x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle );
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
                         
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+                        }
 
                         m = ( x * B_sqr ) / (( y * A_sqr ) | 1 );
                         break;
@@ -766,7 +751,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 if( m >= 1 ) break;
 
             }
-
+            // draw secend part of the ellipse 
             for( ; y >= 0 ; y-- ){
                 
                 y_sqr = y*y;
@@ -775,33 +760,22 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
-                        xc = x , yc = y;
-                        cos = Math.cos(deg); sin = Math.sin(deg);
-
-                        X = ( cos * xc ) + -( sin * yc );
-                        Y = ( sin * xc ) +  ( cos * yc );
-
-                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
-
-                        xc = -x;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                        // needed values to draw ellipse using reflection 
+                        let reflected_values = [
+                            { X :  x    , Y :  y},
+                            { X : -x    , Y :  y},
+                            { X :  x    , Y : -y},
+                            { X : -x    , Y : -y},
+                        ];
                         
-                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+                        // draw ellipse using reflection values
+                        for( let reflecte of reflected_values ){
 
-                        xc = +x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
-
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
-
-                        xc = -x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle );
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
                         
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+                        }
+
                         break;
                     }
                 }
@@ -811,6 +785,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
         else { /* B > A */
         
+            // draw first part of the ellipse 
             for( y = 0 ; y <= B ; y++ ){
 
                 y_sqr = y*y;
@@ -819,33 +794,21 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
-                        xc = x , yc = y;
-                        cos = Math.cos(deg); sin = Math.sin(deg);
-
-                        X = ( cos * xc ) + -( sin * yc );
-                        Y = ( sin * xc ) +  ( cos * yc );
-
-                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
-
-                        xc = -x;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                        // needed values to draw ellipse using reflection 
+                        let reflected_values = [
+                            { X :  x    , Y :  y},
+                            { X : -x    , Y :  y},
+                            { X :  x    , Y : -y},
+                            { X : -x    , Y : -y},
+                        ];
                         
-                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+                        // draw ellipse using reflection values
+                        for( let reflecte of reflected_values ){
 
-                        xc = +x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
-
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
-
-                        xc = -x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle );
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
                         
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+                        }
 
                         m = ( x * B_sqr ) / (( y * A_sqr ) | 1);
                         break;
@@ -856,6 +819,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             }
 
+            // draw secend part of the ellipse 
             for(  ; x >= 0 ; x-- ){
 
                 x_sqr = x*x;
@@ -863,34 +827,23 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 for( y = B ; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
-                        xc = x , yc = y;
-                        cos = Math.cos(deg); sin = Math.sin(deg);
-
-                        X = ( cos * xc ) + -( sin * yc );
-                        Y = ( sin * xc ) +  ( cos * yc );
-
-                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
-
-                        xc = -x;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
                         
-                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
-
-                        xc = +x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
-
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
-
-                        xc = -x;
-                        yc = -y;
-                        X = ( cos * xc ) + -( sin * y );
-                        Y = ( sin * xc ) +  ( cos * y );
+                        // needed values to draw ellipse using reflection 
+                        let reflected_values = [
+                            { X :  x    , Y :  y},
+                            { X : -x    , Y :  y},
+                            { X :  x    , Y : -y},
+                            { X : -x    , Y : -y},
+                        ];
                         
-                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+                        // draw ellipse using reflection values
+                        for( let reflecte of reflected_values ){
+
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle );
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
                         
+                        }
+
                         break;
                     }
 
@@ -1088,9 +1041,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     ellipse_object.x , 
                     ellipse_object.y , 
                     ellipse_object.width , 
-                    ellipse_object.height , 
-                    ellipse_object.degree , 
-                    RGBA.to_string(ellipse_object.border_color) , 
+                    ellipse_object.height ,
+                    ellipse_object.angle ,
+                    RGBA.to_string(ellipse_object.border_color) 
                 );
 
             }

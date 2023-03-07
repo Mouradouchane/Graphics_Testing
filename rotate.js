@@ -1,109 +1,90 @@
-import {mesh} from "./mesh.js"
-// =============== rotate functions ===============
-
-// from deg to rad
-export function to_radian ( deg_angle = 0 ){
-    return ( deg_angle * Math.PI ) / 180;
-}
 
 
-export function rotate_x( angel = 0 , tg = new triangle() , origin = { x : 0 , y : 0 , z : 0} ){
-    // debugger
-    r_angel = to_radian(angel);
+export class rotate {
 
-    let cos = Math.cos(r_angel);
-    let sin = Math.sin(r_angel); 
+    static to_radian ( deg_angle = 0 ){
+        return ( deg_angle * Math.PI ) / 180;
+    }
+
+    static to_degree( rad_angle = 0 ){
+
+    }
     
-    let names = ["a","b","c"];
+    // note : rotation round origin (0,0,0)
+    static x( y = 0 , z = 0 , radian_angle = 0 ){
 
-    for(let p of names){
-        tg[p].y -= origin.y;
-        tg[p].z -= origin.z;
-        
+        let cos = Math.cos(radian_angle);
+        let sin = Math.sin(radian_angle); 
+
         let new_y = (tg[p].y * cos + tg[p].z * -sin);
         let new_z = (tg[p].y * sin + tg[p].z * cos);
         
-        tg[p].y = new_y + origin.y;
-        tg[p].z = new_z + origin.z;
+
+        return [
+            ( y * cos ) + ( z * -sin ),   // new Y position
+            ( y * sin ) + ( z *  cos )    // new Z position
+        ];
+
     }
-}
 
+    // note : rotation round origin (0,0,0)
+    static y( x = 0 , z = 0 , radian_angle = 0 ){
 
-export function rotate_y( angel = 0 , tg = new triangle() , origin = { x : 0 , y : 0 , z : 0} ){
-    // debugger
-    r_angel = to_radian(angel);
-
-    let cos = Math.cos(r_angel);
-    let sin = Math.sin(r_angel); 
-    
-    let names = ["a","b","c"];
-
-    for(let p of names){
-        tg[p].x -= origin.x;
-        tg[p].z -= origin.z;
+        let cos = Math.cos(radian_angle);
+        let sin = Math.sin(radian_angle); 
         
-        let new_x = (tg[p].x * cos + tg[p].z * sin);
-        let new_z = (tg[p].x * -sin + tg[p].z * cos);
-        
-        tg[p].x = new_x + origin.x;
-        tg[p].z = new_z + origin.z;
+        return [
+            (x *  cos) + (z * sin) ,    // new X position   
+            (x * -sin) + (z * cos)      // new Z position
+        ];
+
     }
-}
 
+    // note : rotation round origin (0,0,0)
+    static z( x = 0 , y = 0 , radian_angle = 0 ){
 
-export function rotate_z( angel = 0 , tg = new triangle() , origin = { x : 0 , y : 0 , z : 0} ){
-    // debugger
-    r_angel = to_radian(angel);
-
-    let cos = Math.cos(r_angel);
-    let sin = Math.sin(r_angel); 
-    
-    let names = ["a","b","c"];
-
-    for(let p of names){
-        tg[p].x -= origin.x;
-        tg[p].y -= origin.y;
+        let cos = Math.cos(radian_angle);
+        let sin = Math.sin(radian_angle); 
         
-        let new_x = (tg[p].x * cos + tg[p].y * -sin);
-        let new_y = (tg[p].x * sin + tg[p].y * cos);
-        
-        tg[p].x = new_x + origin.x;
-        tg[p].y = new_y + origin.y;
+        return [ 
+            (x * cos) + -(y * sin) ,    // new X position
+            (x * sin) +  (y * cos)      // new Y position
+        ];
+
     }
-}
 
-let current_rotate_index = 0;
-let rotate_intervals = [];
+    /*
+    static rotate_each_time(
+            time_in_ms = 10 , x_angel = 0 , y_angel = 0 , z_angel = 0, 
+            origin = new point(),mesh = new mesh()
+    ){
 
-export function rotate_each_time(
-        time_in_ms = 10 , x_angel = 0 , y_angel = 0 , z_angel = 0, 
-        origin = new point(),mesh = new mesh()
-){
+        current_rotate_index += 1;
 
-    current_rotate_index += 1;
+        rotate_interval.push(
 
-    rotate_interval.push(
+            setInterval((x,y,z,o,m) => {
 
-        setInterval((x,y,z,o,m) => {
+                for(let trig of m.trigs){
+                    if(x_angel != 0) rotate_x( x , trig , o);
+                    if(y_angel != 0) rotate_y( y , trig , o);
+                    if(z_angel != 0) rotate_z( z , trig , o);
+                }
 
-            for(let trig of m.trigs){
-                if(x_angel != 0) rotate_x( x , trig , o);
-                if(y_angel != 0) rotate_y( y , trig , o);
-                if(z_angel != 0) rotate_z( z , trig , o);
-            }
+            },time_in_ms , x_angel , y_angel , z_angel , origin , mesh)
 
-        },time_in_ms , x_angel , y_angel , z_angel , origin , mesh)
+        );
 
-    );
+        return current_rotate_index;
+    }
 
-    return current_rotate_index;
-}
+    static stop_rotate( rotate_index ){
 
+        if( rotate_intervals[rotate_index] == null) return false;
 
-export function stop_rotate( rotate_index ){
+        rotate_intervals[rotate_index] = null;
+        return true;
+    }
+    */
 
-    if( rotate_intervals[rotate_index] == null) return false;
-
-    rotate_intervals[rotate_index] = null;
-    return true;
 }

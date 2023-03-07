@@ -7,13 +7,13 @@ export class ellpise2D{
     #f2 = undefined;
 
     constructor( 
-        x = 1 , y = 1 , width = 1 , height = 1 , rotate_degree = 0 , fill_color = undefined , border_color = undefined
+        x = 1 , y = 1 , width = 1 , height = 1 , radian_angle = 0 , fill_color = undefined , border_color = undefined
     ){
 
         this.x = (typeof(x) == "number") ? x : 1;
         this.y = (typeof(y) == "number") ? y : 1;
 
-        this.degree = (typeof(rotate_degree) == "number") ? rotate_degree : 0; // for rotation around "Z-axis"
+        this.angle = (typeof(radian_angle) == "number") ? radian_angle : 0; // for rotation around "Z-axis"
 
         this.width  = (typeof(width)  == "number") ? width  : 1;
         this.height = (typeof(height) == "number") ? height : 1;
