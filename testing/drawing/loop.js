@@ -46,8 +46,10 @@ var circles = [
 ];
 
 var ellipses = [
-    new ellpise2D(200,200,120,40,0,new RGBA(255,255,0,0.5),new RGBA(255,0,255,0.7)) , 
-    new ellpise2D(400,300,40,120,0,new RGBA(255,255,0,0.5),new RGBA(255,0,255,0.7)) , 
+    new ellpise2D(200,200,120,40, Math.PI/2 ,new RGBA(255,255,0,0.5),new RGBA(255,0,255,0.7)) , 
+    new ellpise2D(400,300,40,120,0,new RGBA(255,255,0,0.5),new RGBA(25,255,255,0.7)) , 
+    new ellpise2D(550,400,60,120,4,new RGBA(255,255,0,0.5),new RGBA(25,255,255,0.7)) , 
+    new ellpise2D(220,500,200,40,0,new RGBA(255,255,0,0.5),new RGBA(20,100,255,0.7)) , 
 ];
 
 draw.set_canvas( canvas );

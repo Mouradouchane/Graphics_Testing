@@ -699,20 +699,27 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
+    // draw ellipse border with z-rotate support 
     static #DRAW_ELLIPSE_SCANLINE(
-        x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color_str = undefined , border_color_str = undefined
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , deg = undefined , border_color_str = undefined
     ){
+        deg = deg | 0;
 
         let A_sqr = A*A; // A²
         let B_sqr = B*B; // B²
 
-        let x = null;
-        let y = null;
         let m = null; // slope
-        
+
+        let x = null;
         let x_sqr = null; // x²
+
+        let y = null;
         let y_sqr = null; // y²
 
+        let X = null , Y = null ;
+        let xc = null , yc = null; // x and y copy
+        let cos = null , sin = null; // sin and cos of degree
+        
         if( A >= B ){
 
             for( x = 0 ; x <= A ; x++ ){
@@ -722,15 +729,36 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 for( y = B; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
+
+                        xc = x , yc = y;
+                        cos = Math.cos(deg); sin = Math.sin(deg);
+
+                        X = ( cos * xc ) + -( sin * yc );
+                        Y = ( sin * xc ) +  ( cos * yc );
+
+                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
+
+                        xc = -x;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
                         
-                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
-                        /*
-                        debugger
-                        */
-                        m = ( x * B_sqr ) / ( y * A_sqr ) ;
+                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+
+                        xc = +x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+
+                        xc = -x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+                        
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+
+                        m = ( x * B_sqr ) / (( y * A_sqr ) | 1 );
                         break;
                     }
 
@@ -747,11 +775,33 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
-                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+                        xc = x , yc = y;
+                        cos = Math.cos(deg); sin = Math.sin(deg);
 
+                        X = ( cos * xc ) + -( sin * yc );
+                        Y = ( sin * xc ) +  ( cos * yc );
+
+                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
+
+                        xc = -x;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+                        
+                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+
+                        xc = +x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+
+                        xc = -x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+                        
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
                         break;
                     }
                 }
@@ -768,13 +818,36 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 for( x = A; x >= 0 ; x-- ){
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
+
+                        xc = x , yc = y;
+                        cos = Math.cos(deg); sin = Math.sin(deg);
+
+                        X = ( cos * xc ) + -( sin * yc );
+                        Y = ( sin * xc ) +  ( cos * yc );
+
+                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
+
+                        xc = -x;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
                         
-                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+
+                        xc = +x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+
+                        xc = -x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
                         
-                        m = ( x * B_sqr ) / ( y * A_sqr );
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+
+                        m = ( x * B_sqr ) / (( y * A_sqr ) | 1);
                         break;
                     }
 
@@ -790,11 +863,33 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 for( y = B ; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
+                        xc = x , yc = y;
+                        cos = Math.cos(deg); sin = Math.sin(deg);
 
-                        draw.#set_pixle( x_org + x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org + y , border_color_str );
-                        draw.#set_pixle( x_org + x , y_org - y , border_color_str );
-                        draw.#set_pixle( x_org - x , y_org - y , border_color_str );
+                        X = ( cos * xc ) + -( sin * yc );
+                        Y = ( sin * xc ) +  ( cos * yc );
+
+                        draw.#set_pixle( x_org +  X , y_org + Y , border_color_str );
+
+                        xc = -x;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+                        
+                        draw.#set_pixle( x_org + X ,  y_org + Y , border_color_str );
+
+                        xc = +x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
+
+                        xc = -x;
+                        yc = -y;
+                        X = ( cos * xc ) + -( sin * y );
+                        Y = ( sin * xc ) +  ( cos * y );
+                        
+                        draw.#set_pixle( x_org - X , y_org - Y , border_color_str );
                         
                         break;
                     }
@@ -987,14 +1082,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         if( f1 && f2 ){
         
-            draw.#DRAW_ELLIPSE_SCANLINE( 
-                ellipse_object.x , 
-                ellipse_object.y , 
-                ellipse_object.width , 
-                ellipse_object.height , 
-                RGBA.to_string(ellipse_object.fill_color) , 
-                RGBA.to_string(ellipse_object.border_color) , 
-            );
+            if( ellipse_object.border_color instanceof RGBA ){
+
+                draw.#DRAW_ELLIPSE_SCANLINE( 
+                    ellipse_object.x , 
+                    ellipse_object.y , 
+                    ellipse_object.width , 
+                    ellipse_object.height , 
+                    ellipse_object.degree , 
+                    RGBA.to_string(ellipse_object.border_color) , 
+                );
+
+            }
 
         }
         else{
