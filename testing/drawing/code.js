@@ -511,7 +511,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     //                         CIRCLE PRIVATE FUNCTIONS
     // =========================================================================
 
-    static #DRAW_ALL_QUADS(
+    static #CIRCLE_DRAW_ALL_QUADS(
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
     ){
 
@@ -527,7 +527,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static #FILL_ALL_QUADS(
+    static #CIRCLE_FILL_ALL_QUADS(
         x_org = 1 , y_org = 1 , radius = 1 , color_ = "white"
     ){
 
@@ -577,7 +577,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             
             // draw or fill in all the QUAD's
             if( str_border_color ) 
-                draw.#DRAW_ALL_QUADS( X , Y , x_org , y_org , str_border_color );
+                draw.#CIRCLE_DRAW_ALL_QUADS( X , Y , x_org , y_org , str_border_color );
             
         }
         while( Y > X );
@@ -675,7 +675,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
 
         // in case "fill circle" wanted
-        if( str_fill_color ) draw.#FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
+        if( str_fill_color ) draw.#CIRCLE_FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
 
     }
     
@@ -700,7 +700,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    // draw ellipse border with z-rotate support 
+    // draw ellipse border with rotation support around the z-axis 
     static #DRAW_ELLIPSE_SCANLINE(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = undefined , border_color_str = undefined 
     ){
@@ -726,13 +726,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 for( y = B; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
-
+                        
                         // needed values to draw ellipse using reflection 
                         let reflected_values = [
-                            { X :  x    , Y :  y},
-                            { X : -x    , Y :  y},
-                            { X :  x    , Y : -y},
-                            { X : -x    , Y : -y},
+                            { X :  x    , Y :  y} ,
+                            { X : -x    , Y :  y} ,
+                            { X :  x    , Y : -y} ,
+                            { X : -x    , Y : -y} ,
                         ];
                         
                         // draw ellipse using reflection values
@@ -743,7 +743,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         
                         }
 
-                        m = ( x * B_sqr ) / (( y * A_sqr ) | 1 );
+                        m = ( x * B_sqr ) / ( ( y * A_sqr ) | 1 );
                         break;
                     }
 
@@ -855,7 +855,64 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
+    // note : fill ellipse with no support to rotation
+    static #FILL_ELLIPSE_SCANLINE(
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , str_fill_color = undefined 
+    ){
 
+        let A_sqr = A*A; // A²
+        let B_sqr = B*B; // B²
+
+        let x = null;
+        let x_sqr = null; // x²
+
+        let y = null;
+        let y_sqr = null; // y²
+     
+        if( A >= B ){
+
+            // fill ellipse 
+            for( x = -A ; x <= A ; x++ ){
+
+                x_sqr = x*x;
+
+                for( y = -B ; y <= B ; y++ ){
+
+                    if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
+    
+                        draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , str_fill_color );
+
+                        break;
+                    }
+
+                }
+
+            }
+
+        }
+        else {
+            
+            // fill ellipse 
+            for( y = -B ; y <= B ; y++ ){
+                
+                y_sqr = y*y;
+                
+                for( x = -A ; x <= A ; x++ ){
+
+                    if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
+
+                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org + y , str_fill_color );
+
+                        break;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
 
     /*
         ==============================================================
@@ -1035,6 +1092,16 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         if( f1 && f2 ){
         
+            if( ellipse_object.fill_color instanceof RGBA ){
+                draw.#FILL_ELLIPSE_SCANLINE( 
+                    ellipse_object.x , 
+                    ellipse_object.y , 
+                    ellipse_object.width , 
+                    ellipse_object.height ,
+                    RGBA.to_string(ellipse_object.fill_color) 
+                );
+            }
+
             if( ellipse_object.border_color instanceof RGBA ){
 
                 draw.#DRAW_ELLIPSE_SCANLINE( 

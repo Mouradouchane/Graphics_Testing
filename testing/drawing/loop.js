@@ -23,8 +23,8 @@ var interval_time = 1000;
 var anti_alias = 0;
 var shape_type = 5;
 var thickness  = 2;
-var max_width  = canvas.clientWidth-20;
-var max_height = canvas.clientHeight-20;
+var max_width  = canvas.clientWidth-200;
+var max_height = canvas.clientHeight-200;
 
 /*
     generate random "shapes for testing"
@@ -47,10 +47,10 @@ var circles = [
 ];
 
 var ellipses = [
-    new ellpise2D(200,200,120,40, rotate.to_radian(145) ,new RGBA(255,255,0,0.5),new RGBA(255,100,25,0.7)) , 
-    new ellpise2D(400,300,40,120, rotate.to_radian(-22) ,new RGBA(255,255,0,0.5),new RGBA(25,255,255,0.7)) , 
-    new ellpise2D(550,400,60,120, rotate.to_radian(35)  ,new RGBA(255,255,0,0.5),new RGBA(250,25,25,0.7)) , 
-    new ellpise2D(220,350,200,40, rotate.to_radian(-45) ,new RGBA(200,185,50,0.5),new RGBA(120,40,255,0.7)) , 
+    new ellpise2D(200,200,150,70,  rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()) , 
+    new ellpise2D(400,300,100,120, rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()) , 
+    new ellpise2D(550,400,50,120,  rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()) , 
+    new ellpise2D(220,350,200,40,  rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()) , 
 ];
 
 draw.set_canvas( canvas );
@@ -61,7 +61,7 @@ check.set.canvas( canvas );
 */
 function clear_frame(){
 
-    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.fillStyle = "rgba(0,0,0,1)";
     ctx.fillRect( 0 , 0 , canvas.clientWidth , canvas.clientHeight );
 
 }

@@ -53,6 +53,17 @@ export class rotate {
 
     }
 
+    static random_x(){
+
+    }
+
+    static random_y(){
+        
+    }
+    static random_z(){
+        return ( Math.PI * Math.random() );
+    }
+
     /*
     static rotate_each_time(
             time_in_ms = 10 , x_angel = 0 , y_angel = 0 , z_angel = 0, 
