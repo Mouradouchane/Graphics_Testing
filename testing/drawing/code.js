@@ -710,10 +710,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let m = null; // slope
 
-        let x = null;
+        let x = A;
         let x_sqr = null; // x²
 
-        let y = null;
+        let y = B;
         let y_sqr = null; // y²
 
         if( A >= B ){
@@ -722,17 +722,17 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             for( x = 0 ; x <= A ; x++ ){
 
                 x_sqr = x*x;
-
-                for( y = B; y >= 0 ; y-- ){
+ 
+                for( ; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
                         
                         // needed values to draw ellipse using reflection 
                         let reflected_values = [
-                            { X :  x    , Y :  y} ,
-                            { X : -x    , Y :  y} ,
-                            { X :  x    , Y : -y} ,
-                            { X : -x    , Y : -y} ,
+                            { X :  x    ,   Y :  y } ,
+                            { X : -x    ,   Y :  y } ,
+                            { X :  x    ,   Y : -y } ,
+                            { X : -x    ,   Y : -y } ,
                         ];
                         
                         // draw ellipse using reflection values
@@ -751,21 +751,23 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 if( m >= 1 ) break;
 
             }
+
             // draw secend part of the ellipse 
+            x = A;
             for( ; y >= 0 ; y-- ){
                 
                 y_sqr = y*y;
-
-                for( x = A; x > 0 ; x-- ){
+                x++;
+                for( ; x > 0 ; x-- ){
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
                         // needed values to draw ellipse using reflection 
                         let reflected_values = [
-                            { X :  x    , Y :  y},
-                            { X : -x    , Y :  y},
-                            { X :  x    , Y : -y},
-                            { X : -x    , Y : -y},
+                            { X :  x    ,    Y :  y },
+                            { X : -x    ,    Y :  y },
+                            { X :  x    ,    Y : -y },
+                            { X : -x    ,    Y : -y },
                         ];
                         
                         // draw ellipse using reflection values
@@ -790,7 +792,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 y_sqr = y*y;
                 
-                for( x = A; x >= 0 ; x-- ){
+                for( ; x >= 0 ; x-- ){
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
@@ -819,12 +821,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             }
 
-            // draw secend part of the ellipse 
+            // draw secend part of the ellipse
+            y = B;
             for(  ; x >= 0 ; x-- ){
 
                 x_sqr = x*x;
-
-                for( y = B ; y >= 0 ; y-- ){
+                y++;
+                for( ; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
                         
@@ -863,24 +866,27 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let A_sqr = A*A; // A²
         let B_sqr = B*B; // B²
 
-        let x = null;
+        let x = -A;
         let x_sqr = null; // x²
 
-        let y = null;
+        let y = -B;
         let y_sqr = null; // y²
      
         if( A >= B ){
 
-            // fill ellipse 
-            for( x = -A ; x <= A ; x++ ){
+            draw.#DRAW_VERTICAL_LINE( x_org , y_org - y - 1 , y_org + y + 1 , str_fill_color );
+
+            // fill ellipse process
+            for( ; x < 0 ; x++ ){
 
                 x_sqr = x*x;
 
-                for( y = -B ; y <= B ; y++ ){
+                y-=4;
+                for( ; y <= 0 ; y++ ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
-    
                         draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , str_fill_color );
+                        draw.#DRAW_VERTICAL_LINE( x_org + x , y_org - y , y_org + y , str_fill_color );
 
                         break;
                     }
@@ -891,17 +897,21 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else {
+
+            draw.#DRAW_HORIZONTAL_LINE( x_org - A +1, x_org + A-1 , y_org , str_fill_color );
             
-            // fill ellipse 
-            for( y = -B ; y <= B ; y++ ){
-                
+            // fill ellipse process
+            for( ; y < 0 ; y++ ){
+
                 y_sqr = y*y;
                 
-                for( x = -A ; x <= A ; x++ ){
+                x-=5;
+                for( ; x <= 0 ; x++ ){
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
                         draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org + y , str_fill_color );
+                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org - y , str_fill_color );
 
                         break;
                     }
