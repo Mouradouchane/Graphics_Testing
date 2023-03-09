@@ -251,7 +251,7 @@ export class check {
 
         },
 
-        ellipse : function( ellipse_object = new ELLIPSE_2D()){
+        ellipse : function( ellipse_object = new ELLIPSE_2D() , show_foci = false ){
             
             if( check.#NEEDED.canvas ){
 
@@ -271,6 +271,25 @@ export class check {
 
                         check.visual_check.point( 
                             new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , reflected.color 
+                        );
+
+                    }
+
+                    if( show_foci ){
+
+                        let foci = ellipse_object.get_f1();
+
+                        let rt = rotate.z( foci.x , foci.y , ellipse_object.angle );
+
+                        check.visual_check.point( 
+                            new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , "cyan" 
+                        );
+
+                        foci = ellipse_object.get_f2();
+                        rt = rotate.z( foci.x , foci.y , ellipse_object.angle );
+
+                        check.visual_check.point( 
+                            new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , "cyan" 
                         );
 
                     }

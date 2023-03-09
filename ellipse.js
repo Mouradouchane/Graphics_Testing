@@ -1,8 +1,10 @@
 import { RGBA } from "./color.js";
+import { point2D } from "./point.js";
 
 export class ellpise2D{
 
-    // ellipse foci point
+    // ellipse foci point's
+    // note : foci point's around origin (0,0) !!
     #f1 = undefined;
     #f2 = undefined;
 
@@ -21,12 +23,25 @@ export class ellpise2D{
         this.fill_color   = (fill_color instanceof RGBA)   ? fill_color   : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
 
-        /*
-            to-do : 
-                - calc foci points
-                - add getter's for foci points 
-                - add support to rotate ellipse
-        */
+        if( width > height ){
+            let fvalue = Math.sqrt( (width*width) - (height*height) );
+            this.#f2 = new point2D( fvalue , 0 );
+            this.#f1 = new point2D(-fvalue , 0 );
+        }
+        else {
+            let fvalue = Math.sqrt( (height*height) - (width*width) );
+            this.#f2 = new point2D( 0 ,  fvalue );
+            this.#f1 = new point2D( 0 , -fvalue );
+        }
+
+        this.get_f1 = () => {
+            return point2D.copy( this.#f1 );
+        }
+
+        this.get_f2 = () => {
+            return point2D.copy( this.#f2 );
+        }
+
     }
 
 

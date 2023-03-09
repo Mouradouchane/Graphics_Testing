@@ -871,6 +871,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let y = -B;
         let y_sqr = null; // y²
+
+        let m  = 0; // slope
      
         if( A >= B ){
 
@@ -888,11 +890,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , str_fill_color );
                         draw.#DRAW_VERTICAL_LINE( x_org + x , y_org - y , y_org + y , str_fill_color );
 
+                        m = ( x * B_sqr ) / ( ( y * A_sqr ) | 1 );
                         break;
                     }
 
                 }
-
+                if( m >= 1 ) break;
             }
 
         }
@@ -905,7 +908,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 y_sqr = y*y;
                 
-                x-=5;
+                x-=4;
                 for( ; x <= 0 ; x++ ){
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
@@ -920,6 +923,50 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             }
 
+        }
+
+    }
+
+    static #FILL_ELLIPSE_SCANLINE_ROTATED(
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, str_fill_color = undefined 
+    ){
+
+        let A_sqr = A*A; // A²
+        let B_sqr = B*B; // B²
+
+        let x = -A;
+        let x_sqr = null; // x²
+
+        let y = -B;
+        let y_sqr = null; // y²
+
+        if( A > B ){
+
+            // fill ellipse process
+            for( ; x < 0 ; x++ ){
+
+                x_sqr = x*x;
+
+                y-=4;
+                for( ; y <= 0 ; y++ ){
+
+                    if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
+                        /*
+                        draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , str_fill_color );
+                        draw.#DRAW_VERTICAL_LINE( x_org + x , y_org - y , y_org + y , str_fill_color );
+                        */
+
+                        let [px , py] = rotate.z( x  , y , angle );
+                        let [nx , ny] = rotate.z( -x , y , angle );
+
+
+
+                        break;
+                    }
+
+                }
+
+            }
         }
 
     }
@@ -1103,18 +1150,37 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         if( f1 && f2 ){
         
             if( ellipse_object.fill_color instanceof RGBA ){
-                draw.#FILL_ELLIPSE_SCANLINE( 
-                    ellipse_object.x , 
-                    ellipse_object.y , 
-                    ellipse_object.width , 
-                    ellipse_object.height ,
-                    RGBA.to_string(ellipse_object.fill_color) 
-                );
+
+                // if ellipse fill require no rotation
+                if(ellipse_object.angle == 0){
+
+                    draw.#FILL_ELLIPSE_SCANLINE( 
+                        ellipse_object.x , 
+                        ellipse_object.y , 
+                        ellipse_object.width , 
+                        ellipse_object.height ,
+                        RGBA.to_string(ellipse_object.fill_color) 
+                    );
+                }
+                else { // if ellipse fill require rotation
+
+                    draw.#FILL_ELLIPSE_SCANLINE_ROTATED( 
+                        ellipse_object.x , 
+                        ellipse_object.y , 
+                        ellipse_object.width , 
+                        ellipse_object.height ,
+                        ellipse_object.angle,
+                        RGBA.to_string(ellipse_object.fill_color) 
+                    );
+
+                }
+
             }
 
+            // if ellipse require draw border
             if( ellipse_object.border_color instanceof RGBA ){
 
-                draw.#DRAW_ELLIPSE_SCANLINE( 
+                draw.#DRAW_ELLIPSE_SCANLINE(
                     ellipse_object.x , 
                     ellipse_object.y , 
                     ellipse_object.width , 

@@ -17,7 +17,7 @@ const ctx = canvas.getContext("2d");
     rendering/drawing "sitting"
 */
 var render_loop = 0;
-var testing = 0;
+var testing = 1;
 var interval_testing = 0;
 var interval_time = 1000;
 var anti_alias = 0;
@@ -47,10 +47,10 @@ var circles = [
 ];
 
 var ellipses = [
-    new ellpise2D(300,100,60,10,   rotate.random_z() , RGBA.random_color(true) , RGBA.random_color()*0) , 
-    new ellpise2D(400,300,40,100, rotate.random_z() , RGBA.random_color(true) , RGBA.random_color()*0) , 
-    new ellpise2D(550,400,50,120,  rotate.random_z() , RGBA.random_color(true) , RGBA.random_color()*0) , 
-    new ellpise2D(220,350,200,40,  rotate.random_z() , RGBA.random_color(true) , RGBA.random_color()*0) , 
+    new ellpise2D(300,100,60,50,   rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()*0) , 
+    new ellpise2D(400,300,40,80,  rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()*0) , 
+    new ellpise2D(550,400,50,120,  rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()*0) , 
+    new ellpise2D(220,350,120,100,  rotate.random_z()*0 , RGBA.random_color(true) , RGBA.random_color()*0) , 
 ];
 
 draw.set_canvas( canvas );
@@ -124,7 +124,7 @@ function new_frame(){
             for(let ellipse of ellipses){
             
                 draw.ellipse( ellipse );
-                if( testing ) check.visual_check.ellipse( ellipse );
+                if( testing ) check.visual_check.ellipse( ellipse , true );
 
             }
 
