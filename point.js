@@ -9,13 +9,13 @@ export class point2D{
 
     constructor(x = 0 , y = 0){
 
-        this.x = (typeof(x) == "number") ? x : 0;
-        this.y = (typeof(y) == "number") ? y : 0;
+        this.x = (typeof(x) == "number" || x instanceof Number ) ? x : 0;
+        this.y = (typeof(y) == "number" || y instanceof Number ) ? y : 0;
 
     }
 
     static copy( POINT = new point2D() ){
-        return POINT.valueOf();
+        return new point2D( new Number( POINT.x ) , new Number( POINT.y ) );
     }
 
     static swap( point_a = new point2D() , point_b = new point2D() ){
