@@ -7,6 +7,7 @@ import {triangle2D as TRIANGLE_2D} from "./triangle.js";
 import {circle2D as CIRCLE_2D} from "./circle.js";
 import {ellpise2D as ELLIPSE_2D} from "./ellipse.js";
 import {rotate} from "./rotate.js";
+import { plane2D } from "./plane.js";
 
 /*
     ============================================================
@@ -306,7 +307,33 @@ export class check {
                 check.#LOG.HINT.DEFINE_CANVAS();
             }
 
-        }
+        },
+
+        plane : function( plane_object = new plane2D() ){
+
+            if( check.#NEEDED.canvas ){
+
+                if( plane_object instanceof plane2D ){
+                    
+                    check.visual_check.point( plane_object.a );
+                    check.visual_check.point( plane_object.b );
+                    check.visual_check.point( plane_object.c );
+                    check.visual_check.point( plane_object.d );
+
+                }
+                else {
+                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.plane" , "plane2D");
+                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.plane" , "plane2D");
+                }
+
+            }
+            else {
+                check.#LOG.ERROR.CANVAS_NOT_DEFINED();
+                check.#LOG.HINT.DEFINE_CANVAS();
+            }
+
+        },
+
     }
     
 

@@ -9,6 +9,7 @@ import {circle2D} from "../../circle.js";
 import {ellpise2D} from "../../ellipse.js";
 import {check} from "../../check.js";
 import {rotate} from "../../rotate.js";
+import {plane2D} from "../../plane.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
@@ -17,11 +18,12 @@ const ctx = canvas.getContext("2d");
     rendering/drawing "sitting"
 */
 var render_loop = 0;
-var testing = 1;
+var grid = 1;
+var testing = 0;
 var interval_testing = 0;
 var interval_time = 1000;
 var anti_alias = 0;
-var shape_type = 5;
+var shape_type = 6;
 var thickness  = 2;
 var max_width  = canvas.clientWidth-200;
 var max_height = canvas.clientHeight-200;
@@ -53,6 +55,14 @@ var ellipses = [
     new ellpise2D(220,350,120,100, rotate.random_z()  , RGBA.random_color(0)*0 , RGBA.random_color()) , 
 ];
 
+var planes = [
+    new plane2D( 
+        new point2D(251,80) , new point2D(400,180) , 
+        new point2D(451,400) , new point2D(101,250) ,
+        RGBA.random_color(1) , RGBA.random_color() , thickness 
+    )
+];
+
 draw.set_canvas( canvas );
 check.set.canvas( canvas );
 
@@ -68,7 +78,7 @@ function clear_frame(){
 
 function new_frame(){
 
-    draw.draw_grid();
+    if( grid ) draw.draw_grid();
 
     ctx.fillStyle = "white";
     ctx.strokeStyle = "white";
@@ -132,6 +142,17 @@ function new_frame(){
 
         } break;
 
+        // planes
+        case 6 : {
+
+            for(let plane of planes){
+
+                draw.plane( plane );
+                if(testing) check.visual_check.plane(plane);
+
+            }
+
+        } break;
     }
     
 }

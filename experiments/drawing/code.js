@@ -8,6 +8,7 @@ import {circle2D} from "../../circle.js";
 import {ellpise2D} from "../../ellipse.js";
 import {buffer} from "../../buffers.js";
 import {rotate} from "../../rotate.js";
+import {plane2D} from "../../plane.js";
 
 
 export class draw {     // CLASS LIKE NAMESPACE :)
@@ -408,11 +409,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     //                      TRIANGLE PRIVATE FUNCTIONS
     // =========================================================================
 
-
+    // NOTE !!! triangle points need to be sorted by "Y-axis"
     static #FILL_TRIANGLE( copy = new triangle2D() ){
 
         // calc needed values
-                
+
         // A-B
         let D_AB_X = (copy.a.x - copy.b.x);
         let D_AB_Y = (copy.a.y - copy.b.y);
@@ -430,7 +431,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let y = copy.a.y;
 
         // fill from A to B
-        for( ; y <= copy.b.y ; y += 1 ){
+        for( ; y < copy.b.y ; y += 1 ){
 
             // find X's
             x_start = Math.round( (y - intercept_AC) / slope_AC );
@@ -450,7 +451,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         y = copy.b.y;
 
         // fill from B to C
-        for( ; y <= copy.c.y ; y += 1 ){
+        for( ; y < copy.c.y ; y += 1 ){
 
             x_start = Math.round( (y - intercept_AC) / slope_AC );
             x_end   = Math.round( (y - intercept_BC) / slope_BC );
@@ -1206,8 +1207,61 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     } 
 
+    static plane( plane_2D_object = new plane2D() ){
 
-    // object contain the famous drawing algorithms . 
+        // check canvas and circle
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = (plane_2D_object instanceof plane2D);
+
+        if( f1 && f2 ){ 
+
+            if( plane_2D_object.fill_color instanceof RGBA ){
+
+                // debugger
+                let copy_part_1 = new triangle2D(
+                    point2D.copy(plane_2D_object.a),
+                    point2D.copy(plane_2D_object.b),
+                    point2D.copy(plane_2D_object.c),
+                    undefined,
+                    RGBA.copy( plane_2D_object.fill_color ),
+                    undefined
+                );
+
+                let copy_part_2 = new triangle2D(
+                    point2D.copy(plane_2D_object.c),
+                    point2D.copy(plane_2D_object.d),
+                    point2D.copy(plane_2D_object.a),
+                    undefined,
+                    RGBA.copy( plane_2D_object.fill_color ),
+                    undefined
+                )
+                copy_part_2.a.x-=1;
+                copy_part_2.b.x-=1;
+                copy_part_2.c.x-=1;
+
+                triangle2D.sort_by_y_axis( copy_part_1 );
+                triangle2D.sort_by_y_axis( copy_part_2 );
+
+                draw.#FILL_TRIANGLE( copy_part_1 );
+                draw.#FILL_TRIANGLE( copy_part_2 );
+
+            }
+
+        }
+        else{
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+        }
+
+
+    }
+
+
+    /*
+
+        famous drawing algorithms 
+
+    */
     static algorithms = {
 
 

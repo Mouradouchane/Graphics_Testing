@@ -5,14 +5,14 @@ export class triangle2D{
 
     constructor(
         point_a = new point2D() , point_b = new point2D() , point_c = new point2D() , 
-        thickness = 1 , color = undefined , border_color = undefined 
+        thickness = 1 , fill_color = undefined , border_color = undefined 
     ){
 
         this.a = (point_a instanceof point2D) ? point_a : new point2D();
         this.b = (point_b instanceof point2D) ? point_b : new point2D();
         this.c = (point_c instanceof point2D) ? point_c : new point2D();
         this.thickness = thickness;
-        this.fill_color = (color instanceof RGBA) ? color : undefined;
+        this.fill_color = (fill_color instanceof RGBA) ? fill_color : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
 
     }
