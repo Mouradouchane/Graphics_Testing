@@ -92,7 +92,7 @@ export class RGBA{
             Math.floor( Math.random() * 255 ), 
             Math.floor( Math.random() * 255 ),
             Math.floor( Math.random() * 255 ),
-            (random_alpha) ? Math.random() * 1 : 1
+            (random_alpha) ? Math.random() : 1
         );
 
     }

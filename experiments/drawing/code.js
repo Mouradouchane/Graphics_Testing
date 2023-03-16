@@ -448,6 +448,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let slope_BC = D_BC_X != 0 ? ( D_BC_Y / D_BC_X ) : 0;
         let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
         
+        //draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y + 1 , RGBA.to_string(copy.fill_color) );
         y = copy.b.y;
 
         // fill from B to C
@@ -461,6 +462,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
 
     }
+
 
     static #DRAW_TRIANGLE(
         p1 = new point2D() , p2 = new point2D() , thickness = 1 , color = new RGBA()
@@ -1217,7 +1219,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             if( plane_2D_object.fill_color instanceof RGBA ){
 
-                // debugger
+                //debugger
+
+                plane2D.sort_by_y_axis( plane_2D_object );
+
                 let copy_part_1 = new triangle2D(
                     point2D.copy(plane_2D_object.a),
                     point2D.copy(plane_2D_object.b),
@@ -1228,19 +1233,17 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 );
 
                 let copy_part_2 = new triangle2D(
+                    point2D.copy(plane_2D_object.b),
                     point2D.copy(plane_2D_object.c),
                     point2D.copy(plane_2D_object.d),
-                    point2D.copy(plane_2D_object.a),
                     undefined,
                     RGBA.copy( plane_2D_object.fill_color ),
                     undefined
                 )
-                copy_part_2.a.x-=1;
-                copy_part_2.b.x-=1;
-                copy_part_2.c.x-=1;
-
-                triangle2D.sort_by_y_axis( copy_part_1 );
-                triangle2D.sort_by_y_axis( copy_part_2 );
+                /*
+                    triangle2D.sort_by_y_axis( copy_part_1 );
+                    triangle2D.sort_by_y_axis( copy_part_2 );  
+                */
 
                 draw.#FILL_TRIANGLE( copy_part_1 );
                 draw.#FILL_TRIANGLE( copy_part_2 );

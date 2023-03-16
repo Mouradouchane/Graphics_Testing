@@ -25,6 +25,84 @@ export class plane2D{
 
     }
 
+
+    static sort_by_y_axis( plane_object = new plane2D() ){
+
+        if( plane_object instanceof plane2D ){
+
+            let points = [
+                plane_object.a , 
+                plane_object.b , 
+                plane_object.c , 
+                plane_object.d , 
+            ];
+
+            points.sort( ( a , b ) => {
+                return ( a.y > b.y );
+            });
+
+            plane_object.a = points[0];
+            plane_object.b = points[1];
+            plane_object.c = points[2];
+            plane_object.d = points[3];
+            
+            return true;
+        }
+        else return false;
+
+    }
+
+    static sort_by_x_axis( plane_object = new plane2D() ){
+
+        if( plane_object instanceof plane2D ){
+
+            let points = [
+                plane_object.a , 
+                plane_object.b , 
+                plane_object.c , 
+                plane_object.d , 
+            ];
+
+            points.sort( ( a , b ) => {
+                return ( a.x > b.x );
+            });
+
+            plane_object.a = points[0];
+            plane_object.b = points[1];
+            plane_object.c = points[2];
+            plane_object.d = points[3];
+            
+            return true;
+        }
+        else return false;
+
+    }
+
+    static sort_by_x_and_y_axis( plane_object = new plane2D() ){
+
+        if( plane_object instanceof plane2D ){
+
+            let points = [
+                plane_object.a , 
+                plane_object.b , 
+                plane_object.c , 
+                plane_object.d , 
+            ];
+
+            points.sort( ( a , b ) => {
+                return ( a.x > b.x && a.y > b.y );
+            });
+
+            plane_object.a = points[0];
+            plane_object.b = points[1];
+            plane_object.c = points[2];
+            plane_object.d = points[3];
+            
+            return true;
+        }
+        else return false;
+
+    }
 }
 
     /* need work */
