@@ -8,9 +8,10 @@ import {plane2D} from "./plane.js";
 
 export class generate {
    
+    // default options for shapes generation in case some parameters "undefined"
     static #default = {
 
-        thickness : 4,
+        thickness : 6 ,
 
         min_width : 1,
         max_width : 800,
@@ -24,21 +25,25 @@ export class generate {
     // the main function who generate all the shapes 
     static #main_generator(
 
-        SHAPES_TYPE = undefined ,
+        // class name
+        SHAPES_TYPE = undefined , 
+    
+        AMOUNT_OF_OBJECTS = 1 , 
+
+        thickness = undefined , 
 
         min_X = undefined , max_X = undefined , 
         min_Y = undefined , max_Y = undefined , 
 
-        amount_of_shapes = 1 , thickness = undefined , 
-
         fill_color = undefined , border_color = undefined ,
-        fill_color_alpha = undefined , border_color_alpha = undefined ,
+        fill_color_random_alpha = undefined , border_color_random_alpha = undefined ,
 
+    ) {
 
+        if( SHAPES_TYPE === undefined ||SHAPES_TYPE === null ) return;
 
-    ){
-
-        // check ranges before generate the point
+        // check values before generate the shape's
+        AMOUNT_OF_OBJECTS = ( AMOUNT_OF_OBJECTS <= 0 ) ? 1 : AMOUNT_OF_OBJECTS;
 
         min_X = (min_X == undefined) ? generate.#default.min_width : min_X;
         max_X = (max_X == undefined) ? generate.#default.max_width : max_X;
@@ -46,43 +51,130 @@ export class generate {
         min_Y = (min_Y == undefined) ? generate.#default.min_height : min_Y;
         max_Y = (max_Y == undefined) ? generate.#default.max_height : max_Y;
 
+        let allow_fill = false;
+        if(fill_color == undefined || !(fill_color instanceof RGBA) ) {
 
-        // generate shapes 
+            allow_fill = true;
+            fill_color = generate.random.color( fill_color_random_alpha );
 
-        var shapes = [];
+        } 
 
-        for( let i = 0 ; i < amount_of_shapes ; i += 1){
+        let allow_border = false;
+        if( border_color == undefined || !(border_color instanceof RGBA) ){
 
-            if ( SHAPES_TYPE === RGBA ){
+            allow_border = true;
+            border_color = generate.random.color( border_color_random_alpha );
 
-            } 
+        } 
+        
+        let allow_thickness = false;
+        if( thickness == undefined || thickness <= 0 ) {
 
+            allow_thickness = true;
+            thickness = generate.#default.thickness;
+
+        }
+
+        // generate process 
+        
+        var OBJECTS = [];
+
+        for( let i = 0 ; i < AMOUNT_OF_OBJECTS ; i += 1){
+            
+            if(allow_fill)      fill_color      = generate.random.color( fill_color_random_alpha );
+            if(allow_border)    border_color    = generate.random.color( border_color_random_alpha );
+            if(allow_thickness) thickness       = (Math.random() * generate.#default.thickness) + 1;
+            
             if( SHAPES_TYPE === point2D ){
 
-                shapes[i] = new point2D(
+                OBJECTS[i] = new point2D(
                     (Math.random() * max_X) + min_X , 
                     (Math.random() * max_Y) + min_Y 
                 );
+                
                 continue;
-
             }
             
             if( SHAPES_TYPE === line ){
                 
-                shapes[i] = new line(
-                    generate.random.point2D( min_X , max_X , min_Y , max_Y ) ,
-                    generate.random.point2D( min_X , max_X , min_Y , max_Y ) ,
-                    ( thickness == undefined ) ? generate.#default.thickness : thickness,
-                    ( color == undefined || !(color instanceof RGBA) ) ? generate.random.color(random_alpha) : color
+                OBJECTS[i] = new line(
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
+                    ( thickness == undefined || thickness <= 0 ) ? generate.#default.thickness : thickness ,
+                    ( fill_color == undefined || !(fill_color instanceof RGBA) ) ? generate.random.color(fill_color_random_alpha) : fill_color
                 );
                 continue;
 
             }
 
+            if( SHAPES_TYPE === rectangle ){
+
+                OBJECTS[i] = new rectangle(
+                    // X , Y
+                    (Math.random() * max_X) + min_X ,
+                    (Math.random() * max_Y) + min_Y ,
+                    // WIDTH , HEIGHT
+                    (Math.random() * max_X) + min_X , 
+                    (Math.random() * max_Y) + min_Y ,
+                    
+                    fill_color ,
+                    border_color,
+                    thickness
+                );
+                
+                continue;
+            }
+
+            if( SHAPES_TYPE === triangle2D ){
+
+                OBJECTS[i] = new triangle2D(
+                    // Points A , B , C
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
+                    
+                    thickness,
+                    fill_color ,
+                    border_color
+                );
+                
+                continue;
+            }
+
+            if( SHAPES_TYPE === circle2D ){    
+                
+                OBJECTS[i] = new circle2D(
+                    // X , Y
+                    (Math.random() * max_X) + min_X , 
+                    (Math.random() * max_Y) + min_Y , 
+                    // Raduis
+                    ((Math.random() * max_X) + min_X) / 4, 
+
+                    fill_color ,
+                    thickness,
+                    border_color
+                );
+
+                continue;
+            }
+
+            if( SHAPES_TYPE === plane2D){
+
+                OBJECTS[i] = new plane2D(
+                    // POINTS A , B , C , D
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,  
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,  
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,  
+                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
+                    fill_color , border_color , thickness 
+                );
+
+                continue;
+            }
 
         }
 
-        return shapes;
+        return OBJECTS;
 
     }
 
@@ -100,105 +192,114 @@ export class generate {
         },
 
         point2D(  
+            amount_of_points = 1 , 
             min_X = undefined , max_X = undefined , 
-            min_Y = undefined , max_Y = undefined , amount_of_shapes = 1 
+            min_Y = undefined , max_Y = undefined , 
         ){
 
-            return generate.#main_generator( point2D , min_X , max_X , min_Y , max_Y , amount_of_shapes );
+            return generate.#main_generator( 
+                point2D , amount_of_points , undefined , min_X , max_X , min_Y , max_Y 
+            );
 
         },
 
         lines( 
+            amount_of_objects = 1 ,
             min_X = undefined , max_X = undefined , 
             min_Y = undefined , max_Y = undefined ,
-            amount_of_shapes = 1 , thickness = undefined , 
-            color = undefined , random_alpha = false
+            fill_color = undefined , fill_color_random_alpha = false ,
+            thickness = undefined , 
         ){
 
             return generate.#main_generator( 
-                line , min_X  , max_X , min_Y , max_Y ,
-                amount_of_shapes , thickness , color , random_alpha 
+                line , amount_of_objects , thickness , min_X , max_X , min_Y , max_Y ,
+                fill_color , undefined , fill_color_random_alpha 
             );
 
         },
 
         rectangles( 
+            amount_of_objects = 1 ,
             min_X = undefined , max_X = undefined , 
             min_Y = undefined , max_Y = undefined ,
-            amount_of_shapes = 1 , color = undefined 
+            fill_color = undefined , fill_color_random_alpha = false , 
+            border_color = undefined , border_color_random_alpha = false ,
+            border_thickness = undefined, 
         ){
 
-            amount_of_shapes = Math.abs( amount_of_shapes );
-            var shapes = [];
-            
-            for( let i = 0 ; i < amount_of_shapes ; i += 1 ){
-                
-                shapes[i] = rectangle.random_rectangle(max_X , max_Y , color);
-
-            }
-        
-            return shapes;
+            return generate.#main_generator( 
+                rectangle , amount_of_objects ,
+                border_thickness,
+                min_X , max_X , min_Y , max_Y , 
+                fill_color , border_color , 
+                fill_color_random_alpha , border_color_random_alpha 
+            );
 
         },
 
         triangles(
-            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , color = true , border_color = false
+            amount_of_objects = 1 ,
+
+            min_X = undefined , max_X = undefined , 
+            min_Y = undefined , max_Y = undefined ,
+            border_thickness = 0 ,
+            
+            fill_color = undefined , border_color = undefined ,
+
+            fill_color_random_alpha = undefined , 
+            border_color_random_alpha = undefined
         ){
 
-            amount = Math.abs(amount);
-            var arr = [];
-
-            for( let i = 0 ; i < amount ; i += 1 ){
-                arr[i] = triangle2D.random_triangle(max_width , max_height , thickness , color , border_color);
-            }
-
-            return arr;
+            return generate.#main_generator(
+                triangle2D , amount_of_objects , border_thickness ,
+                min_X , max_X ,min_Y ,max_Y , 
+                fill_color , border_color ,
+                fill_color_random_alpha , border_color_random_alpha
+            );
             
         },
 
         cicrles( 
-            max_width = 1 , max_height = 1 , amount = 1 , thickness = 1 , fill_color = true , border_color = true 
+            amount_of_objects = 1 ,
+            
+            min_X = undefined , max_X = undefined , 
+            min_Y = undefined , max_Y = undefined ,
+            border_thickness = 0 ,
+            
+            fill_color = undefined , border_color = undefined ,
+
+            fill_color_random_alpha = undefined , 
+            border_color_random_alpha = undefined
         ){
 
-            amount = Math.abs(amount);
-            var arr = [];
-            
-            for( let i = 0 ; i < amount ; i += 1 ){
-                arr[i] = circle2D.random_circle( max_width , max_height , thickness , fill_color , border_color );
-            }
-
-            return arr;
+            return generate.#main_generator(
+                circle2D , amount_of_objects , border_thickness ,
+                min_X , max_X ,min_Y ,max_Y ,
+                fill_color , border_color ,
+                fill_color_random_alpha , border_color_random_alpha
+            );
 
         },
 
         planes(
-            max_width = 1 , max_height = 1 , amount_of_shapes = 1 , thickness = undefined , 
-            fill_color = true , border_color = true , 
-            fill_color_random_alpha = false , border_color_random_alpha = false
+            amount_of_objects = 1 ,  
+
+            min_X = undefined , max_X = undefined , 
+            min_Y = undefined , max_Y = undefined ,
+            border_thickness = 0 ,
+
+            fill_color = undefined , border_color = undefined ,
+
+            fill_color_random_alpha = undefined , 
+            border_color_random_alpha = undefined
         ){
 
-            amount_of_shapes = Math.abs(amount_of_shapes);
-            var shapes = [];
-
-            for( let i = 0 ; i < amount_of_shapes ; i += 1 ){
-
-                shapes[i] = new plane2D( 
-
-                    point2D.random_point( max_width , max_height ) , 
-                    point2D.random_point( max_width , max_height ) , 
-                    point2D.random_point( max_width , max_height ) , 
-                    point2D.random_point( max_width , max_height ) ,
-
-                    (fill_color) ? RGBA.random_color(fill_color_random_alpha) : undefined ,
-                    (border_color) ? RGBA.random_color(border_color_random_alpha) : undefined , 
-
-                    (thickness == undefined) ? Math.ceil( (Math.random() * generate.#default.thickness ) + 1) : thickness 
-                );
-
-            }
-            
-
-            return shapes;
+            return generate.#main_generator(
+                plane2D , amount_of_objects , border_thickness ,
+                min_X , max_X ,min_Y ,max_Y ,
+                fill_color , border_color ,
+                fill_color_random_alpha , border_color_random_alpha
+            );
 
         }
 

@@ -23,7 +23,7 @@ var preforme_check = 1;
 var interval_testing = 0;
 var interval_time = 2000;
 var anti_alias = 0;
-var shapes_type = 3;
+var shapes_type = 6;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 1;
 var thickness  = 2;
@@ -44,25 +44,23 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    ...generate.random.triangles(max_width , max_height , shapes_amount , thickness , true , false),
+    ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , thickness ),
 ];
 
 var circles = [
     // new circle2D( 200 , 200 , 50 , new RGBA(255,0,255) , 1 , new RGBA(255,0,255)),
-    ...generate.random.cicrles(max_width , max_height , shapes_amount , thickness , true , false)
+    ...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height , thickness )
 ];
 
 var ellipses = [
-    new ellpise2D(300,100,80,30,  rotate.random_z()  , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellpise2D(500,100,40,80, rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellpise2D(550,400,50,120, rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellpise2D(220,350,120,100, rotate.random_z()  , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    new ellpise2D(300,100,80,30  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    new ellpise2D(500,100,40,80  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    new ellpise2D(550,400,50,120 , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    new ellpise2D(220,350,120,100, rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
 ];
 
 var planes = [
-    ...generate.random.planes( 
-        max_width , max_height , shapes_amount , thickness , true , false , true , false
-    )
+    ...generate.random.planes( shapes_amount , 0 , max_width , 0 , max_height , thickness )
     /*
     new plane2D( 
         new point2D( 100 + (Math.random() * 200) , 200 ) , 

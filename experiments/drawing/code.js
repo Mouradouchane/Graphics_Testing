@@ -431,7 +431,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let y = copy.a.y;
 
         // fill from A to B
-        for( ; y < copy.b.y ; y += 1 ){
+        for( ; y <= copy.b.y; y += 1 ){
 
             // find X's
             x_start = Math.round( (y - intercept_AC) / slope_AC );
@@ -448,9 +448,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let slope_BC = D_BC_X != 0 ? ( D_BC_Y / D_BC_X ) : 0;
         let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
         
-        //draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y + 1 , RGBA.to_string(copy.fill_color) );
-        y = copy.b.y;
-
         // fill from B to C
         for( ; y < copy.c.y ; y += 1 ){
 

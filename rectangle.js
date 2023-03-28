@@ -12,34 +12,16 @@ import { RGBA } from "./color.js";
 export class rectangle{ // no gradient support  
 
     constructor(
-        x = 1, y = 1, width = 1, height = 1, rectangle_color = new RGBA() , 
-        fill = true , border = 0 , border_color = new RGBA() 
+        x = 1, y = 1, width = 1, height = 1, fill_color = undefined , 
+        border_color = undefined , border_thickness = 0 
     ){
 
         this.position = new point2D(x , y);
         this.width  = (width < 1) ? 1 : width ;
         this.height = (height < 1) ? 1 : height ;
-        this.fill   = (typeof(fill) == "boolean") ? fill : false;
-        this.border = (border < 0) ? 0 : border;
-        this.color  = ( rectangle_color instanceof RGBA ) ? rectangle_color : new RGBA();
-        this.border_color = ( border_color instanceof RGBA ) ? border_color : new RGBA();
-
-    }
-
-    static random_rectangle(max_width = 1, max_hegith = 1, color = undefined){
-
-        // the process of generate random rectangle 
-        return new rectangle(
-
-            Math.round( Math.random() * max_width  ), // x
-            Math.round( Math.random() * max_hegith ), // y
-            Math.round( Math.random() * max_width  ), // width
-            Math.round( Math.random() * max_hegith ), // height
-            ( color instanceof RGBA ) ? color : RGBA.random_color() ,
-            true , // Math.ceil( Math.random() * 1 ) , // fill
-            Math.round( Math.random() * 12), // border
-            RGBA.random_color(true) // border color
-        );
+        this.border = (border_thickness <= 0) ? 0 : border_thickness;
+        this.fill_color   = ( fill_color instanceof RGBA ) ? fill_color : undefined;
+        this.border_color = ( border_color instanceof RGBA ) ? border_color : undefined;
 
     }
 
