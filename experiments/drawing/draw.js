@@ -6,9 +6,9 @@ import {RGBA} from "../../color.js";
 import {triangle2D} from "../../triangle.js";
 import {circle2D} from "../../circle.js";
 import {ellpise2D} from "../../ellipse.js";
-import {buffer} from "../../buffers.js";
 import {rotate} from "../../rotate.js";
 import {plane2D} from "../../plane.js";
+import {frame_buffer} from "../../buffers.js";
 
 
 export class draw {     // CLASS LIKE NAMESPACE :)
@@ -73,8 +73,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static #NEEDED = {
 
         buffer : undefined,
+
+        // draw_to_canvas_direct : false,
         canvas : undefined,
         ctx : undefined,
+
         anti_alising : false,
 
         copy_object_for_drawing : false,
@@ -86,25 +89,27 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     static #CHECK_CANVAS(){
-        return ( draw.#NEEDED.canvas != undefined && draw.#NEEDED.ctx  != undefined );
+        return ( draw.#NEEDED.canvas != undefined && draw.#NEEDED.ctx != undefined );
     }
 
-    static #set_pixle( x , y , pixle_color = "white" ) {
+    static #CHECK_BUFFER(){
+        return ( draw.#NEEDED.buffer instanceof frame_buffer ) ? true : false;
+    }
 
-        draw.#NEEDED.ctx.fillStyle = pixle_color;
-        draw.#NEEDED.ctx.fillRect( x , y , 1 , 1 );
+    static #set_pixle( x , y , pixle_color = null ) {
+
+        draw.#NEEDED.buffer.set_pixle( x , y , pixle_color );
 
     }
 
     // we need this for our color blending 
+    static #set_sample( x , y , sample_color ){
+    }
     static #canvas_get_pixle( x , y ) {
-
     }
     static #buffer_get_pixle( x , y ) {
-
     }
     static #buffer_get_sample( x , y ) {
-
     }
 
     // =========================================================================
@@ -116,7 +121,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         point_a = new point2D() , point_b = new point2D() , width = 1 ,
         color_a = new RGBA()  , color_b = new RGBA()
     ){
-
 
         width = Math.abs(width);
         let width_mod = Math.floor(width) % 2;
@@ -162,7 +166,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if(x_or_y){
 
                 do{
-                    this.#set_pixle( position , start , RGBA.to_string(color) );
+                    this.#set_pixle( position , start , color );
                     start += 1;
                 }
                 while(start < end);
@@ -171,7 +175,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle( start , position , RGBA.to_string(color) );
+                    this.#set_pixle( start , position , color );
                     start += 1;
                 }
                 while(start < end);
@@ -233,7 +237,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if(x_or_y){
 
                 do{
-                    this.#set_pixle( position , start , RGBA.to_string(color) );
+                    this.#set_pixle( position , start , color );
                     start += 1;
                 }
                 while(start < end);
@@ -242,7 +246,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle( start , position , RGBA.to_string(color) );
+                    this.#set_pixle( start , position , color );
                     start += 1;
                 }
                 while(start < end);
@@ -296,7 +300,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if(x_or_y){
 
                 do{
-                    this.#set_pixle(Math.round(x) , Math.round(sT) , RGBA.to_string(line_object.color));
+                    this.#set_pixle(Math.round(x) , Math.round(sT) , line_object.color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -305,7 +309,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle(Math.round(sT) , Math.round(y) , RGBA.to_string(line_object.color));
+                    this.#set_pixle(Math.round(sT) , Math.round(y) , line_object.color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -365,7 +369,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     ){
         // debugger;
 
-        let str_color = RGBA.to_string(color);
+        let str_color = color;
         let w = X + width;
         let h = Y + height;
 
@@ -385,7 +389,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
     ){
         
-        let str_color = RGBA.to_string(color);
+        let str_color = color;
 
         let ranges = [
             { x : (X - B) , y : (Y - B) , w : (X + W + B) , h : Y               },
@@ -438,7 +442,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             x_end   = Math.round( (y - intercept_AB) / slope_AB );
             
             // fill range
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , RGBA.to_string(copy.fill_color) );
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color);
 
         }
 
@@ -454,7 +458,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             x_start = Math.round( (y - intercept_AC) / slope_AC );
             x_end   = Math.round( (y - intercept_BC) / slope_BC );
 
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , RGBA.to_string(copy.fill_color) );
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color);
 
         }
 
@@ -484,7 +488,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             let sT = ( ( x_or_y ? y : x ) - half_width );
             let eT = ( ( x_or_y ? y : x ) + half_width - (isodd ? 1 : 0));
-            let str_color = RGBA.to_string(color);
+            let str_color = color;
 
             if(x_or_y){
 
@@ -595,8 +599,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     ){
 
         // convert colors to strings
-        let str_fill_color   = (fill_color   instanceof RGBA) ? RGBA.to_string( fill_color )   : undefined ;
-        let str_border_color = (border_color instanceof RGBA) ? RGBA.to_string( border_color ) : undefined ;
+        let str_fill_color   = (fill_color   instanceof RGBA) ?  fill_color   : undefined ;
+        let str_border_color = (border_color instanceof RGBA) ?  border_color : undefined ;
         
         // in case "draw cicle border" wanted
         if( str_border_color ){
@@ -967,7 +971,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         for( let x = 0 ; x <= draw.#NEEDED.canvas.width ; x += draw.#NEEDED.grid_distance ){
 
             draw.#DRAW_VERTICAL_LINE( 
-                x , 0 , draw.#NEEDED.canvas.height , RGBA.to_string(draw.#NEEDED.grid_color) 
+                x , 0 , draw.#NEEDED.canvas.height , draw.#NEEDED.grid_color 
             );
 
         }
@@ -975,7 +979,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         for( let y = 0 ; y <= draw.#NEEDED.canvas.height ; y += draw.#NEEDED.grid_distance ){
         
             draw.#DRAW_HORIZONTAL_LINE( 
-                0 , draw.#NEEDED.canvas.width , y , RGBA.to_string(draw.#NEEDED.grid_color) 
+                0 , draw.#NEEDED.canvas.width , y , draw.#NEEDED.grid_color
             );
             
         }
@@ -989,21 +993,31 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             draw.#NEEDED.canvas = canvas_object;
             draw.#NEEDED.ctx = draw.#NEEDED.canvas.getContext("2d");
 
+            return true;
         }
         else draw.#LOG.ERROR.CANVAS.INVALID();
 
+        return false;
     }
 
-    /* need work */
-    static set_buffer( buffer_object = new buffer() ){
+    static set_buffer( buffer_object = new frame_buffer() ){
 
+        if( buffer_object instanceof frame_buffer ){
+
+            draw.#NEEDED.buffer = buffer_object;
+            return true;
+
+        }
+        else draw.#LOG.ERROR.BUFFER.INVALID();
+
+        return false;
     }
 
     static line( 
         line_object = new line()
     ) { 
 
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (line_object instanceof line);
 
         if( f1 && f2 ){
@@ -1015,7 +1029,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         } 
         else {
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1025,7 +1039,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         line_object = new line_with_colors()
     ) {
 
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (line_object instanceof line_with_colors);
 
         if( f1 && f2 ){
@@ -1037,7 +1051,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
         } 
         else {
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1045,7 +1059,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     static rectangle( rectangle_obejct = new RECT() ){
 
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (rectangle_obejct instanceof RECT);
 
         // debugger
@@ -1078,7 +1092,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else {
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1087,7 +1101,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static triangle( triangle_object = new triangle2D() ){
 
         // check canvas and triangle
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (triangle_object instanceof triangle2D);
         
         if( f1 && f2 ){
@@ -1116,7 +1130,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1125,7 +1139,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static circle( circle_object = new circle2D() ){
 
         // check canvas and circle
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (circle_object instanceof circle2D);
 
         if( f1 && f2 ){
@@ -1140,7 +1154,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         
         }
         else{
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1149,7 +1163,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static ellipse( ellipse_object = new ellpise2D() ){
 
         // check canvas and circle
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (ellipse_object instanceof ellpise2D);
 
         if( f1 && f2 ){
@@ -1164,8 +1178,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         ellipse_object.y , 
                         ellipse_object.width , 
                         ellipse_object.height ,
-                        RGBA.to_string(ellipse_object.fill_color) 
-                    );
+                        ellipse_object.fill_color
+                        );
                 }
                 else { // if ellipse fill require rotation
 
@@ -1177,7 +1191,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         ellipse_object.angle,
                         ellipse_object.get_f1(),
                         ellipse_object.get_f2(),
-                        RGBA.to_string(ellipse_object.fill_color) 
+                        ellipse_object.fill_color
                     );
 
                 }
@@ -1193,14 +1207,14 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     ellipse_object.width , 
                     ellipse_object.height ,
                     ellipse_object.angle ,
-                    RGBA.to_string(ellipse_object.border_color) 
+                    ellipse_object.border_color
                 );
 
             }
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1209,7 +1223,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static plane( plane_2D_object = new plane2D() ){
 
         // check canvas and circle
-        let f1 = draw.#CHECK_CANVAS();
+        let f1 = draw.#CHECK_BUFFER();
         let f2 = (plane_2D_object instanceof plane2D);
 
         if( f1 && f2 ){ 
@@ -1249,7 +1263,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
@@ -1269,14 +1283,14 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         DDA_LINE_DRAW( line_object = new line() ){
 
-            let f1 = draw.#CHECK_CANVAS();
+            let f1 = draw.#CHECK_BUFFER();
             let f2 = ( line_object instanceof line );
 
             if( f1 && f2 ){
                 draw.#DDA_LINE_DRAW_ALGORITHM( line_object );
             }
             else{
-                if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+                if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
                 if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
             }
 
@@ -1296,7 +1310,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         MID_POINT_CIRCLE_DRAW( circle_object = new circle2D() ){
 
             // check canvas and circle
-            let f1 = draw.#CHECK_CANVAS();
+            let f1 = ( draw.#NEEDED.draw_to_canvas_direct ) ? draw.#CHECK_CANVAS() : draw.#CHECK_BUFFER();
             let f2 = (circle_object instanceof circle2D);
 
             if( f1 && f2 ){
@@ -1305,13 +1319,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
 
-                    draw.#MID_POINT_CIRCLE_DRAW( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , RGBA.to_string(copy.border_color) );
+                    draw.#MID_POINT_CIRCLE_DRAW( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , copy.border_color);
 
                 }
             
             }
             else{
-                if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+                if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
                 if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
             }
 
