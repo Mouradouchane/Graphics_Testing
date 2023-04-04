@@ -21,11 +21,11 @@ export class circle2D {
         if( circle2D_object instanceof circle2D ) {
 
             return new circle2D( 
-                new Number(circle2D_object.x) , 
-                new Number(circle2D_object.y) ,
-                new Number(circle2D_object.r) ,
+                Number.parseInt(circle2D_object.x) , 
+                Number.parseInt(circle2D_object.y) ,
+                Number.parseInt(circle2D_object.r) ,
                 (circle2D_object.fill_color instanceof RGBA) ? RGBA.copy(circle2D_object.fill_color) : undefined ,
-                new Number(circle2D_object.border) ,
+                Number.parseInt(circle2D_object.border) ,
                 (circle2D_object.border_color instanceof RGBA) ? RGBA.copy(circle2D_object.border_color) : undefined
             );
 

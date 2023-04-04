@@ -69,10 +69,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    // object for needed "stuff,options,..." for drawing 
-    static #NEEDED = {
+    // for needed stuff for "drawing,options,..." 
+    static #RESOURCES = {
 
-        buffer : undefined,
+        buffer : undefined, // frame_vuffer
 
         // draw_to_canvas_direct : false,
         canvas : undefined,
@@ -89,17 +89,25 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     static #CHECK_CANVAS(){
-        return ( draw.#NEEDED.canvas != undefined && draw.#NEEDED.ctx != undefined );
+        return ( draw.#RESOURCES.canvas != undefined && draw.#RESOURCES.ctx != undefined );
     }
 
     static #CHECK_BUFFER(){
-        return ( draw.#NEEDED.buffer instanceof frame_buffer ) ? true : false;
+        return ( draw.#RESOURCES.buffer instanceof frame_buffer ) ? true : false;
     }
 
     static #set_pixle( x , y , pixle_color = null ) {
 
-        draw.#NEEDED.buffer.set_pixle( x , y , pixle_color );
+        x = Number.parseInt(x);
+        y = Number.parseInt(y);
 
+        // if blend color's needed , no z-axis 
+        if(pixle_color.alpha < 1) {
+            pixle_color = RGBA.blend( pixle_color , draw.#RESOURCES.buffer.get_pixle(x , y) );
+        }
+        
+        draw.#RESOURCES.buffer.set_pixle( x , y , pixle_color );   
+        
     }
 
     // we need this for our color blending 
@@ -334,26 +342,26 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     // fast and direct function for filling shapes line by line horizontaly  
-    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , str_color = "white" ){
-
+    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , color = undefined ){
+        
         if( x1 > x2 ) [x1 , x2] = [x2 , x1];
 
         for( let x = x1 ; x <= x2 ; x += 1 ){
 
-            this.#set_pixle( x , y , str_color );
+            draw.#set_pixle( x , y , color );
 
         }
 
     }
     
     // fast and direct function for filling shapes line by line verticaly  
-    static #DRAW_VERTICAL_LINE( x = 1 , y1 = 1 , y2 = 1 , str_color = "white" ){
+    static #DRAW_VERTICAL_LINE( x = 1 , y1 = 1 , y2 = 1 , color = undefined ){
 
         if( y1 > y2 ) [y1 , y2] = [y2 , y1];
 
         for( let y = y1 ; y <= y2 ; y += 1 ){
 
-            this.#set_pixle( x , y , str_color );
+            draw.#set_pixle( x , y , color );
 
         }
 
@@ -369,7 +377,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     ){
         // debugger;
 
-        let str_color = color;
         let w = X + width;
         let h = Y + height;
 
@@ -377,7 +384,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             
             for(let y = Y ; y <= h ; y += 1){
                 
-                draw.#set_pixle( x , y , str_color );
+                draw.#set_pixle( x , y , color );
                 
             }
             
@@ -388,8 +395,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static #DRAW_RECT_BORDER(
         X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
     ){
-        
-        let str_color = color;
 
         let ranges = [
             { x : (X - B) , y : (Y - B) , w : (X + W + B) , h : Y               },
@@ -400,9 +405,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         for(let range of ranges){
 
-            for(let x = range.x; x < range.w ; x += 1)
-                for(let y = range.y; y < range.h; y += 1)
-                    draw.#set_pixle( x , y , str_color);
+            for(let x = range.x; x < range.w ; x += 1){
+
+                for(let y = range.y; y < range.h; y += 1) draw.#set_pixle( x , y , color );
+
+            }
             
         }
 
@@ -434,6 +441,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let x_end = 0;
         let y = copy.a.y;
 
+        //debugger;
+
         // fill from A to B
         for( ; y <= copy.b.y; y += 1 ){
 
@@ -442,7 +451,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             x_end   = Math.round( (y - intercept_AB) / slope_AB );
             
             // fill range
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color);
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
 
         }
 
@@ -457,8 +466,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             x_start = Math.round( (y - intercept_AC) / slope_AC );
             x_end   = Math.round( (y - intercept_BC) / slope_BC );
-
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color);
+            
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
 
         }
 
@@ -488,12 +497,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             let sT = ( ( x_or_y ? y : x ) - half_width );
             let eT = ( ( x_or_y ? y : x ) + half_width - (isodd ? 1 : 0));
-            let str_color = color;
 
             if(x_or_y){
 
                 do{
-                    this.#set_pixle(Math.round(x) , Math.round(sT) , str_color);
+                    this.#set_pixle(Math.round(x) , Math.round(sT) , color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -502,7 +510,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle(Math.round(sT) , Math.round(y) , str_color);
+                    this.#set_pixle(Math.round(sT) , Math.round(y) , color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -565,7 +573,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // - no support to border thickness
     // - no support to fill    
     static #MID_POINT_CIRCLE_DRAW(
-        x_org = 1 , y_org = 1 , r = 1 , str_border_color = undefined
+        x_org = 1 , y_org = 1 , r = 1 , border_color = undefined
     ){
           
         let d = 1 - r;  // decision parameter
@@ -585,8 +593,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             } 
             
             // draw or fill in all the QUAD's
-            if( str_border_color ) 
-                draw.#CIRCLE_DRAW_ALL_QUADS( X , Y , x_org , y_org , str_border_color );
+            if( border_color ) 
+                draw.#CIRCLE_DRAW_ALL_QUADS( X , Y , x_org , y_org , border_color );
             
         }
         while( Y > X );
@@ -598,12 +606,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
     ){
 
-        // convert colors to strings
-        let str_fill_color   = (fill_color   instanceof RGBA) ?  fill_color   : undefined ;
-        let str_border_color = (border_color instanceof RGBA) ?  border_color : undefined ;
-        
         // in case "draw cicle border" wanted
-        if( str_border_color ){
+        if( border_color ){
 
             // define needed variables for drawing border with thickness
             let R_sqr = r * r;
@@ -623,8 +627,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 for( let x = -t ; x <= 0 ; x++ ){
                     if( (x * x) + ysqr <= T_sqr ){
-                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org + y , str_border_color);
-                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org - y , str_border_color);
+                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org + y , border_color);
+                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org - y , border_color);
                         break;
                     }
                 }
@@ -667,11 +671,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 // fill in it in left and right side of circle
 
                 draw.#DRAW_HORIZONTAL_LINE( 
-                    x_org + start , x_org + end -1, y_org + ty , str_border_color
+                    x_org + start , x_org + end -1, y_org + ty , border_color
                 );
                 
                 draw.#DRAW_HORIZONTAL_LINE( 
-                    x_org - start , x_org - end +1, y_org + ty , str_border_color
+                    x_org - start , x_org - end +1, y_org + ty , border_color
                 );
                 
                 // reset for next step
@@ -684,7 +688,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
 
         // in case "fill circle" wanted
-        if( str_fill_color ) draw.#CIRCLE_FILL_ALL_QUADS( x_org , y_org , r , str_fill_color );
+        if( fill_color ) draw.#CIRCLE_FILL_ALL_QUADS( x_org , y_org , r , fill_color );
 
     }
     
@@ -869,7 +873,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // note : fill ellipse with no support to rotation
     static #FILL_ELLIPSE_SCANLINE(
-        x_org = 1 , y_org = 1 , A = 1 , B = 1 , str_fill_color = undefined 
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color = undefined 
     ){
         let safety_factor = 4;
 
@@ -885,7 +889,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         if( A >= B ){
 
             // fill ellipse process
-            draw.#DRAW_VERTICAL_LINE( x_org , y_org - y - 1 , y_org + y + 1 , str_fill_color );
+            draw.#DRAW_VERTICAL_LINE( x_org , y_org - y - 1 , y_org + y + 1 , fill_color );
 
             for(  ; x < A ; x++ ){
 
@@ -897,8 +901,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
 
-                        draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , str_fill_color );
-                        draw.#DRAW_VERTICAL_LINE( x_org + x , y_org - y , y_org + y , str_fill_color );
+                        draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , fill_color );
+                        draw.#DRAW_VERTICAL_LINE( x_org + x , y_org - y , y_org + y , fill_color );
 
                         break;
                     }
@@ -911,7 +915,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         else {
 
             // fill ellipse process
-            draw.#DRAW_HORIZONTAL_LINE( x_org - A +1, x_org + A-1 , y_org , str_fill_color );
+            draw.#DRAW_HORIZONTAL_LINE( x_org - A +1, x_org + A-1 , y_org , fill_color );
             
             for( ; y < 0 ; y++ ){
 
@@ -922,8 +926,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
-                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org + y , str_fill_color );
-                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org - y , str_fill_color );
+                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org + y , fill_color );
+                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org - y , fill_color );
 
                         break;
                     }
@@ -940,7 +944,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // note : fill ellipse with rotation will only work with buffers  
     static #FILL_ELLIPSE_SCANLINE_ROTATED(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
-        str_fill_color = undefined 
+        fill_color = undefined 
     ){
        
 
@@ -960,26 +964,26 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     static set_grid_setting( size = 1 , distance = 10 , color = new RGBA(255,255,255,0.5) ){
 
-        draw.#NEEDED.grid_size = (typeof(size) == "number") ? size : 1;
-        draw.#NEEDED.grid_distance = (typeof(distance) == "number") ? distance : 4;
-        draw.#NEEDED.grid_color = (color instanceof RGBA ) ? color : new RGBA(255,255,255,1);
+        draw.#RESOURCES.grid_size = (typeof(size) == "number") ? size : 1;
+        draw.#RESOURCES.grid_distance = (typeof(distance) == "number") ? distance : 4;
+        draw.#RESOURCES.grid_color = (color instanceof RGBA ) ? color : new RGBA(255,255,255,1);
 
     }
 
     static draw_grid(){
 
-        for( let x = 0 ; x <= draw.#NEEDED.canvas.width ; x += draw.#NEEDED.grid_distance ){
+        for( let x = 0 ; x <= draw.#RESOURCES.canvas.width ; x += draw.#RESOURCES.grid_distance ){
 
             draw.#DRAW_VERTICAL_LINE( 
-                x , 0 , draw.#NEEDED.canvas.height , draw.#NEEDED.grid_color 
+                x , 0 , draw.#RESOURCES.canvas.height , draw.#RESOURCES.grid_color 
             );
 
         }
 
-        for( let y = 0 ; y <= draw.#NEEDED.canvas.height ; y += draw.#NEEDED.grid_distance ){
+        for( let y = 0 ; y <= draw.#RESOURCES.canvas.height ; y += draw.#RESOURCES.grid_distance ){
         
             draw.#DRAW_HORIZONTAL_LINE( 
-                0 , draw.#NEEDED.canvas.width , y , draw.#NEEDED.grid_color
+                0 , draw.#RESOURCES.canvas.width , y , draw.#RESOURCES.grid_color
             );
             
         }
@@ -990,8 +994,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         if( canvas_object && canvas_object.tagName == "CANVAS" ){
 
-            draw.#NEEDED.canvas = canvas_object;
-            draw.#NEEDED.ctx = draw.#NEEDED.canvas.getContext("2d");
+            draw.#RESOURCES.canvas = canvas_object;
+            draw.#RESOURCES.ctx = draw.#RESOURCES.canvas.getContext("2d");
 
             return true;
         }
@@ -1004,13 +1008,50 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         if( buffer_object instanceof frame_buffer ){
 
-            draw.#NEEDED.buffer = buffer_object;
+            draw.#RESOURCES.buffer = buffer_object;
             return true;
 
         }
         else draw.#LOG.ERROR.BUFFER.INVALID();
 
         return false;
+    }
+
+    static draw_buffer(){
+
+        let f1 = draw.#CHECK_CANVAS();
+        let f2 = draw.#CHECK_BUFFER();
+
+        if( f1 && f2 ){
+
+            let img = new ImageData(draw.#RESOURCES.buffer.width() , draw.#RESOURCES.buffer.height());
+            let color = null;
+
+            for( let y = 0 , c = 0 ; y <= draw.#RESOURCES.buffer.height() ; y++ ){
+
+                for( let x = 0 ; x <= draw.#RESOURCES.buffer.width() ; x++ ){
+                    
+                    color = draw.#RESOURCES.buffer.get_pixle(x,y);
+                    
+                    img.data[c] = 255;
+                    img.data[c+1] = 0;
+                    img.data[c+2] = 255;
+                    img.data[c+3] = 1;
+                    
+                    color = null;
+                    c += 4;
+                }
+                
+            }
+
+            draw.#RESOURCES.ctx.putImageData( img , img.width , img.height );
+
+        }
+        else{
+            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) draw.#LOG.ERROR.BUFFER.MISSING();
+        }
+
     }
 
     static line( 
@@ -1251,10 +1292,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     RGBA.copy( plane_2D_object.fill_color ),
                     undefined
                 )
-                /*
-                    triangle2D.sort_by_y_axis( copy_part_1 );
-                    triangle2D.sort_by_y_axis( copy_part_2 );  
-                */
 
                 draw.#FILL_TRIANGLE( copy_part_1 );
                 draw.#FILL_TRIANGLE( copy_part_2 );
@@ -1310,7 +1347,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         MID_POINT_CIRCLE_DRAW( circle_object = new circle2D() ){
 
             // check canvas and circle
-            let f1 = ( draw.#NEEDED.draw_to_canvas_direct ) ? draw.#CHECK_CANVAS() : draw.#CHECK_BUFFER();
+            let f1 = ( draw.#RESOURCES.draw_to_canvas_direct ) ? draw.#CHECK_CANVAS() : draw.#CHECK_BUFFER();
             let f2 = (circle_object instanceof circle2D);
 
             if( f1 && f2 ){

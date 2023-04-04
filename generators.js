@@ -158,7 +158,7 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === plane2D){
+            if( SHAPES_TYPE === plane2D ){
 
                 OBJECTS[i] = new plane2D(
                     // POINTS A , B , C , D

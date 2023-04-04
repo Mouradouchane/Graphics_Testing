@@ -148,7 +148,12 @@ export class RGBA{
     static copy( rgba_color = new RGBA() ){
 
         if( rgba_color instanceof RGBA ){
-            return new RGBA( rgba_color.red , rgba_color.green , rgba_color.blue , rgba_color.alpha );
+            return new RGBA( 
+                Number.parseInt(rgba_color.red) , 
+                Number.parseInt(rgba_color.green) , 
+                Number.parseInt(rgba_color.blue) , 
+                Number.parseFloat(rgba_color.alpha) 
+            );
         }
         else return null;
 

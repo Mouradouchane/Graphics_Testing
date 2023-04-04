@@ -26,7 +26,7 @@ export class triangle2D{
                 point2D.copy(triangle2D_obj.b),
                 point2D.copy(triangle2D_obj.c),
                 Number.parseInt(triangle2D_obj.thickness),
-                (triangle2D_obj.fill_color instanceof RGBA ) ? RGBA.copy(triangle2D_obj.fill_color) : undefined ,
+                (triangle2D_obj.fill_color   instanceof RGBA) ? RGBA.copy(triangle2D_obj.fill_color) : undefined ,
                 (triangle2D_obj.border_color instanceof RGBA) ? RGBA.copy(triangle2D_obj.border_color) : undefined ,
             );
             

@@ -15,7 +15,7 @@ export class point2D{
     }
 
     static copy( POINT = new point2D() ){
-        return new point2D( new Number( POINT.x ) , new Number( POINT.y ) );
+        return new point2D( Number.parseFloat( POINT.x ) , Number.parseFloat( POINT.y ) );
     }
 
     static swap( point_a = new point2D() , point_b = new point2D() ){

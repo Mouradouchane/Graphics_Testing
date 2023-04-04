@@ -6,73 +6,62 @@ export class frame_buffer{
     // PRIVATE PROPERTIES 
     #width  = 1;
     #height = 1;
+    #length = 1;
     #buffer = undefined;
+    #c_color = new RGBA(0,0,0,1);
 
-    constructor( buffer_width = 1 , buffer_height = 1 ){
-
-        if( buffer_width > 0 ) this.#width = new Number(buffer_width);
+    constructor( buffer_width = 1 , buffer_height = 1 , clear_color = new RGBA(0,0,0,1) ){
+        
+        if( clear_color instanceof RGBA ) this.#c_color = clear_color;
+        
+        if( buffer_width > 0 ) this.#width = Number.parseInt(buffer_width);
         else {
 
             frame_buffer.#LOG.invalid();
             frame_buffer.#LOG.def_value();
+            this.#width = 800;
 
         }
 
-        if( buffer_height > 0 ) this.#height = new Number(buffer_height);
+        if( buffer_height > 0 ) this.#height = Number.parseInt(buffer_height);
         else {
             
             frame_buffer.#LOG.invalid();
             frame_buffer.#LOG.def_value();
+            this.#height = 600;
 
         }
 
-        // allocated 2D buffer
-
-        this.#buffer = new Array(this.#height);
-
-        for(let y = 0; y < this.#height ; y += 1 ){
-            this.#buffer[y] = new Array( this.#width ).fill(null);
-        }
+        // allocate buffer array 
+        this.#length = this.#width * this.#height;
+        this.#buffer = new Array( this.#length );
+        this.#buffer.fill( this.#c_color );
 
 
-        // frame_buffer functions
-         
+        /*
+           ============ frame_buffer public functions ============ 
+        */
+
         this.get_pixle = ( x = 0 , y = 0 ) => {
 
-            if( x < 0 || x > this.#width - 1 ) {
-                frame_buffer.#LOG.invalid_value("x" , x);
-                return null;
-            }
-
-            if( y < 0 || y > this.#height - 1 ) {
-                frame_buffer.#LOG.invalid_value("y" , y);
-                return null;
-            }
-
-            return this.#buffer[x][y];
+            return this.#buffer[ (this.#width * y) + x ];
 
         }
   
         this.set_pixle = ( x = 0 , y = 0 , pixle_color = null ) => {
-            debugger
-            if( x < 0 || x > this.#width - 1 ) {
-                frame_buffer.#LOG.invalid_value("x" , x);
-                return false;
+
+            this.#buffer[ (this.#width * y) + x] = pixle_color;
+
+        }
+
+        this.get_line = ( y = 0 ) => {
+            
+            if( y < 0 || y > this.#height - 1 ){ 
+                frame_buffer.#LOG.invalid_value("y",y);
+                return null;
             }
 
-            if( y < 0 || y > this.#height - 1 ) {
-                frame_buffer.#LOG.invalid_value("y" , y);
-                return false;
-            }
-
-            if( pixle_color != null || !(pixle_color instanceof RGBA) ){
-                frame_buffer.#LOG.invalid_value("pixle_color" , pixle_color);
-                return false;
-            }
-
-            this.#buffer[x][y] = pixle_color;
-
-            return true;
+            return this.#buffer[y];
         }
 
         this.clear = ( color_to_clear_with = null ) => {
@@ -87,7 +76,7 @@ export class frame_buffer{
             for( let y = 0; y < (this.#height - 1) ; y++ ){
 
                 for( let x = 0; x < (this.#width - 1) ; x++ ){
-                    this.#buffer[x][y] = clear_color;
+                    this.#buffer[y][x] = clear_color;
                 }
 
             }
@@ -112,7 +101,7 @@ export class frame_buffer{
             for( let Y = y ; Y <= (height + y) ; Y++ ){
 
                 for( let X = x ; X <= (width + x) ; X++ ){
-                    this.#buffer[X][Y] = clear_color;
+                    this.#buffer[y][x] = clear_color;
                 }
 
             }
@@ -130,18 +119,16 @@ export class frame_buffer{
     }
 
 
-    // STATIC PRIVATE/PUBLIC FUNCTION'S
-
     static #LOG = {
     
         invalid : (param_name) => {
-            console.error(`invalid parameter ${param_name} .`);
+            console.error(`draw.js : invalid parameter ${param_name} .`);
         },
         invalid_value : (param_name , param_value) => {
-            console.warn(`parameter ${param_name} = ${param_value} , not a valid value .`);
+            console.warn(`draw.js : parameter ${param_name} = ${param_value} , not a valid value .`);
         },
         def_value : (param_name) => {
-            console.warn(`because the passed parameter ${param_name} invalid , the default value gonna replace it .`);
+            console.warn(`draw.js : because the passed parameter ${param_name} invalid , the default value gonna replace it .`);
         }
     
     }

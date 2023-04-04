@@ -14,6 +14,7 @@ import { frame_buffer } from "../../buffers.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
+const buffer = new frame_buffer( 800 , 600 );
 
 /*
     rendering/drawing "options"
@@ -24,8 +25,8 @@ var preforme_check = 1;
 var interval_testing = 0;
 var interval_time = 2000;
 var anti_alias = 0;
-var shapes_type = 6;
-var shapes_amount = 3;
+var shapes_type = 3;
+var shapes_amount = 13;
 var generate_random_shapes_each_time = 1;
 var thickness  = 2;
 var max_width  = canvas.clientWidth  - 100;
@@ -74,7 +75,7 @@ var planes = [
 ];
 
 draw.set_canvas( canvas );
-draw.set_buffer( new frame_buffer( 800 , 600 ) );
+draw.set_buffer( buffer );
 check.set.canvas( canvas );
 
 /*
@@ -94,11 +95,6 @@ function new_frame(){
     ctx.fillStyle = "white";
     ctx.strokeStyle = "white";
 
-    /*
-    draw.line( lines[0] );
-    draw.line( lines[1] );
-    */
- 
     switch( shapes_type ){
 
         // lines
@@ -194,8 +190,11 @@ function new_frame(){
             }
 
         } break;
-    }
+
+    } // end of switch/case
     
+   draw.draw_buffer();
+
 }
 
 function render(){
