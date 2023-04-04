@@ -1,17 +1,19 @@
 
-// import {RGBA} from "../../color.js";
+import {RGBA} from "../../color.js";
+import {draw} from "./experiments/drawing/draw.js";
 import {line as LINE_2D} from "./line.js";
 import {point2D as POINT_2D} from "./point.js";
 import {rectangle as RECTANGLE} from "./rectangle.js";
 import {triangle2D as TRIANGLE_2D} from "./triangle.js";
-import {circle2D as CIRCLE_2D} from "./circle.js";
+import {circle2D as CIRCLE_2D, circle2D} from "./circle.js";
 import {ellpise2D as ELLIPSE_2D} from "./ellipse.js";
 import {rotate} from "./rotate.js";
-import { plane2D } from "./plane.js";
+import {plane2D} from "./plane.js";
+import {frame_buffer} from "./buffers.js";
 
 /*
     ============================================================
-        class for testing/checking "functions" for draw api
+            FOR VISUAL "TESTING / CHECKING" RESULT 
     ============================================================
 */
 export class check {
@@ -23,7 +25,7 @@ export class check {
             CANVAS_NOT_DEFINED : () => console.error("canvas not defined yet to draw in"),
 
             BUFFER_INVALID : () => console.error("received parameter as buffer are invalid , send a real buffer or a supported buffer type !"),
-            BUFFER : () => console.error("buffer not defined yet to draw in"),
+            BUFFER_NOT_DEFINED : () => console.error("buffer not defined yet to draw in"),
             
             OBJECT_INVALID : (fn_name = "def" , needed_type = "object") => console.error(`received parameter in function ${fn_name} is not a valid type ${needed_type}`)
         },
@@ -53,9 +55,8 @@ export class check {
 
     }
 
-    // needed stuff to work with 
-    // note : we don't need everything !
-    static #NEEDED = {
+    // some resources to work with 
+    static #RESOURCES = {
 
         buffer : undefined ,
         canvas : undefined , 
@@ -64,11 +65,10 @@ export class check {
         copy_objects_for_testing : false,
 
         default_point_size  : 2 ,
-        default_point_color : "cyan" ,
-        default_line_color  : "yellow" ,
+        default_point_color : new RGBA(255,0,160,1) ,
+        default_line_color  : new RGBA(255,255,0,1)   ,
 
     }
-
 
     /*
         =============================================================
@@ -82,8 +82,8 @@ export class check {
     
             if( canvas_object && canvas_object.tagName == "CANVAS" ){
 
-                check.#NEEDED.canvas = canvas_object;
-                check.#NEEDED.ctx = check.#NEEDED.canvas.getContext("2d");
+                check.#RESOURCES.canvas = canvas_object;
+                check.#RESOURCES.ctx = check.#RESOURCES.canvas.getContext("2d");
     
             }
             else{
@@ -93,30 +93,36 @@ export class check {
     
         },
         
-        buffer : () => {
-    
+        buffer : ( buffer_object = undefined ) => {
+            
+            if( buffer_object instanceof frame_buffer ){
+
+                check.#RESOURCES.buffer = buffer_object;
+                
+            }
+            else {
+
+                check.#LOG.ERROR.BUFFER_INVALID();
+                check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.set.buffer" , "frame_buffer");
+
+            }
         }
 
     }
 
-    // NOTE  : currently support only cavnas !
-    // to-do : add support to buffer's
+    // NOTE  : currently support only frame_buffer
     static visual_check = {  
 
-        point : function( point_object = new POINT_2D() , point_size = undefined , str_color = undefined){
-    
-            if( check.#NEEDED.canvas ){
+        point : function( point_object = new POINT_2D() , point_size = undefined , color = undefined){
+            
+            if( check.#RESOURCES.buffer instanceof frame_buffer ){
+                
+                if( point_object instanceof POINT_2D ){
+                    
+                    color = (color) ? color : check.#RESOURCES.default_point_color;
+                    let psize = (point_size) ? point_size : check.#RESOURCES.default_point_size;
 
-                let ctx =  check.#NEEDED.ctx;
-                let psize = (point_size) ? point_size : check.#NEEDED.default_point_size;
-
-                if( point_object instanceof POINT_2D){
-
-                    ctx.fillStyle = (str_color) ? str_color : check.#NEEDED.default_point_color ;
-
-                    ctx.beginPath();
-                    ctx.arc(point_object.x, point_object.y, psize , 0 , Math.PI * 2);
-                    ctx.fill();
+                    draw.circle( new circle2D( point_object.x , point_object.y , psize , color ) );
 
                 }
                 else {
@@ -126,27 +132,21 @@ export class check {
 
             }
             else {
-                check.#LOG.ERROR.CANVAS_NOT_DEFINED();
-                check.#LOG.HINT.DEFINE_CANVAS();
+                check.#LOG.ERROR.BUFFER_NOT_DEFINED();
+                check.#LOG.HINT.DEFINE_BUFFER();
             }
 
         },
         
-        line : function( line_object = new LINE_2D() , point_size = undefined ){
+        line : function( line_object = new LINE_2D() , point_size = undefined , color = undefined ){
 
-            if( check.#NEEDED.canvas ){
+            if( check.#RESOURCES.buffer instanceof frame_buffer ){
 
                 if( line_object instanceof LINE_2D ){
                 
-                    let ctx =  check.#NEEDED.ctx;
-    
-                    ctx.fillStyle = check.#NEEDED.default_line_color;
+                    check.visual_check.point( line_object.p1 , point_size , color);
+                    check.visual_check.point( line_object.p2 , point_size , color);
             
-                    ctx.beginPath();
-                    ctx.arc(line_object.p1.x, line_object.p1.y, point_size , 0, Math.PI * 2);
-                    ctx.arc(line_object.p2.x, line_object.p2.y, point_size , 0, Math.PI * 2);
-                    ctx.fill();
-
                 }   
                 else {
                     check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.line" , "line2D");
@@ -155,41 +155,27 @@ export class check {
 
             }
             else {
-                check.#LOG.ERROR.CANVAS_NOT_DEFINED();
-                check.#LOG.HINT.DEFINE_CANVAS();
+                check.#LOG.ERROR.BUFFER_NOT_DEFINED();
+                check.#LOG.HINT.DEFINE_BUFFER();
             }
 
         },
         
-        rectangle : function( rectangle_object = new RECTANGLE() , point_size = undefined ){
+        rectangle : function( rectangle_object = new RECTANGLE() , point_size = undefined , color = undefined){
 
-            if( check.#NEEDED.canvas ){
+            if( check.#RESOURCES.buffer instanceof frame_buffer ){
 
                 if( rectangle_object instanceof RECTANGLE ){
-            
-                    let ctx =  check.#NEEDED.ctx;
 
                     let x = rectangle_object.position.x;
                     let y = rectangle_object.position.y;
                     let w = rectangle_object.width;
                     let h = rectangle_object.height;
-            
-                    ctx.fillStyle = check.#NEEDED.default_line_color;
-                    ctx.beginPath();
-                    ctx.arc( x , y , point_size , 0 , Math.PI * 2);
-                    ctx.fill();
-            
-                    ctx.beginPath();
-                    ctx.arc( x+w , y , point_size , 0 , Math.PI * 2);
-                    ctx.fill();
-                
-                    ctx.beginPath();
-                    ctx.arc( x , y+h , point_size , 0 , Math.PI * 2);
-                    ctx.fill();
-            
-                    ctx.beginPath();
-                    ctx.arc( x+w , y+h , point_size , 0 , Math.PI * 2);
-                    ctx.fill();
+                    
+                    check.visual_check.point( new POINT_2D( x , y )     , point_size , color );
+                    check.visual_check.point( new POINT_2D( x+w , y )   , point_size , color );
+                    check.visual_check.point( new POINT_2D( x  , y+h )  , point_size , color );
+                    check.visual_check.point( new POINT_2D( x+w , y+h ) , point_size , color );
 
                 }   
                 else {
@@ -199,15 +185,15 @@ export class check {
 
             }
             else {
-                check.#LOG.ERROR.CANVAS_NOT_DEFINED();
-                check.#LOG.HINT.DEFINE_CANVAS();
+                check.#LOG.ERROR.BUFFER_NOT_DEFINED();
+                check.#LOG.HINT.DEFINE_BUFFER();
             }
     
         },
         
         triangle : function( triangle_object = new TRIANGLE_2D() ){
 
-            if( check.#NEEDED.canvas ){
+            if( check.#RESOURCES.canvas ){
 
                 if( triangle_object instanceof TRIANGLE_2D ){
 
@@ -231,7 +217,7 @@ export class check {
         
         circle : function( circle_object = new CIRCLE_2D() ){
 
-            if( check.#NEEDED.canvas ){
+            if( check.#RESOURCES.canvas ){
 
                 if( circle_object instanceof CIRCLE_2D ){
 
@@ -254,7 +240,7 @@ export class check {
 
         ellipse : function( ellipse_object = new ELLIPSE_2D() , show_foci = false ){
             
-            if( check.#NEEDED.canvas ){
+            if( check.#RESOURCES.canvas ){
 
                 if( ellipse_object instanceof ELLIPSE_2D ){
 
@@ -311,7 +297,7 @@ export class check {
 
         plane : function( plane_object = new plane2D() ){
 
-            if( check.#NEEDED.canvas ){
+            if( check.#RESOURCES.canvas ){
 
                 if( plane_object instanceof plane2D ){
                     

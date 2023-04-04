@@ -10,7 +10,6 @@ import {rotate} from "../../rotate.js";
 import {plane2D} from "../../plane.js";
 import {frame_buffer} from "../../buffers.js";
 
-
 export class draw {     // CLASS LIKE NAMESPACE :)
 
     /*
@@ -120,8 +119,14 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static #buffer_get_sample( x , y ) {
     }
 
+    static #CALC_DISTANCE( x1 = 1 , x2 = 1 , y1 = 1 , y2 = 1 ){
+
+        return ( Math.sqrt( ((x2 - x1)**2) + ((y2 - y1)**2 ) ) );
+
+    }
+
     // =========================================================================
-    //                          LINE DRAW FUNCTIONS
+    //                         LINE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
     // standard line draw 
@@ -266,7 +271,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    // ****** need work ******
     static #DDA_LINE_DRAW_ALGORITHM(
         line_object = new line()
     ){
@@ -369,14 +373,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
 
     // =========================================================================
-    //                      RECTANGLE PRIVATE FUNCTIONS
+    //                      RECTANGLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
     static #FILL_RECT(
         X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
     ){
-        // debugger;
-
+        
         let w = X + width;
         let h = Y + height;
 
@@ -417,7 +420,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
 
     // =========================================================================
-    //                      TRIANGLE PRIVATE FUNCTIONS
+    //                      TRIANGLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
     // NOTE !!! triangle points need to be sorted by "Y-axis"
@@ -473,7 +476,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-
     static #DRAW_TRIANGLE(
         p1 = new point2D() , p2 = new point2D() , thickness = 1 , color = new RGBA()
     ) {
@@ -525,7 +527,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     // =========================================================================
-    //                         CIRCLE PRIVATE FUNCTIONS
+    //                       CIRCLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
     static #CIRCLE_DRAW_ALL_QUADS(
@@ -694,9 +696,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
 
     // =========================================================================
-    //                         ELLPISE PRIVATE FUNCTIONS
+    //                       ELLPISE DRAW PRIVATE FUNCTIONS
     // =========================================================================
-
 
     static #FILL_ELLIPSE_QUADS_X(){
 
@@ -706,10 +707,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     static #DRAW_ELLIPSE_DDA(){
-
-    }
-
-    static #DRAW_ELLIPSE_MID_POINT(){
 
     }
 
@@ -950,15 +947,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static #CALC_DISTANCE( x1 = 1 , x2 = 1 , y1 = 1 , y2 = 1 ){
 
-        return ( Math.sqrt( ((x2 - x1)**2) + ((y2 - y1)**2 ) ) );
-
-    }
 
     /*
         ==============================================================
-                PUBLIC FUCNTIONS AS INTERFACE FOR DRAWING API 
+                PUBLIC FUCNTIONS AS INTERFACE FOR DRAWING 
         ==============================================================
     */
 
@@ -1017,34 +1010,25 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         return false;
     }
 
-    static draw_buffer(){
+    static render_buffer(){
 
         let f1 = draw.#CHECK_CANVAS();
         let f2 = draw.#CHECK_BUFFER();
 
         if( f1 && f2 ){
 
-            let img = new ImageData(draw.#RESOURCES.buffer.width() , draw.#RESOURCES.buffer.height());
-            let color = null;
-
-            for( let y = 0 , c = 0 ; y <= draw.#RESOURCES.buffer.height() ; y++ ){
+            for( let y = 0 ; y <= draw.#RESOURCES.buffer.height() ; y++ ){
 
                 for( let x = 0 ; x <= draw.#RESOURCES.buffer.width() ; x++ ){
-                    
-                    color = draw.#RESOURCES.buffer.get_pixle(x,y);
-                    
-                    img.data[c] = 255;
-                    img.data[c+1] = 0;
-                    img.data[c+2] = 255;
-                    img.data[c+3] = 1;
-                    
-                    color = null;
-                    c += 4;
+
+                    draw.#RESOURCES.ctx.fillStyle = RGBA.to_string(draw.#RESOURCES.buffer.get_pixle(x,y));
+                    draw.#RESOURCES.ctx.fillRect( x , y , 1 , 1);
+
                 }
                 
             }
 
-            draw.#RESOURCES.ctx.putImageData( img , img.width , img.height );
+            //draw.#RESOURCES.ctx.putImageData( img , img.width , img.height );
 
         }
         else{
@@ -1106,18 +1090,21 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // debugger
         if( f1 && f2 ){
 
-            if( rectangle_obejct.fill ){
+            if( rectangle_obejct.fill_color ){
 
                 // fill rectangle 
                 draw.#FILL_RECT(
-                    rectangle_obejct.position.x , rectangle_obejct.position.y , 
-                    rectangle_obejct.width , rectangle_obejct.height , rectangle_obejct.color
+                    rectangle_obejct.position.x , 
+                    rectangle_obejct.position.y , 
+                    rectangle_obejct.width , 
+                    rectangle_obejct.height , 
+                    rectangle_obejct.fill_color
                 );
 
             }
 
             // if rectangle want border around
-            if( rectangle_obejct.border > 0){
+            if( rectangle_obejct.border_color > 0){
 
                 // draw border process in "FILL_RECT_BORDER"
                 draw.#DRAW_RECT_BORDER( 
@@ -1266,15 +1253,15 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // check canvas and circle
         let f1 = draw.#CHECK_BUFFER();
         let f2 = (plane_2D_object instanceof plane2D);
-
+    
         if( f1 && f2 ){ 
-
+    
             if( plane_2D_object.fill_color instanceof RGBA ){
-
+    
                 //debugger
-
+    
                 plane2D.sort_by_y_axis( plane_2D_object );
-
+    
                 let copy_part_1 = new triangle2D(
                     point2D.copy(plane_2D_object.a),
                     point2D.copy(plane_2D_object.b),
@@ -1283,7 +1270,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     RGBA.copy( plane_2D_object.fill_color ),
                     undefined
                 );
-
+    
                 let copy_part_2 = new triangle2D(
                     point2D.copy(plane_2D_object.b),
                     point2D.copy(plane_2D_object.c),
@@ -1292,22 +1279,22 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     RGBA.copy( plane_2D_object.fill_color ),
                     undefined
                 )
-
+    
                 draw.#FILL_TRIANGLE( copy_part_1 );
                 draw.#FILL_TRIANGLE( copy_part_2 );
-
+    
             }
-
+    
         }
         else{
             if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
         }
-
-
+    
+    
     }
-
-
+    
+    
     /*
 
         famous drawing algorithms 

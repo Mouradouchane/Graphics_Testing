@@ -40,7 +40,7 @@ export class generate {
 
     ) {
 
-        if( SHAPES_TYPE === undefined ||SHAPES_TYPE === null ) return;
+        if( SHAPES_TYPE === undefined || SHAPES_TYPE === null ) return null;
 
         // check values before generate the shape's
         AMOUNT_OF_OBJECTS = ( AMOUNT_OF_OBJECTS <= 0 ) ? 1 : AMOUNT_OF_OBJECTS;
@@ -183,7 +183,7 @@ export class generate {
         color( random_alpha = undefined ){
 
             return new RGBA(
-                Math.floor( Math.random() * 255 ) , 
+                Math.floor( Math.random() * 255 ) ,
                 Math.floor( Math.random() * 255 ) ,
                 Math.floor( Math.random() * 255 ) ,
                 ( random_alpha == undefined || random_alpha > 1 || random_alpha < 0 ) ? Math.random() : random_alpha

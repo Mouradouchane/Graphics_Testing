@@ -14,7 +14,9 @@ export class frame_buffer{
         
         if( clear_color instanceof RGBA ) this.#c_color = clear_color;
         
-        if( buffer_width > 0 ) this.#width = Number.parseInt(buffer_width);
+        if( buffer_width > 0 ) {
+            this.#width = Number.parseInt(buffer_width);
+        }
         else {
 
             frame_buffer.#LOG.invalid();
@@ -23,7 +25,9 @@ export class frame_buffer{
 
         }
 
-        if( buffer_height > 0 ) this.#height = Number.parseInt(buffer_height);
+        if( buffer_height > 0 ) {
+            this.#height = Number.parseInt(buffer_height);
+        }
         else {
             
             frame_buffer.#LOG.invalid();
@@ -44,11 +48,17 @@ export class frame_buffer{
 
         this.get_pixle = ( x = 0 , y = 0 ) => {
 
+            if( x < 0 || x > this.#width  - 1 ) return null;
+            if( y < 0 || y > this.#height - 1 ) return null;
+            
             return this.#buffer[ (this.#width * y) + x ];
 
         }
   
         this.set_pixle = ( x = 0 , y = 0 , pixle_color = null ) => {
+
+            if( x < 0 || x > this.#width  - 1 ) return;
+            if( y < 0 || y > this.#height - 1 ) return;
 
             this.#buffer[ (this.#width * y) + x] = pixle_color;
 
