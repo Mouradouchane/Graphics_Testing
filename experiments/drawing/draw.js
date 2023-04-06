@@ -377,11 +377,15 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // =========================================================================
 
     static #FILL_RECT(
-        X = 1 , Y = 1 , width = 1 , height = 1 , color = new RGBA()
+        X = 1 , Y = 1 , W = 1 , H = 1 , color = new RGBA()
     ){
-        
-        let w = X + width;
-        let h = Y + height;
+        X = Number.parseInt( X );
+        Y = Number.parseInt( Y );
+        W = Number.parseInt( W );
+        H = Number.parseInt( H );
+
+        let w = X + W;
+        let h = Y + H;
 
         for(let x = X ; x <= w ; x += 1){
             
@@ -399,22 +403,31 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
     ){
 
+        X = Number.parseInt( X );
+        Y = Number.parseInt( Y );
+        W = Number.parseInt( W );
+        H = Number.parseInt( H );
+        B = Number.parseInt( B ) - 1;
+
         let ranges = [
-            { x : (X - B) , y : (Y - B) , w : (X + W + B) , h : Y               },
-            { x : (X - B) , y : (Y + H) , w : (X + W + B) , h : ( Y + H + B )   },
-            { x : (X - B) , y :  Y      , w :  X          , h : (Y + H)         },
-            { x : (X + W) , y :  Y      , w : (X + W + B) , h : (Y + H)         },
+            { x : (X - B - 1) , y : (Y - B - 1) , w : (X + W + B + 1) , h : Y - 1           }, // top
+            { x : (X - B - 1) , y : (Y + H + 1) , w : (X + W + B + 1) , h : (Y + H + B + 1) }, // buttom
+            { x : (X - B - 1) , y :  Y          , w :  X - 1          , h : (Y + H)         }, // left 
+            { x : (X + W + 1) , y :  Y          , w : (X + W + B + 1) , h : (Y + H)         }, // right
         ];
-
+        
         for(let range of ranges){
-
-            for(let x = range.x; x < range.w ; x += 1){
-
-                for(let y = range.y; y < range.h; y += 1) draw.#set_pixle( x , y , color );
-
+            
+            for(let x = range.x ; x <= range.w ; x += 1){
+                
+                for(let y = range.y ; y <= range.h; y += 1) {
+                    draw.#set_pixle( x , y , color );
+                }
+                
             }
             
         }
+        
 
     }
 
@@ -1102,9 +1115,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 );
 
             }
-
+            
             // if rectangle want border around
-            if( rectangle_obejct.border_color > 0){
+            if( rectangle_obejct.border > 0){
 
                 // draw border process in "FILL_RECT_BORDER"
                 draw.#DRAW_RECT_BORDER( 

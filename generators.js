@@ -36,13 +36,14 @@ export class generate {
         min_Y = undefined , max_Y = undefined , 
 
         fill_color = undefined , border_color = undefined ,
-        fill_color_random_alpha = undefined , border_color_random_alpha = undefined ,
+        fill_color_random_alpha = false , border_color_random_alpha = false ,
 
     ) {
 
+        // check parameter's before generate
+
         if( SHAPES_TYPE === undefined || SHAPES_TYPE === null ) return null;
 
-        // check values before generate the shape's
         AMOUNT_OF_OBJECTS = ( AMOUNT_OF_OBJECTS <= 0 ) ? 1 : AMOUNT_OF_OBJECTS;
 
         min_X = (min_X == undefined) ? generate.#default.min_width : min_X;
@@ -52,7 +53,7 @@ export class generate {
         max_Y = (max_Y == undefined) ? generate.#default.max_height : max_Y;
 
         let allow_fill = false;
-        if(fill_color == undefined || !(fill_color instanceof RGBA) ) {
+        if( fill_color == undefined || !(fill_color instanceof RGBA) ) {
 
             allow_fill = true;
             fill_color = generate.random.color( fill_color_random_alpha );
@@ -75,6 +76,7 @@ export class generate {
 
         }
 
+
         // generate process 
         
         var OBJECTS = [];
@@ -83,7 +85,7 @@ export class generate {
             
             if(allow_fill)      fill_color      = generate.random.color( fill_color_random_alpha );
             if(allow_border)    border_color    = generate.random.color( border_color_random_alpha );
-            if(allow_thickness) thickness       = (Math.random() * generate.#default.thickness) + 1;
+            if(allow_thickness) thickness       = Math.ceil((Math.random() * generate.#default.thickness) + 1);
             
             if( SHAPES_TYPE === point2D ){
 
@@ -109,19 +111,23 @@ export class generate {
 
             if( SHAPES_TYPE === rectangle ){
 
+                // X , Y
+                let x = ( Math.random() * max_X / 2) + min_X ;
+                let y = ( Math.random() * max_Y / 2) + min_Y ;
+                // WIDTH , HEIGHT
+                let w = ( Math.random() * max_X );
+                let h = ( Math.random() * max_Y );
+
                 OBJECTS[i] = new rectangle(
-                    // X , Y
-                    (Math.random() * max_X) + min_X ,
-                    (Math.random() * max_Y) + min_Y ,
-                    // WIDTH , HEIGHT
-                    (Math.random() * max_X) + min_X , 
-                    (Math.random() * max_Y) + min_Y ,
+                    x , y ,
+                    ( x + w > max_X) ? max_X - x - thickness: w, 
+                    ( y + h > max_Y) ? max_Y - y - thickness: h,
                     
                     fill_color ,
                     border_color,
                     thickness
                 );
-                
+
                 continue;
             }
 
@@ -186,7 +192,7 @@ export class generate {
                 Math.floor( Math.random() * 255 ) ,
                 Math.floor( Math.random() * 255 ) ,
                 Math.floor( Math.random() * 255 ) ,
-                ( random_alpha == undefined || random_alpha > 1 || random_alpha < 0 ) ? Math.random() : random_alpha
+                ( random_alpha ) ? Math.random() + 0.1 : 1
             );
 
         },

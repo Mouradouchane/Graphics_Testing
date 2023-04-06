@@ -20,17 +20,17 @@ const buffer = new frame_buffer( 800 , 600 );
     rendering/drawing "options"
 */
 var render_loop = 0;
-var grid = 1;
-var preforme_check = 1;
+var grid = 0;
+var preforme_check = 0;
 var interval_testing = 0;
 var interval_time = 2000;
 var anti_alias = 0;
 var shapes_type = 2;
-var shapes_amount = 6;
+var shapes_amount = 3;
 var generate_random_shapes_each_time = 1;
 var thickness  = 2;
-var max_width  = canvas.clientWidth  - 100;
-var max_height = canvas.clientHeight - 100;
+var max_width  = canvas.clientWidth  ;
+var max_height = canvas.clientHeight ;
 
 /*
     generate random "shapes for testing"
@@ -44,7 +44,7 @@ var lines = [
 ];
 
 var rectangles = [
-    ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height )
+    ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height , null , true , null , true , 3)
 ]; 
 
 var triangles = [ 
