@@ -5,6 +5,7 @@ import {rectangle , rectangle_with_gradient} from "./rectangle.js";
 import {triangle2D} from "./triangle.js";
 import {circle2D} from "./circle.js";
 import {plane2D} from "./plane.js";
+import { ellipse2D } from "./ellipse.js";
 
 export class generate {
    
@@ -154,11 +155,33 @@ export class generate {
                     (Math.random() * max_X) + min_X , 
                     (Math.random() * max_Y) + min_Y , 
                     // Raduis
-                    ((Math.random() * max_X) + min_X) / 4, 
+                    (Math.random() * (max_X/4)) + min_X , 
 
                     fill_color ,
                     thickness,
                     border_color
+                );
+
+                continue;
+            }
+
+            if( SHAPES_TYPE === ellipse2D ){
+
+                OBJECTS[i] = new ellipse2D(
+                    // X , Y
+                    (Math.random() * max_X) + min_X , 
+                    (Math.random() * max_Y) + min_Y ,
+
+                    // WIDTH , HEIGHT
+                    (Math.random() * (max_X/4)) + min_X , 
+                    (Math.random() * (max_Y/4)) + min_Y ,
+
+                    // angle
+                    (Math.random() * Math.PI),
+
+                    fill_color ,
+                    border_color,
+                    thickness
                 );
 
                 continue;
@@ -280,6 +303,28 @@ export class generate {
 
             return generate.#main_generator(
                 circle2D , amount_of_objects , border_thickness ,
+                min_X , max_X ,min_Y ,max_Y ,
+                fill_color , border_color ,
+                fill_color_random_alpha , border_color_random_alpha
+            );
+
+        },
+
+        ellipses(
+            amount_of_objects = 1 ,
+            
+            min_X = undefined , max_X = undefined , 
+            min_Y = undefined , max_Y = undefined ,
+            border_thickness = 0 ,
+            
+            fill_color = undefined , border_color = undefined ,
+
+            fill_color_random_alpha = undefined , 
+            border_color_random_alpha = undefined
+        ){
+
+            return generate.#main_generator( 
+                ellipse2D , amount_of_objects , border_thickness ,
                 min_X , max_X ,min_Y ,max_Y ,
                 fill_color , border_color ,
                 fill_color_random_alpha , border_color_random_alpha

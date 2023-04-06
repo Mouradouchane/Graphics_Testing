@@ -6,7 +6,7 @@ import {point2D as POINT_2D} from "./point.js";
 import {rectangle as RECTANGLE} from "./rectangle.js";
 import {triangle2D as TRIANGLE_2D} from "./triangle.js";
 import {circle2D as CIRCLE_2D, circle2D} from "./circle.js";
-import {ellpise2D as ELLIPSE_2D} from "./ellipse.js";
+import {ellipse2D as ELLIPSE_2D} from "./ellipse.js";
 import {rotate} from "./rotate.js";
 import {plane2D} from "./plane.js";
 import {frame_buffer} from "./buffers.js";

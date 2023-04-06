@@ -6,7 +6,7 @@ import {triangle2D} from "../../triangle.js";
 import {generate} from "../../generators.js";
 import {draw} from "./draw.js";
 import {circle2D} from "../../circle.js";
-import {ellpise2D} from "../../ellipse.js";
+import {ellipse2D} from "../../ellipse.js";
 import {check} from "../../check.js";
 import {rotate} from "../../rotate.js";
 import {plane2D} from "../../plane.js";
@@ -25,7 +25,7 @@ var preforme_check = 0;
 var interval_testing = 0;
 var interval_time = 2000;
 var anti_alias = 0;
-var shapes_type = 2;
+var shapes_type = 5;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 1;
 var thickness  = 2;
@@ -37,30 +37,32 @@ var max_height = canvas.clientHeight ;
 */
 var lines = [
     ...generate.random.lines(shapes_amount , 0 , max_width , 0, max_height )
-    /*
-    new line( new point2D( 100 , 200 ) , new point2D( 500 , 200 ) , 2 , new RGBA(255,0,255,1) ),
-    new line( new point2D( 300 , 50 )  , new point2D( 300 , 400 ) , 2 , new RGBA(255,0,255,1) ),
-    */
 ];
 
 var rectangles = [
-    ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height , null , true , null , true , 3)
+    // ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height , null , true , null , true , 3)
 ]; 
 
 var triangles = [ 
-    ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height ),
+    ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , null , null , undefined , true ),
 ];
 
 var circles = [
-    // new circle2D( 200 , 200 , 50 , new RGBA(255,0,255) , 1 , new RGBA(255,0,255)),
-    ...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height )
+    //...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height , 2 , null , null , true)
+    new circle2D( 250 , 300 , 50 , new RGBA(0,255,0, 0.4)) ,
+    new circle2D( 300 , 300 , 50 , new RGBA(0,0,255, 0.5)) ,
+    new circle2D( 270 , 250 , 50 , new RGBA(255,0,0, 0.6)) ,
 ];
 
 var ellipses = [
+    ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
+
+    /*
     new ellpise2D(300,100,80,30  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     new ellpise2D(500,100,40,80  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     new ellpise2D(550,400,50,120 , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     new ellpise2D(220,350,120,100, rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    */
 ];
 
 var planes = [

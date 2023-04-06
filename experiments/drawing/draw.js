@@ -5,7 +5,7 @@ import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from 
 import {RGBA} from "../../color.js";
 import {triangle2D} from "../../triangle.js";
 import {circle2D} from "../../circle.js";
-import {ellpise2D} from "../../ellipse.js";
+import {ellipse2D} from "../../ellipse.js";
 import {rotate} from "../../rotate.js";
 import {plane2D} from "../../plane.js";
 import {frame_buffer} from "../../buffers.js";
@@ -712,21 +712,30 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     //                       ELLPISE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
+    /* need work */
     static #FILL_ELLIPSE_QUADS_X(){
 
     }
+    
+    /* need work */
     static #FILL_ELLIPSE_QUADS_Y(){
 
     }
 
+    /* need work */
     static #DRAW_ELLIPSE_DDA(){
 
     }
 
     // draw ellipse border with rotation support around the z-axis 
     static #DRAW_ELLIPSE_SCANLINE(
-        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = undefined , border_color_str = undefined 
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = undefined , border_color = undefined 
     ){
+
+        x_org = Number.parseInt( x_org );
+        y_org = Number.parseInt( y_org );
+        A = Number.parseInt( A );
+        B = Number.parseInt( B );
 
         let A_sqr = A*A; // A²
         let B_sqr = B*B; // B²
@@ -762,7 +771,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         for( let reflecte of reflected_values ){
 
                           [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle );
-                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
+                          reflecte.X = Number.parseInt(reflecte.X);
+                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
 
@@ -797,7 +808,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         for( let reflecte of reflected_values ){
 
                           [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle );
-                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
+                          reflecte.X = Number.parseInt(reflecte.X);
+                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
 
@@ -831,7 +844,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         for( let reflecte of reflected_values ){
 
                           [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle );
-                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
+                          reflecte.X = Number.parseInt(reflecte.X);
+                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
 
@@ -866,7 +881,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         for( let reflecte of reflected_values ){
 
                           [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle );
-                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color_str );
+                          reflecte.X = Number.parseInt(reflecte.X);
+                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
 
@@ -951,7 +968,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     /* need work */
-    // note : fill ellipse with rotation will only work with buffers  
     static #FILL_ELLIPSE_SCANLINE_ROTATED(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
         fill_color = undefined 
@@ -959,7 +975,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
        
 
     }
-
 
 
     /*
@@ -1201,11 +1216,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static ellipse( ellipse_object = new ellpise2D() ){
+    static ellipse( ellipse_object = new ellipse2D() ){
 
         // check canvas and circle
         let f1 = draw.#CHECK_BUFFER();
-        let f2 = (ellipse_object instanceof ellpise2D);
+        let f2 = (ellipse_object instanceof ellipse2D);
 
         if( f1 && f2 ){
         
@@ -1371,7 +1386,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         // ellipse algorithms
 
-        ELLIPSE_MID_POINT_ALGORITHM( ellipse_object = new ellpise2D() ){
+        ELLIPSE_MID_POINT_ALGORITHM( ellipse_object = new ellipse2D() ){
 
         } ,
 
