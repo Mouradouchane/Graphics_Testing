@@ -55,14 +55,14 @@ var circles = [
 ];
 
 var ellipses = [
+    /*
     ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
 
-    /*
     new ellpise2D(300,100,80,30  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     new ellpise2D(500,100,40,80  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellpise2D(550,400,50,120 , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellpise2D(220,350,120,100, rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     */
+    new ellipse2D(200,300,120,50 , 0 , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    new ellipse2D(500,300,120,50 , Math.PI-0.14 , RGBA.random_color(0)*0 , RGBA.random_color()) , 
 ];
 
 var planes = [

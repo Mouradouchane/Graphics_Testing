@@ -732,10 +732,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = undefined , border_color = undefined 
     ){
 
-        x_org = Number.parseInt( x_org );
-        y_org = Number.parseInt( y_org );
-        A = Number.parseInt( A );
-        B = Number.parseInt( B );
+        x_org = Math.round( x_org );
+        y_org = Math.round( y_org );
+        A = Math.round( A );
+        B = Math.round( B );
 
         let A_sqr = A*A; // A²
         let B_sqr = B*B; // B²
@@ -754,7 +754,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             for( x = 0 ; x <= A ; x++ ){
 
                 x_sqr = x*x;
- 
+                y++;
                 for( ; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
@@ -770,9 +770,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         // draw ellipse using reflection values
                         for( let reflecte of reflected_values ){
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle );
-                          reflecte.X = Number.parseInt(reflecte.X);
-                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , true);
                           draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
@@ -792,7 +790,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 
                 y_sqr = y*y;
                 x++;
-                for( ; x > 0 ; x-- ){
+                for( ; x >= 0 ; x-- ){
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
@@ -807,9 +805,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         // draw ellipse using reflection values
                         for( let reflecte of reflected_values ){
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle );
-                          reflecte.X = Number.parseInt(reflecte.X);
-                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , true);
                           draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
@@ -821,7 +817,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             }
 
         }
-        else { /* B > A */
+        /* when B > A */
+        else { 
         
             // draw first part of the ellipse 
             for( y = 0 ; y <= B ; y++ ){
@@ -843,9 +840,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         // draw ellipse using reflection values
                         for( let reflecte of reflected_values ){
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle );
-                          reflecte.X = Number.parseInt(reflecte.X);
-                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle , true);
                           draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
@@ -880,9 +875,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         // draw ellipse using reflection values
                         for( let reflecte of reflected_values ){
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle );
-                          reflecte.X = Number.parseInt(reflecte.X);
-                          reflecte.Y = Number.parseInt(reflecte.Y);
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle , true);
                           draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }

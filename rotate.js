@@ -11,7 +11,7 @@ export class rotate {
     }
     
     // note : rotation round origin (0,0,0)
-    static x( y = 0 , z = 0 , radian_angle = 0 ){
+    static x( y = 0 , z = 0 , radian_angle = 0 , round_it = false){
 
         let cos = Math.cos(radian_angle);
         let sin = Math.sin(radian_angle); 
@@ -21,34 +21,34 @@ export class rotate {
         
 
         return [
-            ( y * cos ) + ( z * -sin ),   // new Y position
-            ( y * sin ) + ( z *  cos )    // new Z position
+            (round_it) ? Math.round((y * cos) + (z * -sin)) : (y * cos) + (z * -sin) , // new Y position
+            (round_it) ? Math.round((y * sin) + (z *  cos)) : (y * sin) + (z *  cos)   // new Z position
         ];
 
     }
 
     // note : rotation round origin (0,0,0)
-    static y( x = 0 , z = 0 , radian_angle = 0 ){
+    static y( x = 0 , z = 0 , radian_angle = 0 , round_it = false){
 
         let cos = Math.cos(radian_angle);
         let sin = Math.sin(radian_angle); 
         
         return [
-            (x *  cos) + (z * sin) ,    // new X position   
-            (x * -sin) + (z * cos)      // new Z position
+            (round_it) ? Math.round((x *  cos) + (z * sin)) : (x *  cos) + (z * sin) , // new X position   
+            (round_it) ? Math.round((x * -sin) + (z * cos)) : (x * -sin) + (z * cos)   // new Z position
         ];
 
     }
 
     // note : rotation round origin (0,0,0)
-    static z( x = 0 , y = 0 , radian_angle = 0 ){
+    static z( x = 0 , y = 0 , radian_angle = 0 , round_it = false){
 
         let cos = Math.cos(radian_angle);
         let sin = Math.sin(radian_angle); 
         
         return [ 
-            (x * cos) + -(y * sin) ,    // new X position
-            (x * sin) +  (y * cos)      // new Y position
+           (round_it) ? Math.round((x * cos) + -(y * sin)) : (x * cos) + -(y * sin) , // new X position
+           (round_it) ? Math.round((x * sin) +  (y * cos)) : (x * sin) +  (y * cos)   // new Y position
         ];
 
     }
