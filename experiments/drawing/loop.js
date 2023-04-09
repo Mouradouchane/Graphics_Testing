@@ -61,8 +61,8 @@ var ellipses = [
     new ellpise2D(300,100,80,30  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     new ellpise2D(500,100,40,80  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     */
-    new ellipse2D(200,300,120,50 , 0 , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellipse2D(500,300,120,50 , Math.PI-0.14 , RGBA.random_color(0)*0 , RGBA.random_color()) , 
+    new ellipse2D(200,300,120,50 , 0 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
+    new ellipse2D(500,300,120,50 , Math.PI/4 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
 ];
 
 var planes = [

@@ -7,6 +7,7 @@ import {triangle2D} from "../../triangle.js";
 import {circle2D} from "../../circle.js";
 import {ellipse2D} from "../../ellipse.js";
 import {rotate} from "../../rotate.js";
+import {shear} from "../../shear.js";
 import {plane2D} from "../../plane.js";
 import {frame_buffer} from "../../buffers.js";
 
@@ -748,6 +749,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let y = B;
         let y_sqr = null; // y²
 
+        let shy = 0;
+        let shx = 1;
+        let rnd = true;
+
+        debugger 
+
         if( A >= B ){
 
             // draw first part of the ellipse 
@@ -758,7 +765,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 for( ; y >= 0 ; y-- ){
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
-                        
+
                         // needed values to draw ellipse using reflection 
                         let reflected_values = [
                             { X :  x    ,   Y :  y } ,
@@ -770,7 +777,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         // draw ellipse using reflection values
                         for( let reflecte of reflected_values ){
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , true);
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , rnd);
+                          //reflecte.X = shear.x(reflecte.X , reflecte.Y , shx);
+                          //reflecte.Y = shear.y(reflecte.X , reflecte.Y , shy);
                           draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
@@ -805,7 +814,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         // draw ellipse using reflection values
                         for( let reflecte of reflected_values ){
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , true);
+                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , rnd);
+                          //reflecte.X = shear.x(reflecte.X , reflecte.Y , shx);
+                          //reflecte.Y = shear.y(reflecte.X , reflecte.Y , shy);
                           draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
                         
                         }
