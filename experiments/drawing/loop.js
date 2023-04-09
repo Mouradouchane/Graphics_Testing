@@ -27,7 +27,7 @@ var interval_time = 2000;
 var anti_alias = 0;
 var shapes_type = 5;
 var shapes_amount = 3;
-var generate_random_shapes_each_time = 1;
+var generate_random_shapes_each_time = 0;
 var thickness  = 2;
 var max_width  = canvas.clientWidth  ;
 var max_height = canvas.clientHeight ;
@@ -61,8 +61,8 @@ var ellipses = [
     new ellpise2D(300,100,80,30  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     new ellpise2D(500,100,40,80  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
     */
-    new ellipse2D(200,300,120,50 , 0 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
-    new ellipse2D(500,300,120,50 , Math.PI/4 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
+    new ellipse2D(200,300, 150,150 , 0 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
+    // new ellipse2D(500,300, 320,50 , 0.5 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
 ];
 
 var planes = [
@@ -76,11 +76,15 @@ check.set.buffer( buffer );
 /*
     render/frame functions
 */
-function clear_frame(){
+function clear_canvas(){
 
     ctx.fillStyle = "rgba(0,0,0,1)";
     ctx.fillRect( 0 , 0 , canvas.clientWidth , canvas.clientHeight );
 
+}
+
+function clear_buffer(){
+    buffer.clear();
 }
 
 function new_frame(){
@@ -203,7 +207,8 @@ function new_frame(){
 
 function render(){
 
-    clear_frame();
+    clear_canvas();
+    clear_buffer();
     new_frame();
 
     requestAnimationFrame( render );
@@ -223,7 +228,7 @@ else {
 
         setInterval( () => {
 
-            clear_frame();
+            clear_canvas();
             new_frame();
 
         } , interval_time );
@@ -231,7 +236,7 @@ else {
     }
     else{
 
-        clear_frame();
+        clear_canvas();
         new_frame();
 
     }
