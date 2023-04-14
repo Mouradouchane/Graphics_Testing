@@ -81,6 +81,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         anti_alising : false,
 
         copy_object_for_drawing : false,
+        draw_direct_to_canvas : true ,
 
         grid_size : 1,
         grid_distance : 10,
@@ -100,13 +101,23 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         x = Number.parseInt(x);
         y = Number.parseInt(y);
-
-        // if blend color's needed , no z-axis 
-        if(pixle_color.alpha < 1) {
-            pixle_color = RGBA.blend( pixle_color , draw.#RESOURCES.buffer.get_pixle(x , y) );
-        }
         
-        draw.#RESOURCES.buffer.set_pixle( x , y , pixle_color );   
+        if( !(draw.#RESOURCES.draw_direct_to_canvas) ){
+
+            // if blend color's needed , no z-axis 
+            if(pixle_color.alpha < 1) {
+                pixle_color = RGBA.blend( pixle_color , draw.#RESOURCES.buffer.get_pixle(x , y) );
+            }
+            
+            draw.#RESOURCES.buffer.set_pixle( x , y , pixle_color );
+            
+        } 
+        else {
+
+            draw.#RESOURCES.ctx.fillStyle = RGBA.to_string( pixle_color );
+            draw.#RESOURCES.ctx.fillRect( x , y , 1 , 1 );
+
+        }
         
     }
 
@@ -713,27 +724,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     //                       ELLPISE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
-    /* need work */
-    static #FILL_ELLIPSE_QUADS_X(){
-
-    }
-    
-    /* need work */
-    static #FILL_ELLIPSE_QUADS_Y(){
-
-    }
-
-    /* need work */
-    static #DRAW_ELLIPSE_DDA(){
-
-    }
-
     // draw ellipse border with no rotation support
     static #DRAW_ELLIPSE_SCANLINE(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , f1 = 0 , f2 = 0 , 
         border_thickness = 1 , border_color = undefined 
     ){
-        
+
         x_org = Math.round( x_org );
         y_org = Math.round( y_org );
 
@@ -760,182 +756,106 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let x_end = Aout;
 
-        if( A >= B ){
-
-            // draw first part of the ellipse 
-            for( ; y_start <= Bout ; y_start++ ){
-                
-                y_start_sqr = y_start*y_start;
-                
-                x_start++;
-                for( ; x_start > 0 ; x_start-- ){
-                    
-                    x_start_sqr = x_start*x_start;
-
-                    if( ( x_start_sqr / Aout_sqr ) + ( y_start_sqr / Bout_sqr ) <= 1 ){
-                        
-                        x_end = x_start;
-
-                        while( (x_end*x_end / A_sqr) + ( y_start_sqr / B_sqr ) > 1 && x_end > 1 ) x_end-- ;
-             
-                        // needed values to draw ellipse using reflection 
-                        let reflected_values = [
-                            { X :  x_start   ,   Y :  y_start   ,   Xo :  x_end } ,
-                            { X : -x_start   ,   Y :  y_start   ,   Xo : -x_end } ,
-                            { X :  x_start   ,   Y : -y_start   ,   Xo :  x_end } ,
-                            { X : -x_start   ,   Y : -y_start   ,   Xo : -x_end } ,
-                        ];
-
-                        // draw all other ellipse parts using reflection
-                        for( let reflecte of reflected_values ){
-
-                            draw.#DRAW_HORIZONTAL_LINE(
-                                x_org + reflecte.Xo , x_org + reflecte.X , y_org + reflecte.Y , border_color
-                            );
-
-                        }
-                        
-                        m = ( x_start * Bout_sqr ) / ( ( y_start * Aout_sqr ) | 1 );
-                        break;
-                    }
-
-                }
-
-                if( m <= 1 ) break;
-
-            }
-
-            draw.#DRAW_HORIZONTAL_LINE(
-                x_org + A - 1, x_org + Aout - 1 , y_org , border_color
-            );
-            draw.#DRAW_HORIZONTAL_LINE(
-                x_org - A + 1, x_org - Aout + 1, y_org , border_color
-            );
-
-            // draw secend part of the ellipse 
-            y_start++;
+        // draw first part of the ellipse 
+        for( ; y_start <= Bout ; y_start++ ){
             
-            for( ; y_start <= Bout ; y_start++ ){
+            y_start_sqr = y_start*y_start;
+            
+            x_start++;
+            for( ; x_start > 1 ; x_start-- ){
                 
-                y_start_sqr = y_start*y_start;
-                
-                x_start++;
-                for( ; x_start > 1 ; x_start-- ){
-
-                    if( ( (x_start*x_start) / Aout_sqr ) + ( y_start_sqr / Bout_sqr ) <= 1 ){
-
-                        x_end = x_start;
-                        
-                        // while( (x_end*x_end / A_sqr) + ( y_start_sqr / B_sqr ) > 1 && x_end > 0 ) x_end--;
-                        while( 
-                            draw.#CALC_DISTANCE( x_end , f1.x , y_start , f1.y ) +
-                            draw.#CALC_DISTANCE( x_end , f2.x , y_start , f2.y ) > (A*2)
-                            && x_end > 0  
-                        ) x_end--;
-
-                        // needed values to draw ellipse using reflection 
-                        let reflected_values = [
-                            { X :  x_start   ,   Y :  y_start   ,   Xo :  x_end } ,
-                            { X : -x_start   ,   Y :  y_start   ,   Xo : -x_end-1 } ,
-                            { X :  x_start   ,   Y : -y_start   ,   Xo :  x_end } ,
-                            { X : -x_start   ,   Y : -y_start   ,   Xo : -x_end-1 } ,
-                        ];
-                        
-                        // draw ellipse using reflection values
-                        for( let reflecte of reflected_values ){
-
-                          //[reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y ,  angle , rnd);
-                          //reflecte.X = shear.x(reflecte.X , reflecte.Y , shx);
-                          //reflecte.Y = shear.y(reflecte.X , reflecte.Y , shy);
-
-                          draw.#DRAW_HORIZONTAL_LINE(
-                            x_org + reflecte.Xo , x_org + reflecte.X , y_org + reflecte.Y , border_color
-                          );
-
-                        }
-
-                        break;
-                    }
-                }
-
-            }
-
-        }
-        /* when B > A */
-        else { 
-        
-            // draw first part of the ellipse 
-            for( y_start = 0 ; y_start <= B ; y_start++ ){
-
-                y_start_sqr = y_start*y_start;
-                
-                for( ; x_start >= 0 ; x_start-- ){
-
-                    if( ( (x_start*x_start) / A_sqr ) + ( y_start_sqr / B_sqr ) <= 1 ){
-
-                        // needed values to draw ellipse using reflection 
-                        let reflected_values = [
-                            { X :  x_start    , Y :  y_start},
-                            { X : -x_start    , Y :  y_start},
-                            { X :  x_start    , Y : -y_start},
-                            { X : -x_start    , Y : -y_start},
-                        ];
-                        
-                        // draw ellipse using reflection values
-                        for( let reflecte of reflected_values ){
-
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle , true);
-                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
-                        
-                        }
-
-                        m = ( x_start * B_sqr ) / (( y_start * A_sqr ) | 1);
-                        break;
-                    }
-
-                }
-                if( m <= 1 ) break;
-
-            }
-
-            // draw secend part of the ellipse
-            y_start = B;
-            for(  ; x_start >= 0 ; x_start-- ){
-
                 x_start_sqr = x_start*x_start;
-                y_start++;
-                for( ; y_start >= 0 ; y_start-- ){
 
-                    if( ( x_start_sqr / A_sqr ) + ( (y_start*y_start) / B_sqr ) <= 1 ){
-                        
-                        // needed values to draw ellipse using reflection 
-                        let reflected_values = [
-                            { X :  x_start    , Y :  y_start},
-                            { X : -x_start    , Y :  y_start},
-                            { X :  x_start    , Y : -y_start},
-                            { X : -x_start    , Y : -y_start},
-                        ];
-                        
-                        // draw ellipse using reflection values
-                        for( let reflecte of reflected_values ){
+                if( ( x_start_sqr / Aout_sqr ) + ( y_start_sqr / Bout_sqr ) <= 1 ){
+                    
+                    x_end = x_start;
 
-                          [reflecte.X , reflecte.Y] = rotate.z( reflecte.X , reflecte.Y , angle , true);
-                          draw.#set_pixle( x_org + reflecte.X , y_org + reflecte.Y , border_color );
-                        
-                        }
+                    while( 
+                        ( x_end*x_end / A_sqr ) + ( y_start_sqr / B_sqr ) > 1 && x_end > 1
+                    ) x_end-- ;
+            
+                    // needed values to draw ellipse using reflection 
+                    let reflected_values = [
+                        {  X :  x_start   ,   Y :  y_start   ,   Xo :  x_end } ,
+                        {  X : -x_start   ,   Y :  y_start   ,   Xo : -x_end } ,
+                        {  X :  x_start   ,   Y : -y_start   ,   Xo :  x_end } ,
+                        {  X : -x_start   ,   Y : -y_start   ,   Xo : -x_end } ,
+                    ];
 
-                        break;
+                    // draw all other ellipse parts using reflection
+                    for( let reflecte of reflected_values ){
+
+                        draw.#DRAW_HORIZONTAL_LINE(
+                            x_org + reflecte.Xo , x_org + reflecte.X , y_org + reflecte.Y , border_color
+                        );
+
+                    }
+                    
+                    m = ( x_start * Bout_sqr ) / ( ( y_start * Aout_sqr ) | 1 );
+                    break;
+                }
+
+            }
+
+            if( m <= 1 ) break;
+
+        }
+
+        draw.#DRAW_HORIZONTAL_LINE(
+            x_org + A - 1, x_org + Aout - 1 , y_org , border_color
+        );
+        draw.#DRAW_HORIZONTAL_LINE(
+            x_org - A + 1, x_org - Aout + 1, y_org , border_color
+        );
+
+        // draw secend part of the ellipse 
+        y_start++;
+        
+        for( ; y_start <= Bout ; y_start++ ){
+            
+            y_start_sqr = y_start*y_start;
+            
+            x_start++;
+            for( ; x_start > 1 ; x_start-- ){
+
+                if( ( ( x_start*x_start ) / Aout_sqr ) + ( y_start_sqr / Bout_sqr ) <= 1 ){
+                    
+                    x_end = x_start;
+                    
+                    while( 
+                        (x_end*x_end / A_sqr) + ( y_start_sqr / B_sqr ) > 1 && x_end > 1
+                    ) x_end--;
+
+                    // needed values to draw ellipse using reflection 
+                    let reflected_values = [
+                        {  X :  x_start   ,   Y :  y_start   ,   Xo :  x_end  } ,
+                        {  X : -x_start   ,   Y :  y_start   ,   Xo : -x_end  } ,
+                        {  X :  x_start   ,   Y : -y_start   ,   Xo :  x_end  } ,
+                        {  X : -x_start   ,   Y : -y_start   ,   Xo : -x_end  } ,
+                    ];
+                    
+                    // draw ellipse using reflection values
+                    for( let reflecte of reflected_values ){
+
+                        draw.#DRAW_HORIZONTAL_LINE(
+                            x_org + reflecte.Xo , x_org + reflecte.X , y_org + reflecte.Y , border_color
+                        );
+
                     }
 
+                    break;
                 }
 
             }
 
         }
-
+ 
+        draw.#DRAW_VERTICAL_LINE(x_org + x_start - 1 , y_org + B , y_org + B+ border_thickness - 1 , border_color)
+        draw.#DRAW_VERTICAL_LINE(x_org + x_start - 1 , y_org - B , y_org - B - border_thickness + 1 , border_color)
+    
     }
 
-    // note : fill ellipse with no support to rotation
+    // note : no rotation support
     static #FILL_ELLIPSE_SCANLINE(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color = undefined 
     ){
@@ -1080,6 +1000,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let f1 = draw.#CHECK_CANVAS();
         let f2 = draw.#CHECK_BUFFER();
 
+        if( !(draw.#RESOURCES.draw_direct_to_canvas) ){
+
         if( f1 && f2 ){
 
             for( let y = 0 ; y <= draw.#RESOURCES.buffer.height() ; y++ ){
@@ -1099,6 +1021,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         else{
             if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
             if(!f2) draw.#LOG.ERROR.BUFFER.MISSING();
+        }
+
         }
 
     }
@@ -1264,15 +1188,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if( ellipse_object.fill_color instanceof RGBA ){
 
                 // if ellipse fill require no rotation
-                if(ellipse_object.angle == 0){
+                if( ellipse_object.angle == 0 ){
 
                     draw.#FILL_ELLIPSE_SCANLINE( 
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
                         ellipse_object.height ,
-                        ellipse_object.fill_color
-                        );
+                        ellipse_object.get_f1(),
+                        ellipse_object.get_f2(),
+                        ellipse_object.border , 
+                        ellipse_object.border_color
+                    );
                 }
                 else { // if ellipse fill require rotation
 

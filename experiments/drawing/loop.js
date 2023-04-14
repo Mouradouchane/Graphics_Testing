@@ -49,20 +49,15 @@ var triangles = [
 
 var circles = [
     //...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height , 2 , null , null , true)
-    new circle2D( 250 , 300 , 50 , new RGBA(0,255,0, 0.4)) ,
-    new circle2D( 300 , 300 , 50 , new RGBA(0,0,255, 0.5)) ,
-    new circle2D( 270 , 250 , 50 , new RGBA(255,0,0, 0.6)) ,
+    new circle2D( 250 , 300 , 50 , new RGBA(0,255,0, 0.4) ) ,
+    new circle2D( 300 , 300 , 50 , new RGBA(0,0,255, 0.5) ) ,
+    new circle2D( 270 , 250 , 50 , new RGBA(255,0,0, 0.6) ) ,
 ];
 
 var ellipses = [
-    /*
-    ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
-
-    new ellpise2D(300,100,80,30  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    new ellpise2D(500,100,40,80  , rotate.random_z() , RGBA.random_color(0)*0 , RGBA.random_color()) , 
-    */
-    new ellipse2D(200,300, 150,150 , 0 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
-    // new ellipse2D(500,300, 320,50 , 0.5 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 4) , 
+    // ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
+    new ellipse2D(201,300, 150,50 , 0 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 16) , 
+    new ellipse2D(250,300, 50,150 , 0 , RGBA.random_color(0)*0 , new RGBA(155,80,208,0.5) , 16) , 
 ];
 
 var planes = [
