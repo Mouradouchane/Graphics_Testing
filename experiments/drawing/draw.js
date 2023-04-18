@@ -456,20 +456,20 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // A-B
         let D_AB_X = (copy.a.x - copy.b.x);
         let D_AB_Y = (copy.a.y - copy.b.y);
-        let slope_AB = D_AB_X != 0 ? ( D_AB_Y / D_AB_X ) : 0;
+        let slope_AB = ( D_AB_Y / ( D_AB_X | 1 ) );
         let intercept_AB = copy.a.y - (slope_AB * copy.a.x);
 
         // A-C
         let D_AC_X = (copy.a.x - copy.c.x);
         let D_AC_Y = (copy.a.y - copy.c.y);
-        let slope_AC = D_AC_X != 0 ? ( D_AC_Y / D_AC_X ) : 0;
+        let slope_AC = ( D_AC_Y / ( D_AC_X | 1 ) );
         let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
 
         let x_start = 0;
         let x_end = 0;
         let y = copy.a.y;
 
-        //debugger;
+        debugger;
 
         // fill from A to B
         for( ; y <= copy.b.y; y += 1 ){
@@ -486,7 +486,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // B-C
         let D_BC_X = (copy.b.x - copy.c.x);
         let D_BC_Y = (copy.b.y - copy.c.y);
-        let slope_BC = D_BC_X != 0 ? ( D_BC_Y / D_BC_X ) : 0;
+        let slope_BC = ( D_BC_Y / ( D_BC_X | 1 ) );
         let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
         
         // fill from B to C
@@ -856,11 +856,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     // note : no rotation support
-    static #FILL_ELLIPSE_SCANLINE(
+    static #FILL_ELLIPSE_WITH_NO_ROTATION(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color = undefined 
     ){
         let safety_factor = 4;
-
+        
         let A_sqr = A*A; // A²
         let B_sqr = B*B; // B²
 
@@ -925,7 +925,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     /* need work */
-    static #FILL_ELLIPSE_SCANLINE_ROTATED(
+    static #FILL_ELLIPSE_WITH_ROTATION(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
         fill_color = undefined 
     ){
@@ -1182,7 +1182,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // check canvas and circle
         let f1 = draw.#CHECK_BUFFER();
         let f2 = (ellipse_object instanceof ellipse2D);
-
+        
         if( f1 && f2 ){
         
             if( ellipse_object.fill_color instanceof RGBA ){
@@ -1190,20 +1190,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 // if ellipse fill require no rotation
                 if( ellipse_object.angle == 0 ){
 
-                    draw.#FILL_ELLIPSE_SCANLINE( 
+                    draw.#FILL_ELLIPSE_WITH_NO_ROTATION( 
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
                         ellipse_object.height ,
-                        ellipse_object.get_f1(),
-                        ellipse_object.get_f2(),
-                        ellipse_object.border , 
-                        ellipse_object.border_color
+                        ellipse_object.fill_color 
                     );
+
                 }
                 else { // if ellipse fill require rotation
 
-                    draw.#FILL_ELLIPSE_SCANLINE_ROTATED( 
+                    draw.#FILL_ELLIPSE_WITH_ROTATION( 
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
@@ -1221,6 +1219,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             // if ellipse require draw border
             if( ellipse_object.border_color instanceof RGBA ){
 
+                // ellipse with rotation
                 if( ellipse_object.angle == 0 ){
 
                     draw.#DRAW_ELLIPSE_SCANLINE(
@@ -1235,6 +1234,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     );
 
                 }
+                // ellipse with no rotation
                 else {
 
                 }
@@ -1243,8 +1243,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else{
+
             if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
             if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+
         }
 
     } 
@@ -1259,30 +1261,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
             if( plane_2D_object.fill_color instanceof RGBA ){
     
-                //debugger
-    
-                plane2D.sort_by_y_axis( plane_2D_object );
-    
-                let copy_part_1 = new triangle2D(
-                    point2D.copy(plane_2D_object.a),
-                    point2D.copy(plane_2D_object.b),
-                    point2D.copy(plane_2D_object.c),
-                    undefined,
-                    RGBA.copy( plane_2D_object.fill_color ),
-                    undefined
-                );
-    
-                let copy_part_2 = new triangle2D(
-                    point2D.copy(plane_2D_object.b),
-                    point2D.copy(plane_2D_object.c),
-                    point2D.copy(plane_2D_object.d),
-                    undefined,
-                    RGBA.copy( plane_2D_object.fill_color ),
-                    undefined
-                )
-    
-                draw.#FILL_TRIANGLE( copy_part_1 );
-                draw.#FILL_TRIANGLE( copy_part_2 );
+                
     
             }
     

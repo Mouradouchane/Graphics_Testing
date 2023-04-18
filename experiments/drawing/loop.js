@@ -25,7 +25,7 @@ var preforme_check = 0;
 var interval_testing = 0;
 var interval_time = 2000;
 var anti_alias = 0;
-var shapes_type = 5;
+var shapes_type = 3;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 0;
 var thickness  = 2;
@@ -44,7 +44,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , null , null , undefined , true ),
+    ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , null , null , 0 ),
 ];
 
 var circles = [
@@ -56,12 +56,19 @@ var circles = [
 
 var ellipses = [
     // ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
-    new ellipse2D(201,300, 150,50 , 0 , RGBA.random_color(0)*0 , new RGBA(255,0,180,0.5) , 16) , 
-    new ellipse2D(250,300, 50,150 , 0 , RGBA.random_color(0)*0 , new RGBA(155,80,208,0.5) , 16) , 
+    new ellipse2D(201,300, 150,50 , 0 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5) , 16) , 
+    new ellipse2D(250,300, 50,150 , 0 , new RGBA(55,100,80,0.7) , new RGBA(155,80,208,0.5) , 16) , 
 ];
 
 var planes = [
-    ...generate.random.planes( shapes_amount , 0 , max_width , 0 , max_height , thickness )
+    // ...generate.random.planes( shapes_amount , 0 , max_width , 0 , max_height , thickness)
+    new plane2D( 
+        new point2D(100,100) ,
+        new point2D(100,400) ,
+        new point2D(200,100) , 
+        new point2D(200,400) , 
+        new RGBA(255,0,180,0.5) 
+    )
 ];
 
 draw.set_canvas( canvas );
