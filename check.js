@@ -193,7 +193,7 @@ export class check {
         
         triangle : function( triangle_object = new TRIANGLE_2D() ){
 
-            if( check.#RESOURCES.canvas ){
+            if( check.#RESOURCES.buffer instanceof frame_buffer ){
 
                 if( triangle_object instanceof TRIANGLE_2D ){
 
@@ -209,8 +209,8 @@ export class check {
                 
             }
             else {
-                check.#LOG.ERROR.CANVAS_NOT_DEFINED();
-                check.#LOG.HINT.DEFINE_CANVAS();
+                check.#LOG.ERROR.BUFFER_NOT_DEFINED();
+                check.#LOG.HINT.DEFINE_BUFFER();
             }
 
         },

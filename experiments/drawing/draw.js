@@ -455,28 +455,31 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         // A-B
         let D_AB_X = (copy.a.x - copy.b.x);
+            // D_AB_X = (D_AB_X == 0) ? 1 : D_AB_X;
         let D_AB_Y = (copy.a.y - copy.b.y);
-        let slope_AB = ( D_AB_Y / ( D_AB_X | 1 ) );
+        let slope_AB = (D_AB_X == 0) ? D_AB_Y : ( D_AB_Y / D_AB_X );
+            // slope_AB = (slope_AB == 0) ? 1 : slope_AB;
         let intercept_AB = copy.a.y - (slope_AB * copy.a.x);
 
         // A-C
         let D_AC_X = (copy.a.x - copy.c.x);
+            // D_AC_X = (D_AC_X == 0) ? 1 : D_AC_X;
         let D_AC_Y = (copy.a.y - copy.c.y);
-        let slope_AC = ( D_AC_Y / ( D_AC_X | 1 ) );
+        let slope_AC = (D_AC_X == 0) ? D_AC_Y : ( D_AC_Y / D_AC_X ); 
+            // slope_AC = (slope_AC == 0) ? 1 : slope_AC;
         let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
 
         let x_start = 0;
         let x_end = 0;
         let y = copy.a.y;
 
-        debugger;
-
+        debugger
         // fill from A to B
         for( ; y <= copy.b.y; y += 1 ){
 
             // find X's
-            x_start = Math.round( (y - intercept_AC) / slope_AC );
-            x_end   = Math.round( (y - intercept_AB) / slope_AB );
+            x_start = (slope_AC == 0) ? y : Number.parseInt((y - intercept_AC) / slope_AC);
+            x_end   = (slope_AB == 0) ? y : Number.parseInt((y - intercept_AB) / slope_AB);
             
             // fill range
             draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
@@ -485,16 +488,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         // B-C
         let D_BC_X = (copy.b.x - copy.c.x);
+            // D_BC_X = (D_BC_X == 0) ? 1 : D_BC_X;
         let D_BC_Y = (copy.b.y - copy.c.y);
-        let slope_BC = ( D_BC_Y / ( D_BC_X | 1 ) );
+        let slope_BC = (D_BC_X == 0) ? D_BC_Y : ( D_BC_Y / D_BC_X );
+            // slope_BC = (slope_BC == 0) ? 1 : slope_BC;
         let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
         
         // fill from B to C
-        for( ; y < copy.c.y ; y += 1 ){
+        for( ; y <= copy.c.y ; y += 1 ){
 
-            x_start = Math.round( (y - intercept_AC) / slope_AC );
-            x_end   = Math.round( (y - intercept_BC) / slope_BC );
-            
+            x_start = (slope_AC == 0) ? y : Number.parseInt((y - intercept_AC) / slope_AC);
+            x_end   = (slope_BC == 0) ? y : Number.parseInt((y - intercept_BC) / slope_BC);
+
             draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
 
         }
@@ -1128,7 +1133,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             // sort points depend on Y-axis
             triangle2D.sort_by_y_axis(copy);
-
+            
             if( copy.fill_color instanceof RGBA ){
 
                 // fill triangle  
