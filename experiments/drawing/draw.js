@@ -473,7 +473,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let x_end = 0;
         let y = copy.a.y;
 
-        debugger
         // fill from A to B
         for( ; y <= copy.b.y; y += 1 ){
 
@@ -929,12 +928,101 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
+    static #DRAW_ELLIPSE_WITH_ROTATION(
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
+        border = 1 , border_color = undefined 
+    ){
+ 
+        x_org = Math.round( x_org );
+        y_org = Math.round( y_org );
+
+        A = Math.round( A );
+        B = Math.round( B );
+
+        let gap_value = 16;
+        let gap = ((A >= B) ? A : B) / gap_value; 
+
+        let A_sqr = A*A; // A²
+        let B_sqr = B*B; // B²
+
+        // let m = null; // slope
+
+        f1  = rotate.z( f1.x , f1.y , angle );
+        f2  = rotate.z( f2.x , f2.y , angle );
+        
+        let x = 0;
+        let x_sqr = null; // x²
+
+        let y = B;
+        let y_sqr = null; // y²
+
+        let ref = [
+            {  X :  x   ,   Y :  y  } ,
+            {  X : -x   ,   Y :  y  } ,
+            {  X :  x   ,   Y : -y  } ,
+            {  X : -x   ,   Y : -y  } ,
+        ];
+
+        let old_ref = [
+            {  X_out :  x   ,   Y_out :  y  } ,
+            {  X_out : -x   ,   Y_out :  y  } ,
+            {  X_out :  x   ,   Y_out : -y  } ,
+            {  X_out : -x   ,   Y_out : -y  } 
+        ]
+
+        for( ; x <= A ; x += gap ){
+
+            // debugger
+            // if( m >= 1 ) break;
+
+            x_sqr = x * x;
+            
+            for( ; y >= 0 ; y-- ){
+                
+                y_sqr = y * y;
+     
+                if( (x_sqr / A_sqr) + (y_sqr / B_sqr) <= 1 ){
+                    
+                    // debugger
+                    // rotating x and y 
+
+                    ref = [
+                        {  X :  x   ,   Y :  y  } ,
+                        {  X : -x   ,   Y :  y  } ,
+                        {  X :  x   ,   Y : -y  } ,
+                        {  X : -x   ,   Y : -y  } ,
+                    ];
+
+                    for( let i = 0 ; i < 4 ; i++ ) {                    
+
+                        [ref[i].X , ref[i].Y] = rotate.z( ref[i].X , ref[i].Y , angle );
+
+                        if( draw.#CALC_DISTANCE())
+                        draw.#CUSTOM_LINE_NO_GRADIENT(
+                            new point2D( x_org + ref[i].X , y_org + ref[i].Y ) ,
+                            new point2D( x_org + old_ref[i].X , y_org + old_ref[i].Y ) ,
+                            1 , border_color 
+                        );
+                        
+                    }
+
+                    old_ref = ref;
+
+                    // m = ( x * B_sqr ) / ( ( y * A_sqr ) | 1 );
+                    break;
+                }
+
+            }
+
+        }
+
+    }
+
     /* need work */
     static #FILL_ELLIPSE_WITH_ROTATION(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
         fill_color = undefined 
     ){
-       
 
     }
 
@@ -1241,6 +1329,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 }
                 // ellipse with no rotation
                 else {
+
+                    draw.#DRAW_ELLIPSE_WITH_ROTATION(
+                        ellipse_object.x , 
+                        ellipse_object.y , 
+                        ellipse_object.width , 
+                        ellipse_object.height ,
+                        ellipse_object.angle ,
+                        ellipse_object.get_f1(),
+                        ellipse_object.get_f2(),
+                        ellipse_object.border , 
+                        ellipse_object.border_color
+                    );
 
                 }
 

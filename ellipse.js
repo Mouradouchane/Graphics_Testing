@@ -21,8 +21,8 @@ export class ellipse2D{
 
         this.border = border;
 
-        this.width  = (typeof(width)  == "number") ? width  : 1;
-        this.height = (typeof(height) == "number") ? height : 1;
+        this.width  = (typeof(width)  == "number") ? width/2  : 1;
+        this.height = (typeof(height) == "number") ? height/2 : 1;
 
         this.fill_color   = (fill_color instanceof RGBA)   ? fill_color   : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;

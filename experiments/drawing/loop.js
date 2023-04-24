@@ -21,11 +21,11 @@ const buffer = new frame_buffer( 800 , 600 );
 */
 var render_loop = 0;
 var grid = 0;
-var preforme_check = 0;
+var preforme_check = 1;
 var interval_testing = 0;
 var interval_time = 2000;
 var anti_alias = 0;
-var shapes_type = 3;
+var shapes_type = 5;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 0;
 var thickness  = 2;
@@ -40,17 +40,12 @@ var lines = [
 ];
 
 var rectangles = [
-    // ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height , null , true , null , true , 3)
+    ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height , null , true , null , true , 3)
 ]; 
 
 var triangles = [ 
-    // ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , null , null , 0 ),
+    //...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , 0 , null , 0 ),
     new triangle2D( 
-        /*
-        new point2D( 100, 200) ,
-        new point2D( 300, 200) ,
-        new point2D( 300, 200) ,
-        */
         new point2D(100, 200) ,
         new point2D(300, 200) ,
         new point2D(300, 240) ,
@@ -63,6 +58,13 @@ var triangles = [
         new point2D(340, 400) ,
         1, 
         new RGBA(150,100,180,0.5) , 0
+    ),
+    new triangle2D( 
+        new point2D(650, 330) ,
+        new point2D(140, 500) ,
+        new point2D(540, 100) ,
+        1, 
+        new RGBA(150,255,200,0.5) , 0
     )
 ];
 
@@ -75,8 +77,8 @@ var circles = [
 
 var ellipses = [
     // ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
-    new ellipse2D(201,300, 150,50 , 0 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5) , 16) , 
-    new ellipse2D(250,300, 50,150 , 0 , new RGBA(55,100,80,0.7) , new RGBA(155,80,208,0.5) , 16) , 
+    // new ellipse2D(250,300, 50,150 , 0 , new RGBA(55,100,80,0.7) , new RGBA(155,80,208,0.5) , 16) , 
+    new ellipse2D(201,300, 150,50 , 0.1 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5) , 16) , 
 ];
 
 var planes = [
