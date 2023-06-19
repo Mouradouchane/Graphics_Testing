@@ -469,22 +469,30 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             // slope_AC = (slope_AC == 0) ? 1 : slope_AC;
         let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
 
-        let x_start = 0;
-        let x_end = 0;
+        let x_start = copy.a.x;
+        let x_end = copy.b.x;
         let y = copy.a.y;
 
         // fill from A to B
-        for( ; y <= copy.b.y; y += 1 ){
+        if( slope_AB != 0 ){
 
-            // find X's
-            x_start = (slope_AC == 0) ? y : Number.parseInt((y - intercept_AC) / slope_AC);
-            x_end   = (slope_AB == 0) ? y : Number.parseInt((y - intercept_AB) / slope_AB);
-            
-            // fill range
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
+            for( ; y <= copy.b.y; y++ ){
+    
+                // find X's
+                x_start = (slope_AC == 0) ? y : Math.ceil((y - intercept_AC) / slope_AC);
+                x_end   = (slope_AB == 0) ? y : Math.ceil((y - intercept_AB) / slope_AB);
+                
+                // fill range
+                draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
+    
+            }
 
         }
-
+        else {
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
+            y += 1;
+        }
+        
         // B-C
         let D_BC_X = (copy.b.x - copy.c.x);
             // D_BC_X = (D_BC_X == 0) ? 1 : D_BC_X;
@@ -496,8 +504,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // fill from B to C
         for( ; y <= copy.c.y ; y += 1 ){
 
-            x_start = (slope_AC == 0) ? y : Number.parseInt((y - intercept_AC) / slope_AC);
-            x_end   = (slope_BC == 0) ? y : Number.parseInt((y - intercept_BC) / slope_BC);
+            x_start = (slope_AC == 0) ? y : Math.ceil((y - intercept_AC) / slope_AC);
+            x_end   = (slope_BC == 0) ? y : Math.ceil((y - intercept_BC) / slope_BC);
 
             draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
 
@@ -931,7 +939,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     static #DRAW_ELLIPSE_WITH_ROTATION(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
         border = 1 , border_color = undefined 
-    ){
+    ){k
  
         x_org = Math.round( x_org );
         y_org = Math.round( y_org );
