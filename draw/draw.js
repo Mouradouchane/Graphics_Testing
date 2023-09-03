@@ -1,15 +1,15 @@
 
-import {point2D} from "../../point.js"
-import {line , line_with_colors} from "../../line.js"
-import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../../rectangle.js";
-import {RGBA} from "../../color.js";
-import {triangle2D} from "../../triangle.js";
-import {circle2D} from "../../circle.js";
-import {ellipse2D} from "../../ellipse.js";
-import {rotate} from "../../rotate.js";
-import {shear} from "../../shear.js";
-import {plane2D} from "../../plane.js";
-import {frame_buffer} from "../../buffers.js";
+import {point2D} from "../point.js"
+import {line , line_with_colors} from "../line.js"
+import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../rectangle.js";
+import {RGBA} from "../color.js";
+import {triangle2D} from "../triangle.js";
+import {circle2D} from "../circle.js";
+import {ellipse2D} from "../ellipse.js";
+import {rotate} from "../rotate.js";
+import {shear} from "../shear.js";
+import {plane2D} from "../plane.js";
+import {frame_buffer} from "../buffers.js";
 
 export class draw {     // CLASS LIKE NAMESPACE :)
 
@@ -513,6 +513,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
+    // ****** todo : rewrite this ****** 
     static #DRAW_TRIANGLE(
         p1 = new point2D() , p2 = new point2D() , thickness = 1 , color = new RGBA()
     ) {
