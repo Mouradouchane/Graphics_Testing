@@ -1,6 +1,6 @@
 
 import {RGBA} from "../../color.js";
-import {draw} from "./experiments/drawing/draw.js";
+import {draw} from "../draw/draw.js";
 import {line as LINE_2D} from "./line.js";
 import {point2D as POINT_2D} from "./point.js";
 import {rectangle as RECTANGLE} from "./rectangle.js";

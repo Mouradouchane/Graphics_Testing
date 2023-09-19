@@ -1,15 +1,16 @@
+import {draw} from "../../draw/draw.js";
 import {RGBA} from "../../color.js";
 import {line , line_with_colors} from "../../line.js";
 import {point2D, point2D_with_color} from "../../point.js";
 import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
 import {triangle2D} from "../../triangle.js";
 import {generate} from "../../generators.js";
-import {draw} from "./draw.js";
 import {circle2D} from "../../circle.js";
 import {ellipse2D} from "../../ellipse.js";
 import {check} from "../../check.js";
 import {rotate} from "../../rotate.js";
 import {plane2D} from "../../plane.js";
+import {CURVE_2D_3_POINTS , CURVE_2D_4_POINTS} from "../../curve.js";
 import { frame_buffer } from "../../buffers.js";
 
 const canvas = document.querySelector("#canvas");
