@@ -22,7 +22,7 @@ const buffer = new frame_buffer( 800 , 600 );
 */
 var render_loop = 0;
 var grid = 0;
-var show_debug_points = 0;
+var show_debug_points = 1;
 var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
@@ -45,7 +45,8 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    //...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , 0 , null , 0 ),
+    ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , 8 , null , null , 1 ),
+    /*
     new triangle2D( 
         new point2D(100, 200) ,
         new point2D(300, 200) ,
@@ -88,6 +89,7 @@ var triangles = [
         thickness , 
         new RGBA(150,100,180,0.5) , 0
     ),
+    */
 ];
 
 var circles = [

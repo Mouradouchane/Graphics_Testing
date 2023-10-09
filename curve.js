@@ -1,4 +1,4 @@
-import { point2D } from "./point";
+import { point2D } from "./point.js";
 
 
 // a 2D curve with 3 points 

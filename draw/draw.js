@@ -515,53 +515,19 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // ****** todo : rewrite this ****** 
     static #DRAW_TRIANGLE(
-        p1 = new point2D() , p2 = new point2D() , thickness = 1 , color = new RGBA()
+        triange = new triangle2D()
     ) {
 
-        let delta_x = p2.x - p1.x;
-        let delta_y = p2.y - p1.y;
+        // we need center of triangle "vector C"
 
-        let x_or_y  = ( Math.abs(delta_x) > Math.abs(delta_y) );
-        let steps   = ( Math.abs(delta_x) > Math.abs(delta_y) ) ? Math.abs(delta_x) : Math.abs(delta_y);
-        
-        let inc_X = delta_x / steps;
-        let inc_Y = delta_y / steps;
+        // we need a way to move all the triangle points to origin(0,0) 
 
-        let x = p1.x;
-        let y = p1.y;
+        // we need a way to scale up the size to the target boundary we want
 
-        let isodd = (thickness % 2) == 0;
-        let half_width = Math.floor(thickness / 2);
+        // we need a way to move back those scaled up points to correct place
 
-        for(let i = 1; i <= steps ; i += 1){
+        // we need a way to fill that range correctlly 
 
-            let sT = ( ( x_or_y ? y : x ) - half_width );
-            let eT = ( ( x_or_y ? y : x ) + half_width - (isodd ? 1 : 0));
-
-            if(x_or_y){
-
-                do{
-                    this.#set_pixle(Math.round(x) , Math.round(sT) , color);
-                    sT += 1;
-                }
-                while( sT <= eT );
-
-            }
-            else {
-
-                do{
-                    this.#set_pixle(Math.round(sT) , Math.round(y) , color);
-                    sT += 1;
-                }
-                while( sT <= eT );
-
-            }
-
-            x += inc_X;
-            y += inc_Y;
-        }
-    
-    
     }
 
     // =========================================================================
@@ -1241,10 +1207,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if( copy.border_color instanceof RGBA ){
                 
                 // draw border for triangle
-                draw.#DRAW_TRIANGLE( copy.a , copy.b , copy.thickness , copy.border_color );
-                draw.#DRAW_TRIANGLE( copy.a , copy.c , copy.thickness , copy.border_color );
-                draw.#DRAW_TRIANGLE( copy.b , copy.c , copy.thickness , copy.border_color );
-
+                draw.#DRAW_TRIANGLE( copy );
+   
             }
 
         }
