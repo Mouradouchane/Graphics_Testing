@@ -515,18 +515,78 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // ****** todo : rewrite this ****** 
     static #DRAW_TRIANGLE(
-        triange = new triangle2D()
+        triangle = new triangle2D()
     ) {
 
-        // we need center of triangle "vector C"
+        debugger; 
+        // for testing only "remove it later :)"
+        triangle.fill_color = new RGBA(255,255,255,0.3);
+        triangle.border_thickness = 15;
+        // ===========================
 
-        // we need a way to move all the triangle points to origin(0,0) 
+        // 0 - calc center of triangle 
+        let triangle_center =  {
+            x : (triangle.a.x + triangle.b.x + triangle.c.x) / 3 ,
+            y : (triangle.a.y + triangle.b.y + triangle.c.y) / 3 ,
+        }
 
-        // we need a way to scale up the size to the target boundary we want
+        // 1 - move points to origin(0,0) using C
+        triangle.a.x -= triangle_center.x;
+        triangle.a.y -= triangle_center.y;
 
-        // we need a way to move back those scaled up points to correct place
+        triangle.b.x -= triangle_center.x;
+        triangle.b.y -= triangle_center.y;
 
-        // we need a way to fill that range correctlly 
+        triangle.c.x -= triangle_center.x;
+        triangle.c.y -= triangle_center.y;
+
+        // 2 - calc length of the points  ::  ||v|| = sqrt( x² + y² )
+        let a_length = Math.sqrt( (triangle.a.x*triangle.a.x) + ( triangle.a.y*triangle.a.y) ); 
+        let b_length = Math.sqrt( (triangle.b.x*triangle.b.x) + ( triangle.b.y*triangle.b.y) ); 
+        let c_length = Math.sqrt( (triangle.c.x*triangle.c.x) + ( triangle.c.y*triangle.c.y) ); 
+
+        // 3 - normalize moved points  ::  v = [ v.x / ||v|| , v.y / ||v|| ]
+        triangle.a.x /= a_length;
+        triangle.a.y /= a_length;
+
+        triangle.b.x /= b_length;
+        triangle.b.y /= b_length;
+
+        triangle.c.x /= c_length;
+        triangle.c.y /= c_length;
+
+        // 4 - scale up to normalized to the required size
+        triangle.a.x *= (a_length + (triangle.border_thickness | 1));
+        triangle.a.y *= (a_length + (triangle.border_thickness | 1));
+
+        triangle.b.x *= (b_length + (triangle.border_thickness | 1));
+        triangle.b.y *= (b_length + (triangle.border_thickness | 1));
+
+        triangle.c.x *= (c_length + (triangle.border_thickness | 1));
+        triangle.c.y *= (c_length + (triangle.border_thickness | 1));
+
+        // 5 - move those new points back to correct position C(x,y)
+        triangle.a.x += triangle_center.x;
+        triangle.a.y += triangle_center.y;
+
+        triangle.b.x += triangle_center.x;
+        triangle.b.y += triangle_center.y;
+        
+        triangle.c.x += triangle_center.x;
+        triangle.c.y += triangle_center.y;
+        
+        // 6 - fill the area / todo : fill only the width area
+        draw.#FILL_TRIANGLE(triangle);
+        
+        // for debug only
+        draw.circle( new circle2D(triangle_center.x , triangle_center.y , 2 , new RGBA(0,255,0,1)));
+        draw.circle( new circle2D(
+            (triangle.a.x + triangle.b.x + triangle.c.x) / 3, 
+            (triangle.a.y + triangle.b.y + triangle.c.y) / 3
+        , 2 , new RGBA(0,0,0,1)));
+        draw.circle( new circle2D(triangle.a.x , triangle.a.y , 2 , new RGBA(255,255,0,1)));
+        draw.circle( new circle2D(triangle.b.x , triangle.b.y , 2 , new RGBA(255,255,0,1)));
+        draw.circle( new circle2D(triangle.c.x , triangle.c.y , 2 , new RGBA(255,255,0,1)));
 
     }
 
