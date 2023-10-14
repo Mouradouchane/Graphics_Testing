@@ -519,24 +519,22 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     ) {
 
         debugger; 
-        // for testing only "remove it later :)"
-        triangle.fill_color = new RGBA(255,255,255,0.3);
-        triangle.border_thickness = 15;
-        // ===========================
 
         // 0 - calc center of triangle 
         let triangle_center =  {
-            x : (triangle.a.x + triangle.b.x + triangle.c.x) / 3 ,
-            y : (triangle.a.y + triangle.b.y + triangle.c.y) / 3 ,
+            x : Math.round((triangle.a.x + triangle.b.x + triangle.c.x) / 3) ,
+            y : Math.round((triangle.a.y + triangle.b.y + triangle.c.y) / 3) ,
         }
 
         // 1 - move points to origin(0,0) using C
+        /*
+        */
         triangle.a.x -= triangle_center.x;
         triangle.a.y -= triangle_center.y;
 
         triangle.b.x -= triangle_center.x;
         triangle.b.y -= triangle_center.y;
-
+        
         triangle.c.x -= triangle_center.x;
         triangle.c.y -= triangle_center.y;
 
@@ -554,32 +552,29 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         triangle.c.x /= c_length;
         triangle.c.y /= c_length;
-
+        
         // 4 - scale up to normalized to the required size
-        triangle.a.x *= (a_length + (triangle.border_thickness | 1));
-        triangle.a.y *= (a_length + (triangle.border_thickness | 1));
-
-        triangle.b.x *= (b_length + (triangle.border_thickness | 1));
-        triangle.b.y *= (b_length + (triangle.border_thickness | 1));
-
-        triangle.c.x *= (c_length + (triangle.border_thickness | 1));
-        triangle.c.y *= (c_length + (triangle.border_thickness | 1));
-
         // 5 - move those new points back to correct position C(x,y)
-        triangle.a.x += triangle_center.x;
-        triangle.a.y += triangle_center.y;
+        triangle.a.x = ( triangle.a.x * (a_length + (triangle.thickness | 1)) ) + triangle_center.x;
+        triangle.a.y = ( triangle.a.y * (a_length + (triangle.thickness | 1)) ) + triangle_center.y;
 
-        triangle.b.x += triangle_center.x;
-        triangle.b.y += triangle_center.y;
-        
-        triangle.c.x += triangle_center.x;
-        triangle.c.y += triangle_center.y;
-        
+        triangle.b.x = ( triangle.b.x * (b_length + (triangle.thickness | 1)) ) + triangle_center.x;
+        triangle.b.y = ( triangle.b.y * (b_length + (triangle.thickness | 1)) ) + triangle_center.y;
+
+        triangle.c.x = ( triangle.c.x * (c_length + (triangle.thickness | 1)) ) + triangle_center.x;
+        triangle.c.y = ( triangle.c.y * (c_length + (triangle.thickness | 1)) ) + triangle_center.y;
+
+        let new_triangle_center =  {
+            x : Math.round((triangle.a.x + triangle.b.x + triangle.c.x) / 3) ,
+            y : Math.round((triangle.a.y + triangle.b.y + triangle.c.y) / 3) ,
+        }
+
+
         // 6 - fill the area / todo : fill only the width area
         draw.#FILL_TRIANGLE(triangle);
         
         // for debug only
-        draw.circle( new circle2D(triangle_center.x , triangle_center.y , 2 , new RGBA(0,255,0,1)));
+        draw.circle( new circle2D(triangle_center.x , triangle_center.y , 2 , new RGBA(255,255,0,1)));
         draw.circle( new circle2D(
             (triangle.a.x + triangle.b.x + triangle.c.x) / 3, 
             (triangle.a.y + triangle.b.y + triangle.c.y) / 3
