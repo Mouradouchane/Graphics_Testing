@@ -30,8 +30,8 @@ var shapes_type = 3;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 1;
 var thickness  = 4;
-var max_width  = canvas.clientWidth  ;
-var max_height = canvas.clientHeight ;
+var max_width  = canvas.clientWidth  / 2 ;
+var max_height = canvas.clientHeight / 2 ;
 
 /*
     generate random "shapes for testing"
@@ -45,7 +45,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    // ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , 8 , null , null , 1 ),
+    // ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , 20 , null , new RGBA(255,150,111,0.7) , 1 ),
     /*
     new triangle2D( 
         new point2D(100, 200) ,
@@ -68,29 +68,30 @@ var triangles = [
         thickness, 
         new RGBA(150,100,180,0.5) , 0
     ),
+    */
     new triangle2D( 
         new point2D(200, 400+110) ,
         new point2D(200, 300+110) ,
         new point2D(100, 300+110) ,
-        thickness, 0 , 
-        new RGBA(150,100,180,0.5)
+        4 , new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.7) ,
     ),
+
     new triangle2D( 
-        new point2D(500, 400) ,
-        new point2D(400, 500) ,
-        new point2D(600, 500) ,
-        thickness , 
-        new RGBA(150,100,180,0.5) , 0
+        new point2D(100, 100) ,
+        new point2D(300, 100) ,
+        new point2D(300, 300) ,
+        20 , 
+        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
     ),
-    */
     new triangle2D( 
         new point2D(600, 300) ,
         new point2D(500, 255) ,
         new point2D(400, 444) ,
         20 , 
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
-    ),
-];
+        ),
+    
+    ];
 
 var circles = [
     //...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height , 2 , null , null , true)

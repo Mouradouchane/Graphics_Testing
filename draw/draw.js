@@ -518,70 +518,81 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         triangle = new triangle2D()
     ) {
 
-        debugger; 
+        debugger;
 
-        // 0 - calc center of triangle 
-        let triangle_center =  {
-            x : Math.round((triangle.a.x + triangle.b.x + triangle.c.x) / 3) ,
-            y : Math.round((triangle.a.y + triangle.b.y + triangle.c.y) / 3) ,
+        // calc center of triangle
+        let C = {
+            x : (triangle.a.x + triangle.b.x + triangle.c.x) / 3 + 4 ,
+            y : (triangle.a.y + triangle.b.y + triangle.c.y) / 3 + 4
         }
 
-        // 1 - move points to origin(0,0) using C
-        /*
-        */
-        triangle.a.x -= triangle_center.x;
-        triangle.a.y -= triangle_center.y;
-
-        triangle.b.x -= triangle_center.x;
-        triangle.b.y -= triangle_center.y;
+        // move to (0,0)
+        triangle.a.x -= C.x;
+        triangle.b.x -= C.x;
+        triangle.c.x -= C.x;
         
-        triangle.c.x -= triangle_center.x;
-        triangle.c.y -= triangle_center.y;
+        triangle.a.y -= C.y;
+        triangle.b.y -= C.y;
+        triangle.c.y -= C.y;
 
-        // 2 - calc length of the points  ::  ||v|| = sqrt( x² + y² )
-        let a_length = Math.sqrt( (triangle.a.x*triangle.a.x) + ( triangle.a.y*triangle.a.y) ); 
-        let b_length = Math.sqrt( (triangle.b.x*triangle.b.x) + ( triangle.b.y*triangle.b.y) ); 
-        let c_length = Math.sqrt( (triangle.c.x*triangle.c.x) + ( triangle.c.y*triangle.c.y) ); 
+        // calc a,b,c length 
+        let a_len = Math.sqrt( (triangle.a.x*triangle.a.x) + (triangle.a.y*triangle.a.y));
+        let b_len = Math.sqrt( (triangle.b.x*triangle.b.x) + (triangle.b.y*triangle.b.y));
+        let c_len = Math.sqrt( (triangle.c.x*triangle.c.x) + (triangle.c.y*triangle.c.y));
 
-        // 3 - normalize moved points  ::  v = [ v.x / ||v|| , v.y / ||v|| ]
-        triangle.a.x /= a_length;
-        triangle.a.y /= a_length;
+        // calc triangle area
+        let AREA = 0.5 * a_len * b_len * Math.sin(c_len);
 
-        triangle.b.x /= b_length;
-        triangle.b.y /= b_length;
-
-        triangle.c.x /= c_length;
-        triangle.c.y /= c_length;
-        
-        // 4 - scale up to normalized to the required size
-        // 5 - move those new points back to correct position C(x,y)
-        triangle.a.x = ( triangle.a.x * (a_length + (triangle.thickness | 1)) ) + triangle_center.x;
-        triangle.a.y = ( triangle.a.y * (a_length + (triangle.thickness | 1)) ) + triangle_center.y;
-
-        triangle.b.x = ( triangle.b.x * (b_length + (triangle.thickness | 1)) ) + triangle_center.x;
-        triangle.b.y = ( triangle.b.y * (b_length + (triangle.thickness | 1)) ) + triangle_center.y;
-
-        triangle.c.x = ( triangle.c.x * (c_length + (triangle.thickness | 1)) ) + triangle_center.x;
-        triangle.c.y = ( triangle.c.y * (c_length + (triangle.thickness | 1)) ) + triangle_center.y;
-
-        let new_triangle_center =  {
-            x : Math.round((triangle.a.x + triangle.b.x + triangle.c.x) / 3) ,
-            y : Math.round((triangle.a.y + triangle.b.y + triangle.c.y) / 3) ,
+        let IC = {
+            x : ( ( a_len * triangle.a.x ) * ( b_len * triangle.b.x ) * ( c_len * triangle.c.x ) ) / (a_len+b_len+c_len),
+            y : ( ( a_len * triangle.a.y ) * ( b_len * triangle.b.y ) * ( c_len * triangle.c.y ) ) / (a_len+b_len+c_len)
         }
 
+        let S = (a_len + b_len + c_len) / 2;
+        let R = (AREA * 2) / (a_len+b_len+c_len);
+        let D = triangle.thickness;
 
-        // 6 - fill the area / todo : fill only the width area
+        // normlaize triangle points
+        triangle.a.x /= a_len;
+        triangle.a.y /= a_len;
+
+        triangle.b.x /= b_len;
+        triangle.b.y /= b_len;
+
+        triangle.c.x /= c_len;
+        triangle.c.y /= c_len;
+
+        // update lengths
+        a_len += D;
+        b_len += D;
+        c_len += D;
+
+        // scale-up to new length
+        triangle.a.x *= a_len;
+        triangle.a.y *= a_len;
+
+        triangle.b.x *= b_len;
+        triangle.b.y *= b_len;
+
+        triangle.c.x *= c_len;
+        triangle.c.y *= c_len;
+
+        // move back to center 
+        triangle.a.x += C.x;
+        triangle.b.x += C.x;
+        triangle.c.x += C.x;
+        
+        triangle.a.y += C.y;
+        triangle.b.y += C.y;
+        triangle.c.y += C.y;
+
+
+        draw.#DRAW_CIRCLE( C.x , C.y , 2 , 0 , new RGBA(0,255,0,1))
+
         draw.#FILL_TRIANGLE(triangle);
-        
-        // for debug only
-        draw.circle( new circle2D(triangle_center.x , triangle_center.y , 2 , new RGBA(255,255,0,1)));
-        draw.circle( new circle2D(
-            (triangle.a.x + triangle.b.x + triangle.c.x) / 3, 
-            (triangle.a.y + triangle.b.y + triangle.c.y) / 3
-        , 2 , new RGBA(0,0,0,1)));
-        draw.circle( new circle2D(triangle.a.x , triangle.a.y , 2 , new RGBA(255,255,0,1)));
-        draw.circle( new circle2D(triangle.b.x , triangle.b.y , 2 , new RGBA(255,255,0,1)));
-        draw.circle( new circle2D(triangle.c.x , triangle.c.y , 2 , new RGBA(255,255,0,1)));
+        draw.#DRAW_CIRCLE( triangle.a.x , triangle.a.y , 2 , 0 , new RGBA(0,255,0,1))
+        draw.#DRAW_CIRCLE( triangle.b.x , triangle.b.y , 2 , 0 , new RGBA(0,255,0,1))
+        draw.#DRAW_CIRCLE( triangle.c.x , triangle.c.y , 2 , 0 , new RGBA(0,255,0,1))
 
     }
 
