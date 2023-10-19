@@ -567,7 +567,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // 3 - normalaize those "length" 
         // + 
         // 4 - scale by thickness value 
-
         normals.ab.n1.x = (normals.ab.n1.x / normals_lengths.ab) * triangle.thickness;
         normals.ab.n1.y = (normals.ab.n1.y / normals_lengths.ab) * triangle.thickness;
 
@@ -621,15 +620,49 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             ),
         }
 
+        /*
+            A : point A on the line
+            B : point B on the line
+            C : center point of triangle 
+            P1 : target point 1 to check agains
+            P2 : target point 2 to check agains
+
+            note : return gonna be "1 or 2" represent the valid point that's lie out side the triangle
+        */ 
+
+        function check_range( A , B , C , P1 , P2 ){
+            // Math.sign( (Bx - Ax) * (Y - Ay) - (By - Ay) * (X - Ax) );
+
+            // return draw.#CALC_DISTANCE( center.x , center.y , target_point.x , target_point.y ); 
+            return Math.sign( (B.x - A.x) * (target_point.y - A.y) - (B.y - A.y) * (target_point.x - A.x) );
+        }
+
         debugger;
 
-        draw.#DRAW_CIRCLE( scaled_points.ab.x , scaled_points.ab.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( scaled_points.ac.x , scaled_points.ac.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( scaled_points.bc.x , scaled_points.bc.y , 2 , 0 , new RGBA(255,0,0,1) );
-
+        if( 1 ){
+            draw.#DRAW_CIRCLE( scaled_points.ab.x , scaled_points.ab.y , 2 , 0 , new RGBA(255,0,0,1) );
+        }
+        else {
+        }
         draw.#DRAW_CIRCLE( scaled_points.nab.x , scaled_points.nab.y , 2 , 0 , new RGBA(0,255,0,1) );
+
+        if( 1 ){
+            draw.#DRAW_CIRCLE( scaled_points.ac.x , scaled_points.ac.y , 2 , 0 , new RGBA(255,0,0,1) );
+        }
+        else {
+        }
         draw.#DRAW_CIRCLE( scaled_points.nac.x , scaled_points.nac.y , 2 , 0 , new RGBA(0,255,0,1) );
+
+        if( 1 ){
+            draw.#DRAW_CIRCLE( scaled_points.bc.x , scaled_points.bc.y , 2 , 0 , new RGBA(255,0,0,1) );
+        }
+        else {
+        }
         draw.#DRAW_CIRCLE( scaled_points.nbc.x , scaled_points.nbc.y , 2 , 0 , new RGBA(0,255,0,1) );
+       
+
+        // draw points for debug 
+        draw.#DRAW_CIRCLE( C.x , C.y , 2 , 0 , new RGBA(90,140,200,1) );
 
     }
 
