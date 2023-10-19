@@ -73,21 +73,22 @@ var triangles = [
         new point2D(200, 400+110) ,
         new point2D(200, 300+110) ,
         new point2D(100, 300+110) ,
-        4 , new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.7) ,
+        14 , 
+        new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.7) ,
     ),
 
     new triangle2D( 
         new point2D(100, 100) ,
         new point2D(300, 100) ,
         new point2D(300, 300) ,
-        4 , 
+        10 , 
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
     ),
     new triangle2D( 
         new point2D(600, 300) ,
         new point2D(500, 255) ,
         new point2D(400, 444) ,
-        4 , 
+        20 , 
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
         ),
     
