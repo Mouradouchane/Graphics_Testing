@@ -30,8 +30,8 @@ var shapes_type = 3;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 1;
 var thickness  = 4;
-var max_width  = canvas.clientWidth  / 2 ;
-var max_height = canvas.clientHeight / 2 ;
+var max_width  = canvas.clientWidth  / 1.5;
+var max_height = canvas.clientHeight / 1.5;
 
 /*
     generate random "shapes for testing"
@@ -45,7 +45,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    // ...generate.random.triangles(shapes_amount , 0 , max_width , 0 ,max_height , 20 , null , new RGBA(255,150,111,0.7) , 1 ),
+    // ...generate.random.triangles(1 , 0 , max_width , 0 ,max_height , 20 , null , new RGBA(255,150,111,0.7) , 1 ),
     /*
     new triangle2D( 
         new point2D(100, 200) ,
@@ -69,6 +69,7 @@ var triangles = [
         new RGBA(150,100,180,0.5) , 0
     ),
     */
+   
     new triangle2D( 
         new point2D(200, 400+110) ,
         new point2D(200, 300+110) ,
@@ -91,7 +92,6 @@ var triangles = [
         20 , 
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
         ),
-    
     ];
 
 var circles = [

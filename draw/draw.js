@@ -511,12 +511,70 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    // ****** todo : rewrite this ****** 
-    static #DRAW_TRIANGLE(
-        triangle = new triangle2D()
-    ) {
+    /*
+        A : point A on the line
+        B : point B on the line
+        C : center point of triangle 
+        P1 : target point 1 to check agains
+        P2 : target point 2 to check agains
 
-        // let tcopy = triangle2D.copy( triangle );
+        note : return gonna be "1 or 2" , 1 mean P1 is valid otherwise P2
+    */ 
+
+    static #GET_OUTSIDE_POINT( A , B , CENTROID , P1 , P2 ){
+    
+        // formula : Math.sign( (Bx - Ax) * (Y - Ay) - (By - Ay) * (X - Ax) );
+        // calc in which side of the line those points + centroid lies !
+
+        let c_rslt  = Math.sign( (B.x - A.x) * (CENTROID.y - A.y) - (B.y - A.y) * (CENTROID.x - A.x) );
+
+        let p1_rslt = Math.sign( (B.x - A.x) * (P1.y - A.y) - (B.y - A.y) * (P1.x - A.x) );
+
+        let p2_rslt = Math.sign( (B.x - A.x) * (P2.y - A.y) - (B.y - A.y) * (P2.x - A.x) );
+
+        /*
+        debugger;
+
+        console.log("C  : " , c_rslt  );
+        console.log("P1 : " , p1_rslt );
+        console.log("P2 : " , p2_rslt );
+        console.log("\n");
+        */
+
+        // return the correct point that lies in the opposite direction 
+        return ((p1_rslt > c_rslt) && (p1_rslt > p2_rslt)) ? 1 : 2;
+
+    }
+
+    // calc the Y or B intercept point using slope intercept form
+    // y = (m*x) + b   ===========>   b = y - ( m * x )
+    static #CALC_Y_INTERCEPT( target_point = new point2D() , slope = 0){
+        
+        return target_point.y - ( target_point.x * slope );
+
+    }
+
+    // compute the intersection points 
+    static #CALC_INTERSCETION_POINT_2D( point_1 , point_2 , a , b ){
+
+        // calc intercept point of point 1 & 2
+        let c = draw.#CALC_Y_INTERCEPT( point_1 , a );
+        let d = draw.#CALC_Y_INTERCEPT( point_2 , b );
+
+        // the intersection point
+        return new point2D(
+            // x
+            ( (d - c) / ((a - b) | 1) )
+            ,
+            // y
+            ( a * ( (d - c) / ((a - b) | 1) ) ) + c
+        );
+
+    }
+
+    // ****** todo : rewrite this ****** 
+    static #DRAW_TRIANGLE_BORDER( triangle = new triangle2D() ) {
+
 
         // calc center of triangle
         let C = {
@@ -620,48 +678,38 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             ),
         }
 
+
         /*
-            A : point A on the line
-            B : point B on the line
-            C : center point of triangle 
-            P1 : target point 1 to check agains
-            P2 : target point 2 to check agains
-
-            note : return gonna be "1 or 2" represent the valid point that's lie out side the triangle
-        */ 
-
-        function check_range( A , B , C , P1 , P2 ){
-            // Math.sign( (Bx - Ax) * (Y - Ay) - (By - Ay) * (X - Ax) );
-
-            // return draw.#CALC_DISTANCE( center.x , center.y , target_point.x , target_point.y ); 
-            return Math.sign( (B.x - A.x) * (target_point.y - A.y) - (B.y - A.y) * (target_point.x - A.x) );
-        }
+            the filter process for getting outside points 
+        */
+        let ab_check = draw.#GET_OUTSIDE_POINT(triangle.a , triangle.b , C , scaled_points.ab , scaled_points.nab);
+        let ac_check = draw.#GET_OUTSIDE_POINT(triangle.a , triangle.c , C , scaled_points.ac , scaled_points.nac);
+        let bc_check = draw.#GET_OUTSIDE_POINT(triangle.b , triangle.c , C , scaled_points.bc , scaled_points.nbc);
+        
+        // object to hold the right points that lies outside the triangles
+        // we will use those points to compute the missing intersection points
+        let outside_point = {
+            ab : (ab_check == 1) ? scaled_points.ab : scaled_points.nab,
+            ac : (ac_check == 1) ? scaled_points.ac : scaled_points.nac,
+            bc : (bc_check == 1) ? scaled_points.bc : scaled_points.nbc,
+        } 
 
         debugger;
-
-        if( 1 ){
-            draw.#DRAW_CIRCLE( scaled_points.ab.x , scaled_points.ab.y , 2 , 0 , new RGBA(255,0,0,1) );
-        }
-        else {
-        }
-        draw.#DRAW_CIRCLE( scaled_points.nab.x , scaled_points.nab.y , 2 , 0 , new RGBA(0,255,0,1) );
-
-        if( 1 ){
-            draw.#DRAW_CIRCLE( scaled_points.ac.x , scaled_points.ac.y , 2 , 0 , new RGBA(255,0,0,1) );
-        }
-        else {
-        }
-        draw.#DRAW_CIRCLE( scaled_points.nac.x , scaled_points.nac.y , 2 , 0 , new RGBA(0,255,0,1) );
-
-        if( 1 ){
-            draw.#DRAW_CIRCLE( scaled_points.bc.x , scaled_points.bc.y , 2 , 0 , new RGBA(255,0,0,1) );
-        }
-        else {
-        }
-        draw.#DRAW_CIRCLE( scaled_points.nbc.x , scaled_points.nbc.y , 2 , 0 , new RGBA(0,255,0,1) );
+     
+        let p1 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ab , outside_point.ac , slopes.ab , slopes.ac );
+        let p2 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ac , outside_point.bc , slopes.ac , slopes.bc );
+        let p3 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.bc , outside_point.ab , slopes.bc , slopes.ab );
        
+        draw.#DRAW_CIRCLE( p1.x , p1.y , 2 , 0 , new RGBA(255,180,155,1) );
+        draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,180,155,1) );
+        draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,180,155,1) );
 
-        // draw points for debug 
+        // draw points for debug
+
+        draw.#DRAW_CIRCLE( outside_point.ab.x , outside_point.ab.y , 2 , 0 , new RGBA(255,0,0,1) );
+        draw.#DRAW_CIRCLE( outside_point.ac.x , outside_point.ac.y , 2 , 0 , new RGBA(255,0,0,1) );
+        draw.#DRAW_CIRCLE( outside_point.bc.x , outside_point.bc.y , 2 , 0 , new RGBA(255,0,0,1) );
+  
         draw.#DRAW_CIRCLE( C.x , C.y , 2 , 0 , new RGBA(90,140,200,1) );
 
     }
@@ -1343,7 +1391,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if( copy.border_color instanceof RGBA ){
                 
                 // draw border for triangle
-                draw.#DRAW_TRIANGLE( copy );
+                draw.#DRAW_TRIANGLE_BORDER( copy );
    
             }
 
