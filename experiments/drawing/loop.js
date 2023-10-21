@@ -140,7 +140,7 @@ function new_frame(){
 
     if( grid ) draw.draw_grid();
     
-    ctx.fillStyle = "white";
+    ctx.fillStyle   = "white";
     ctx.strokeStyle = "white";
 
     switch( shapes_type ){

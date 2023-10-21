@@ -556,18 +556,25 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // compute the intersection points 
     static #CALC_INTERSCETION_POINT_2D( point_1 , point_2 , a , b ){
-
+        // debugger
         // calc intercept point of point 1 & 2
         let c = draw.#CALC_Y_INTERCEPT( point_1 , a );
         let d = draw.#CALC_Y_INTERCEPT( point_2 , b );
 
+        let x1 = point_1.x , x2 = point_2.x;
+        let y1 = point_1.y , y2 = point_2.y;
+
+        let X = (y2 - y1 + a * x1 - b * x2) / (a - b);
+        let Y = (X * a) + c; 
         // the intersection point
         return new point2D(
             // x
-            ( (d - c) / ((a - b) | 1) )
+            // ( (d - c) / ((a - b) | 1) )
+            X
             ,
             // y
-            ( a * ( (d - c) / ((a - b) | 1) ) ) + c
+            //( a * ( (d - c) / ((a - b) | 1) ) ) + c
+            Y
         );
 
     }
@@ -584,9 +591,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let slopes = {
 
-            ab : ( triangle.b.y - triangle.a.y ) / ( (triangle.b.x - triangle.a.x) | 1 ),
-            ac : ( triangle.c.y - triangle.a.y ) / ( (triangle.c.x - triangle.a.x) | 1 ),
-            bc : ( triangle.c.y - triangle.b.y ) / ( (triangle.c.x - triangle.b.x) | 1 ),
+            ab : /* (triangle.a.x - triangle.b.x) == 0 ? 0 : */ ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
+            ac : /* (triangle.a.x - triangle.c.x) == 0 ? 0 : */ ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
+            bc : /* (triangle.b.x - triangle.c.x) == 0 ? 0 : */ ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) ,
             
         }
 
@@ -688,29 +695,60 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         
         // object to hold the right points that lies outside the triangles
         // we will use those points to compute the missing intersection points
-        let outside_point = {
-            ab : (ab_check == 1) ? scaled_points.ab : scaled_points.nab,
-            ac : (ac_check == 1) ? scaled_points.ac : scaled_points.nac,
-            bc : (bc_check == 1) ? scaled_points.bc : scaled_points.nbc,
+        let new_points = {
+            A : (ab_check == 1) ? scaled_points.ab : scaled_points.nab,
+            B : (bc_check == 1) ? scaled_points.bc : scaled_points.nbc,
+            C : (ac_check == 1) ? scaled_points.ac : scaled_points.nac,
         } 
 
+        new_points.A.slope = slopes.ab;
+        new_points.B.slope = slopes.bc;
+        new_points.C.slope = slopes.ac;
+
         debugger;
-     
-        let p1 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ab , outside_point.ac , slopes.ab , slopes.ac );
-        let p2 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ac , outside_point.bc , slopes.ac , slopes.bc );
-        let p3 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.bc , outside_point.ab , slopes.bc , slopes.ab );
-       
-        draw.#DRAW_CIRCLE( p1.x , p1.y , 2 , 0 , new RGBA(255,180,155,1) );
-        draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,180,155,1) );
-        draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,180,155,1) );
 
         // draw points for debug
 
-        draw.#DRAW_CIRCLE( outside_point.ab.x , outside_point.ab.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( outside_point.ac.x , outside_point.ac.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( outside_point.bc.x , outside_point.bc.y , 2 , 0 , new RGBA(255,0,0,1) );
-  
+        function draw_line_from_point( point , M , distance  , color ){
+            
+            point = point2D.copy(point);
+
+            let b = point.y - ( point.x * M );
+            let end_point = new point2D( point.x + distance , ((point.x+distance) * M) + b );
+ 
+            draw.#CUSTOM_LINE_NO_GRADIENT( point , end_point , 1 , color );
+        }
+
+        /*
+        draw.#DRAW_CIRCLE( new_points.A.x , new_points.A.y , 2 , 0 , new RGBA(255,0,0,1) );
+        draw.#DRAW_CIRCLE( new_points.B.x , new_points.B.y , 2 , 0 , new RGBA(255,0,0,1) );
+        draw.#DRAW_CIRCLE( new_points.C.x , new_points.C.y , 2 , 0 , new RGBA(255,0,0,1) );
+        */
+
+        let p1 = (new_points.A.y < new_points.B.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
+        let p2 = (new_points.A.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
+        let p3 = (new_points.B.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
+        
+        /*
+        draw_line_from_point(new_points.A , new_points.A.slope , 100 , new RGBA(255,0,0,1));
+        draw_line_from_point(new_points.B , new_points.B.slope , 100 , new RGBA(0,255,0,1));
+        draw_line_from_point(new_points.C , new_points.C.slope , 100 , new RGBA(0,100,255,1));
+        */
+       
+        draw.#DRAW_CIRCLE( p1.x , p1.y , 2 , 0 , new RGBA(255,0,0,1) );
+        draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,0,0,1) );
+        draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,0,0,1) );
+
         draw.#DRAW_CIRCLE( C.x , C.y , 2 , 0 , new RGBA(90,140,200,1) );
+        draw.#FILL_TRIANGLE( new triangle2D(p1 , p2 , p3 , 0 ,  new RGBA(255,0,50,0.5) ) );
+        /*
+        let p2 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ab , outside_point.bc , slopes.ab , slopes.bc );
+        draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,180,155,1) );
+
+        let p3 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.bc , outside_point.ac , slopes.bc , slopes.ac );
+        draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,180,155,1) );
+        */
+    
 
     }
 
