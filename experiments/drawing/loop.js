@@ -45,7 +45,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    // ...generate.random.triangles(1 , 0 , max_width , 0 ,max_height , 20 , null , new RGBA(255,150,111,0.7) , 1 ),
+    ...generate.random.triangles(1 , 0 , max_width , 0 ,max_height , 30 , null , new RGBA(255,255,255,0.5) , 1 ),
     /*
     new triangle2D( 
         new point2D(100, 200) ,
@@ -68,8 +68,7 @@ var triangles = [
         thickness, 
         new RGBA(150,100,180,0.5) , 0
     ),
-    */
-   
+
     new triangle2D( 
         new point2D(200, 400+110) ,
         new point2D(200, 300+110) ,
@@ -92,6 +91,7 @@ var triangles = [
         20 , 
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
         ),
+    */
     ];
 
 var circles = [

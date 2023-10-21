@@ -448,8 +448,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // NOTE !!! triangle points need to be sorted by "Y-axis"
     static #FILL_TRIANGLE( copy = new triangle2D() ){
-
-        // calc needed values
+        
+        // calc needed values for the process 
 
         // A-B
         let D_AB_X = (copy.a.x - copy.b.x);
@@ -532,15 +532,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let p2_rslt = Math.sign( (B.x - A.x) * (P2.y - A.y) - (B.y - A.y) * (P2.x - A.x) );
 
-        /*
-        debugger;
-
-        console.log("C  : " , c_rslt  );
-        console.log("P1 : " , p1_rslt );
-        console.log("P2 : " , p2_rslt );
-        console.log("\n");
-        */
-
         // return the correct point that lies in the opposite direction 
         return ((p1_rslt > c_rslt) && (p1_rslt > p2_rslt)) ? 1 : 2;
 
@@ -557,6 +548,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // compute the intersection points 
     static #CALC_INTERSCETION_POINT_2D( point_1 , point_2 , a , b ){
         // debugger
+        // x : ( (d - c) / ((a - b) | 1) )
+        // y :( a * ( (d - c) / ((a - b) | 1) ) ) + c
+
         // calc intercept point of point 1 & 2
         let c = draw.#CALC_Y_INTERCEPT( point_1 , a );
         let d = draw.#CALC_Y_INTERCEPT( point_2 , b );
@@ -566,15 +560,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let X = (y2 - y1 + a * x1 - b * x2) / (a - b);
         let Y = (X * a) + c; 
+
         // the intersection point
         return new point2D(
-            // x
-            // ( (d - c) / ((a - b) | 1) )
-            X
-            ,
-            // y
-            //( a * ( (d - c) / ((a - b) | 1) ) ) + c
-            Y
+            X , Y
         );
 
     }
@@ -740,7 +729,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,0,0,1) );
 
         draw.#DRAW_CIRCLE( C.x , C.y , 2 , 0 , new RGBA(90,140,200,1) );
-        draw.#FILL_TRIANGLE( new triangle2D(p1 , p2 , p3 , 0 ,  new RGBA(255,0,50,0.5) ) );
+
+        let outside_triangle = new triangle2D(p1 , p2 , p3 , 0 ,  new RGBA(255,0,250,0.3) );
+        triangle2D.sort_by_y_axis(outside_triangle);
+
+        draw.#FILL_TRIANGLE( outside_triangle );
         /*
         let p2 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ab , outside_point.bc , slopes.ab , slopes.bc );
         draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,180,155,1) );
