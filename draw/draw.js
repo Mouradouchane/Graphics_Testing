@@ -568,25 +568,52 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
+    /*
+        function to calculate the area of triangle using herons formula 
+    */
+    static #AREA_OF_2D_TRIANGLE( a = point2D() , b = point2D() , c = point2D() ){
+
+		// calc lengths between the points using : √((x2 – x1)² + (y2 – y1)²)
+	    let A = Math.sqrt( Math.abs(((b.x - a.x)**2) + ((b.y - a.y)**2)) );
+	    let B = Math.sqrt( Math.abs(((c.x - b.x)**2) + ((c.y - b.y)**2)) );
+	    let C = Math.sqrt( Math.abs(((c.x - a.x)**2) + ((c.y - a.y)**2)) );
+
+		let p = (A+B+C) / 2;
+
+		return  Math.sqrt(p * (p - A) * (p - B) * (p - C));
+
+    }
+
+    /*
+        draw a line from a point and slope , this function usualy used for debug
+    */
+    static #DRAW_LINE_FROM_POINT( point , M , distance  , color ){
+            
+        point = point2D.copy(point);
+
+        let b = point.y - ( point.x * M );
+        let end_point = new point2D( point.x + distance , ((point.x+distance) * M) + b );
+
+        draw.#CUSTOM_LINE_NO_GRADIENT( point , end_point , 1 , color );
+    }
+
     // ****** todo : rewrite this ****** 
     static #DRAW_TRIANGLE_BORDER( triangle = new triangle2D() ) {
 
 
-        // calc center of triangle
+        // center of triangle
         let C = {
             x : ((triangle.a.x + triangle.b.x + triangle.c.x) / 3) ,
             y : ((triangle.a.y + triangle.b.y + triangle.c.y) / 3)
         };
 
         let slopes = {
-
-            ab : /* (triangle.a.x - triangle.b.x) == 0 ? 0 : */ ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
-            ac : /* (triangle.a.x - triangle.c.x) == 0 ? 0 : */ ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
-            bc : /* (triangle.b.x - triangle.c.x) == 0 ? 0 : */ ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) ,
-            
+            ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
+            ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
+            bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
         }
 
-        // 1 - calc normals of triangle 
+        // normals in triangle 
         let normals = {
 
             // n1 for => (-dy ,  dx)
@@ -694,36 +721,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         new_points.B.slope = slopes.bc;
         new_points.C.slope = slopes.ac;
 
-        debugger;
-
         // draw points for debug
-
-        function draw_line_from_point( point , M , distance  , color ){
-            
-            point = point2D.copy(point);
-
-            let b = point.y - ( point.x * M );
-            let end_point = new point2D( point.x + distance , ((point.x+distance) * M) + b );
- 
-            draw.#CUSTOM_LINE_NO_GRADIENT( point , end_point , 1 , color );
-        }
-
-        /*
-        draw.#DRAW_CIRCLE( new_points.A.x , new_points.A.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( new_points.B.x , new_points.B.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( new_points.C.x , new_points.C.y , 2 , 0 , new RGBA(255,0,0,1) );
-        */
+        debugger;
 
         let p1 = (new_points.A.y < new_points.B.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
         let p2 = (new_points.A.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
         let p3 = (new_points.B.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
-        
-        /*
-        draw_line_from_point(new_points.A , new_points.A.slope , 100 , new RGBA(255,0,0,1));
-        draw_line_from_point(new_points.B , new_points.B.slope , 100 , new RGBA(0,255,0,1));
-        draw_line_from_point(new_points.C , new_points.C.slope , 100 , new RGBA(0,100,255,1));
-        */
-       
+   
         draw.#DRAW_CIRCLE( p1.x , p1.y , 2 , 0 , new RGBA(255,0,0,1) );
         draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,0,0,1) );
         draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,0,0,1) );
@@ -734,14 +738,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         triangle2D.sort_by_y_axis(outside_triangle);
 
         draw.#FILL_TRIANGLE( outside_triangle );
-        /*
-        let p2 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.ab , outside_point.bc , slopes.ab , slopes.bc );
-        draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,180,155,1) );
-
-        let p3 = draw.#CALC_INTERSCETION_POINT_2D( outside_point.bc , outside_point.ac , slopes.bc , slopes.ac );
-        draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,180,155,1) );
-        */
-    
 
     }
 
