@@ -54,12 +54,20 @@ export class triangle2D{
 
     static sort_by_y_axis( trig = new triangle2D() ){
 
-        if( trig.a.y > trig.b.y ) point2D.swap( trig.a , trig.b );
-        if( trig.a.y > trig.c.y ) point2D.swap( trig.a , trig.c );
-        if( trig.b.y > trig.c.y ) point2D.swap( trig.b , trig.c );
+        if( trig.a.y > trig.b.y || ((trig.a.y == trig.b.y) && trig.a.x > trig.b.x) ) point2D.swap( trig.a , trig.b );
+        if( trig.a.y > trig.c.y || ((trig.a.y == trig.c.y) && trig.a.x > trig.c.x) ) point2D.swap( trig.a , trig.c );
+        if( trig.b.y > trig.c.y || ((trig.b.y == trig.c.y) && trig.b.x > trig.c.x) ) point2D.swap( trig.b , trig.c );
 
     }
 
+    static sort_by_x_axis( trig = new triangle2D() ){
+
+        if( trig.a.x > trig.b.x ) point2D.swap( trig.a , trig.b );
+        if( trig.a.x > trig.c.x ) point2D.swap( trig.a , trig.c );
+        if( trig.b.x > trig.c.x ) point2D.swap( trig.b , trig.c );
+
+    }
+    
 }
 
 

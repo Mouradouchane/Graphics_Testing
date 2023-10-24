@@ -34,6 +34,14 @@ export class point2D{
 
     }
 
+    static round( point_a = new point2D() ){
+
+        if( point_a instanceof point2D ){
+            point_a.x = Math.round( point_a.x );
+            point_a.y = Math.round( point_a.y );
+        }
+    }
+
 }
 
 export class point2D_with_color extends point2D{

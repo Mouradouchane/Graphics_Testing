@@ -22,7 +22,7 @@ const buffer = new frame_buffer( 800 , 600 );
 */
 var render_loop = 0;
 var grid = 0;
-var show_debug_points = 1;
+var debug_points = 0;
 var interval_testing = 0;
 var interval_time = 3000;
 var anti_alias = 0;
@@ -45,7 +45,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    ...generate.random.triangles(1 , 0 , max_width , 0 ,max_height , 30 , null , new RGBA(255,255,255,0.5) , 1 ),
+    ...generate.random.triangles(2 , 0 , max_width*0.8 , 0 ,max_height*0.8, null , null , new RGBA(255,255,255,0.5) , 1 ),
     /*
     new triangle2D( 
         new point2D(100, 200) ,
@@ -68,30 +68,46 @@ var triangles = [
         thickness, 
         new RGBA(150,100,180,0.5) , 0
     ),
-
+ 
     new triangle2D( 
         new point2D(200, 400+110) ,
         new point2D(200, 300+110) ,
         new point2D(100, 300+110) ,
-        14 , 
-        new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.7) ,
+        3 , 
+        new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.6) ,
     ),
 
     new triangle2D( 
         new point2D(100, 100) ,
-        new point2D(300, 100) ,
+        new point2D(100, 300) ,
         new point2D(300, 300) ,
-        10 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
+        1 , 
+        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
     ),
     new triangle2D( 
         new point2D(600, 300) ,
         new point2D(500, 255) ,
         new point2D(400, 444) ,
+        30 , 
+        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
+    ),
+
+    new triangle2D( 
+        new point2D(50, 50) ,
+        new point2D(60, 255) ,
+        new point2D(400, 444) ,
         20 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.7) ,
-        ),
-    */
+        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
+    ),
+
+    new triangle2D( 
+        new point2D(150, 150) ,
+        new point2D(400, 55) ,
+        new point2D(420, 80) ,
+        8 , 
+        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
+    ),
+        */
     ];
 
 var circles = [
@@ -152,7 +168,7 @@ function new_frame(){
 
                 draw.line( line );
 
-                if( show_debug_points ) check.visual_check.line( line );
+                if( debug_points ) check.visual_check.line( line );
                 
             }
 
@@ -165,7 +181,7 @@ function new_frame(){
 
                 draw.rectangle( rect ); 
   
-                if( show_debug_points ) check.visual_check.rectangle( rect );
+                if( debug_points ) check.visual_check.rectangle( rect );
 
                 if( generate_random_shapes_each_time ){
                     
@@ -185,7 +201,7 @@ function new_frame(){
 
                 draw.triangle(trig);
 
-                if( show_debug_points ) check.visual_check.triangle(trig);
+                if( debug_points ) check.visual_check.triangle(trig);
 
                 if( generate_random_shapes_each_time ){
 
@@ -206,7 +222,7 @@ function new_frame(){
 
                 draw.circle(circle);
 
-                if( show_debug_points ) check.visual_check.circle( circle );
+                if( debug_points ) check.visual_check.circle( circle );
                 
 
             } 
@@ -220,7 +236,7 @@ function new_frame(){
             
                 draw.ellipse( ellipse );
 
-                if( show_debug_points ) check.visual_check.ellipse( ellipse , true );
+                if( debug_points ) check.visual_check.ellipse( ellipse , true );
 
             }
 
@@ -233,7 +249,7 @@ function new_frame(){
 
                 draw.plane( plane );
 
-                if(show_debug_points) check.visual_check.plane(plane);
+                if(debug_points) check.visual_check.plane(plane);
 
                 if(generate_random_shapes_each_time){
 

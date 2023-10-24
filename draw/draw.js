@@ -470,7 +470,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let x_start = copy.a.x;
         let x_end = copy.b.x;
         let y = copy.a.y;
-
+        
         // fill from A to B
         if( slope_AB != 0 ){
 
@@ -597,9 +597,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         draw.#CUSTOM_LINE_NO_GRADIENT( point , end_point , 1 , color );
     }
 
-    // ****** todo : rewrite this ****** 
-    static #DRAW_TRIANGLE_BORDER( triangle = new triangle2D() ) {
+    static #GENERATE_OUTSIDE_TRIANLGE( triangle = new triangle2D() , round_values = false ){
 
+        let outside_triangle = new triangle2D();
 
         // center of triangle
         let C = {
@@ -611,7 +611,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
             ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
             bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
-        }
+        };
 
         // normals in triangle 
         let normals = {
@@ -720,25 +720,142 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         new_points.A.slope = slopes.ab;
         new_points.B.slope = slopes.bc;
         new_points.C.slope = slopes.ac;
+        
+        
+        outside_triangle.a = (new_points.A.y < new_points.B.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
+        outside_triangle.b = (new_points.A.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
+        outside_triangle.c = (new_points.B.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
+        
+        if(round_values){
 
-        // draw points for debug
+            point2D.round( outside_triangle.a );
+            point2D.round( outside_triangle.b );
+            point2D.round( outside_triangle.c );
+            
+        }
+
+        triangle2D.sort_by_y_axis(outside_triangle);
+  
+        return outside_triangle;
+    }
+    
+    // ****** todo : rewrite this ****** 
+    static #DRAW_TRIANGLE_BORDER( triangle = new triangle2D() ) {
+
+        point2D.round( triangle.a );
+        point2D.round( triangle.b );
+        point2D.round( triangle.c );
+
+        triangle.thickness = Math.abs( triangle.thickness ) + 1;
+
+        // calculate the outside triangle that represent triangle border
+        let border_triangle = draw.#GENERATE_OUTSIDE_TRIANLGE( triangle , true );
+
+        let slopes = {
+            // dy / dx
+            ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
+            ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
+            bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
+        };
+        
+        // intercepts of both triangles inside and outside 
+        // we need them for edges calculations
+        let intercepts = {
+            // b = y - mx
+
+            inside : {
+                ab : Math.round(triangle.a.y - (slopes.ab * triangle.a.x)), 
+                ac : Math.round(triangle.a.y - (slopes.ac * triangle.a.x)),
+                bc : Math.round(triangle.b.y - (slopes.bc * triangle.b.x)),
+            },
+            
+            outside : {
+                ab : Math.round(border_triangle.a.y - (slopes.ab * border_triangle.a.x)),
+                ac : Math.round(border_triangle.a.y - (slopes.ac * border_triangle.a.x)),
+                bc : Math.round(border_triangle.b.y - (slopes.bc * border_triangle.b.x)),
+            }
+
+        }
+
+        let x_start = Math.round(border_triangle.a.x);
+        let x_end   = Math.round(border_triangle.a.x);
+        let y       = Math.round(border_triangle.a.y);
+
+        let in_x_start = 0;
+        let in_x_end = 0;
+
         debugger;
 
-        let p1 = (new_points.A.y < new_points.B.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
-        let p2 = (new_points.A.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
-        let p3 = (new_points.B.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
-   
-        draw.#DRAW_CIRCLE( p1.x , p1.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( p2.x , p2.y , 2 , 0 , new RGBA(255,0,0,1) );
-        draw.#DRAW_CIRCLE( p3.x , p3.y , 2 , 0 , new RGBA(255,0,0,1) );
+        // ab - ac
+        if( slopes.ab != 0 && slopes.ac != 0 ){
 
-        draw.#DRAW_CIRCLE( C.x , C.y , 2 , 0 , new RGBA(90,140,200,1) );
+            for( ; y < border_triangle.b.y ; y += 1){
 
-        let outside_triangle = new triangle2D(p1 , p2 , p3 , 0 ,  new RGBA(255,0,250,0.3) );
-        triangle2D.sort_by_y_axis(outside_triangle);
+                x_start = Math.ceil( (y - intercepts.outside.ab) / slopes.ab );
+                x_end   = Math.ceil( (y - intercepts.outside.ac) / slopes.ac );
 
-        draw.#FILL_TRIANGLE( outside_triangle );
+                if( y <= triangle.c.y && y >= triangle.a.y ){
+                    
+                    if( y < triangle.b.y ){
+                        in_x_start = Math.ceil( (y - intercepts.inside.ab) / slopes.ab );
+                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                    }
+                    else{
+                        in_x_start = Math.ceil( (y - intercepts.inside.bc) / ( (slopes.bc == 0) ? 1 : slopes.bc) );
+                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                    }
 
+                    draw.#DRAW_HORIZONTAL_LINE( x_start , in_x_start , y , triangle.border_color );
+                    draw.#DRAW_HORIZONTAL_LINE( x_end   , in_x_end   , y , triangle.border_color );
+
+                }
+                else {
+                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.border_color );
+                }
+                
+            }
+
+        }
+
+        // y += 1;
+
+        // bc - ac
+        if( slopes.bc != 0 && slopes.ac != 0 ){
+
+            for( ; y <= border_triangle.c.y ; y += 1){
+
+                x_start = Math.ceil( (y - intercepts.outside.bc) / slopes.bc );
+                x_end   = Math.ceil( (y - intercepts.outside.ac) / slopes.ac );
+            
+                if( y >= triangle.a.y && y <= triangle.c.y ){
+
+                    if( y < triangle.b.y ){
+                        in_x_start = Math.ceil( (y - intercepts.inside.ab) / ((slopes.ab == 0) ? 1 : slopes.ab) );
+                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                    }
+                    else{
+                        in_x_start = Math.ceil( (y - intercepts.inside.bc) / slopes.bc );
+                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                    }
+
+                    draw.#DRAW_HORIZONTAL_LINE( x_start , in_x_start , y , triangle.border_color );
+                    draw.#DRAW_HORIZONTAL_LINE( x_end   , in_x_end   , y , triangle.border_color );
+
+                }
+                else{
+                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.border_color );
+                }
+                
+            }
+
+        }
+
+        // points for test/debug
+        /*
+        draw.#DRAW_CIRCLE( border_triangle.a.x , border_triangle.a.y , 2 , 0 , new RGBA(0,255,140,1) );
+        draw.#DRAW_CIRCLE( border_triangle.b.x , border_triangle.b.y , 2 , 0 , new RGBA(0,255,140,1) );
+        draw.#DRAW_CIRCLE( border_triangle.c.x , border_triangle.c.y , 2 , 0 , new RGBA(0,255,140,1) );
+        */
     }
 
     // =========================================================================
