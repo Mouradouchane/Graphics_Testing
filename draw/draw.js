@@ -345,16 +345,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
  
     }
 
-    // ****** need work ******
-    static #GUPTA_SPROULL_LINE_DRAW_ALGORITHM(){
-
-    }
-
-    // ****** need work ******
-    static #BRESENHAM_LINE_DRAW_ALGORITHM(){
-        
-    }
-
+    
     // fast and direct function for filling shapes line by line horizontaly  
     static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , color = undefined ){
         
@@ -447,68 +438,78 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // =========================================================================
 
     // NOTE !!! triangle points need to be sorted by "Y-axis"
-    static #FILL_TRIANGLE( copy = new triangle2D() ){
+    static #FILL_TRIANGLE( triangle = new triangle2D() ){
         
         // calc needed values for the process 
 
         // A-B
-        let D_AB_X = (copy.a.x - copy.b.x);
+        let D_AB_X = (triangle.a.x - triangle.b.x);
             // D_AB_X = (D_AB_X == 0) ? 1 : D_AB_X;
-        let D_AB_Y = (copy.a.y - copy.b.y);
+        let D_AB_Y = (triangle.a.y - triangle.b.y);
         let slope_AB = (D_AB_X == 0) ? D_AB_Y : ( D_AB_Y / D_AB_X );
             // slope_AB = (slope_AB == 0) ? 1 : slope_AB;
-        let intercept_AB = copy.a.y - (slope_AB * copy.a.x);
+        let intercept_AB = triangle.a.y - (slope_AB * triangle.a.x);
 
         // A-C
-        let D_AC_X = (copy.a.x - copy.c.x);
+        let D_AC_X = (triangle.a.x - triangle.c.x);
             // D_AC_X = (D_AC_X == 0) ? 1 : D_AC_X;
-        let D_AC_Y = (copy.a.y - copy.c.y);
+        let D_AC_Y = (triangle.a.y - triangle.c.y);
         let slope_AC = (D_AC_X == 0) ? D_AC_Y : ( D_AC_Y / D_AC_X ); 
             // slope_AC = (slope_AC == 0) ? 1 : slope_AC;
-        let intercept_AC = copy.a.y - (slope_AC * copy.a.x);
+        let intercept_AC = triangle.a.y - (slope_AC * triangle.a.x);
 
-        let x_start = copy.a.x;
-        let x_end = copy.b.x;
-        let y = copy.a.y;
+        let x_start = Math.round(triangle.a.x) + 0.5;
+        let x_end   = Math.round(triangle.b.x) + 0.5;
+        let y       = Math.round(triangle.a.y) + 0.5;
         
         // fill from A to B
         if( slope_AB != 0 ){
 
-            for( ; y <= copy.b.y; y++ ){
+            for( ; y <= triangle.b.y; y++ ){
     
                 // find X's
-                x_start = (slope_AC == 0) ? y : Math.ceil((y - intercept_AC) / slope_AC);
-                x_end   = (slope_AB == 0) ? y : Math.ceil((y - intercept_AB) / slope_AB);
+                x_start = (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
+                x_end   = (slope_AB == 0) ? y : Math.round((y - intercept_AB) / slope_AB);
                 
                 // fill range
-                draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
+                draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.fill_color );
     
             }
 
         }
         else {
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.fill_color );
             y += 1;
         }
         
         // B-C
-        let D_BC_X = (copy.b.x - copy.c.x);
+        let D_BC_X = (triangle.b.x - triangle.c.x);
             // D_BC_X = (D_BC_X == 0) ? 1 : D_BC_X;
-        let D_BC_Y = (copy.b.y - copy.c.y);
+        let D_BC_Y = (triangle.b.y - triangle.c.y);
         let slope_BC = (D_BC_X == 0) ? D_BC_Y : ( D_BC_Y / D_BC_X );
             // slope_BC = (slope_BC == 0) ? 1 : slope_BC;
-        let intercept_BC = copy.b.y - (slope_BC * copy.b.x);
+        let intercept_BC = triangle.b.y - (slope_BC * triangle.b.x);
         
         // fill from B to C
-        for( ; y <= copy.c.y ; y += 1 ){
+        for( ; y <= triangle.c.y ; y += 1 ){
 
-            x_start = (slope_AC == 0) ? y : Math.ceil((y - intercept_AC) / slope_AC);
-            x_end   = (slope_BC == 0) ? y : Math.ceil((y - intercept_BC) / slope_BC);
+            x_start = (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
+            x_end   = (slope_BC == 0) ? y : Math.round((y - intercept_BC) / slope_BC);
 
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , copy.fill_color );
+            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.fill_color );
 
         }
 
+    }
+
+    /*
+        function to fill triangle with a gradient of 3 colors using barycentric-coordinate 
+    */
+    static #FILL_TRIANGLE_WITH_GRADIENT( 
+        point_a = new point2D() , point_b = new point2D() , point_c = new point2D(),
+        color_a = undefined , color_b = undefined , color_c = undefined
+    ){
+        
     }
 
     /*
@@ -738,8 +739,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
   
         return outside_triangle;
     }
-    
-    // ****** todo : rewrite this ****** 
+
+    /* 
+        draw a thick border around 2D triangle
+    */
     static #DRAW_TRIANGLE_BORDER( triangle = new triangle2D() ) {
 
         point2D.round( triangle.a );
@@ -777,36 +780,34 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
 
-        let x_start = Math.round(border_triangle.a.x);
-        let x_end   = Math.round(border_triangle.a.x);
-        let y       = Math.round(border_triangle.a.y);
+        let x_start = Math.round(border_triangle.a.x) + 0.5;
+        let x_end   = Math.round(border_triangle.a.x) + 0.5;
+        let y       = Math.round(border_triangle.a.y) + 0.5;
 
         let in_x_start = 0;
         let in_x_end = 0;
-
-        debugger;
 
         // ab - ac
         if( slopes.ab != 0 && slopes.ac != 0 ){
 
             for( ; y < border_triangle.b.y ; y += 1){
 
-                x_start = Math.ceil( (y - intercepts.outside.ab) / slopes.ab );
-                x_end   = Math.ceil( (y - intercepts.outside.ac) / slopes.ac );
+                x_start = Math.round( (y - intercepts.outside.ab) / slopes.ab );
+                x_end   = Math.round( (y - intercepts.outside.ac) / slopes.ac );
 
                 if( y <= triangle.c.y && y >= triangle.a.y ){
                     
                     if( y < triangle.b.y ){
-                        in_x_start = Math.ceil( (y - intercepts.inside.ab) / slopes.ab );
-                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                        in_x_start = Math.round( (y - intercepts.inside.ab) / slopes.ab ) ;
+                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac ) ;
                     }
                     else{
-                        in_x_start = Math.ceil( (y - intercepts.inside.bc) / ( (slopes.bc == 0) ? 1 : slopes.bc) );
-                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                        in_x_start = Math.round( (y - intercepts.inside.bc) / ( (slopes.bc == 0) ? 1 : slopes.bc) ) ;
+                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac ) ;
                     }
 
                     draw.#DRAW_HORIZONTAL_LINE( x_start , in_x_start , y , triangle.border_color );
-                    draw.#DRAW_HORIZONTAL_LINE( x_end   , in_x_end   , y , triangle.border_color );
+                    draw.#DRAW_HORIZONTAL_LINE( in_x_end , x_end , y , triangle.border_color );
 
                 }
                 else {
@@ -817,29 +818,27 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
 
-        // y += 1;
-
         // bc - ac
         if( slopes.bc != 0 && slopes.ac != 0 ){
 
             for( ; y <= border_triangle.c.y ; y += 1){
 
-                x_start = Math.ceil( (y - intercepts.outside.bc) / slopes.bc );
-                x_end   = Math.ceil( (y - intercepts.outside.ac) / slopes.ac );
+                x_start = Math.round( (y - intercepts.outside.bc) / slopes.bc );
+                x_end   = Math.round( (y - intercepts.outside.ac) / slopes.ac );
             
                 if( y >= triangle.a.y && y <= triangle.c.y ){
 
                     if( y < triangle.b.y ){
-                        in_x_start = Math.ceil( (y - intercepts.inside.ab) / ((slopes.ab == 0) ? 1 : slopes.ab) );
-                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                        in_x_start = Math.round( (y - intercepts.inside.ab) / ((slopes.ab == 0) ? 1 : slopes.ab) ) ;
+                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
                     }
                     else{
-                        in_x_start = Math.ceil( (y - intercepts.inside.bc) / slopes.bc );
-                        in_x_end   = Math.ceil( (y - intercepts.inside.ac) / slopes.ac );
+                        in_x_start = Math.round( (y - intercepts.inside.bc) / slopes.bc );
+                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
                     }
 
                     draw.#DRAW_HORIZONTAL_LINE( x_start , in_x_start , y , triangle.border_color );
-                    draw.#DRAW_HORIZONTAL_LINE( x_end   , in_x_end   , y , triangle.border_color );
+                    draw.#DRAW_HORIZONTAL_LINE( in_x_end , x_end , y , triangle.border_color );
 
                 }
                 else{
@@ -850,17 +849,28 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
 
-        // points for test/debug
-        /*
-        draw.#DRAW_CIRCLE( border_triangle.a.x , border_triangle.a.y , 2 , 0 , new RGBA(0,255,140,1) );
-        draw.#DRAW_CIRCLE( border_triangle.b.x , border_triangle.b.y , 2 , 0 , new RGBA(0,255,140,1) );
-        draw.#DRAW_CIRCLE( border_triangle.c.x , border_triangle.c.y , 2 , 0 , new RGBA(0,255,140,1) );
-        */
+    
+    } 
+    // end of #DRAW_TRIANGLE_BORDER
+
+    /*
+        this function for drawing "non thick border" around triangle 
+        using line_draw algorithm as a fast trick
+    */
+    static #DRAW_FAST_TRIANGLE_BORDER( triangle = new triangle2D() ){
+
+        triangle.border_color.alpha = 1;
+        draw.#CUSTOM_LINE_NO_GRADIENT( triangle.a , triangle.b , 2 , triangle.border_color );
+        draw.#CUSTOM_LINE_NO_GRADIENT( triangle.a , triangle.c , 2 , triangle.border_color );
+        draw.#CUSTOM_LINE_NO_GRADIENT( triangle.b , triangle.c , 2 , triangle.border_color );
+
     }
+
 
     // =========================================================================
     //                       CIRCLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
+
 
     static #CIRCLE_DRAW_ALL_QUADS(
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
@@ -1511,7 +1521,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static triangle( triangle_object = new triangle2D() ){
+    static triangle( triangle_object = new triangle2D() , draw_thick_border = false ){
 
         // check canvas and triangle
         let f1 = draw.#CHECK_BUFFER();
@@ -1534,9 +1544,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             if( copy.border_color instanceof RGBA ){
                 
-                // draw border for triangle
-                draw.#DRAW_TRIANGLE_BORDER( copy );
-   
+                
+                if(draw_thick_border) draw.#DRAW_TRIANGLE_BORDER( copy );
+                else draw.#DRAW_FAST_TRIANGLE_BORDER( copy );
+
             }
 
         }

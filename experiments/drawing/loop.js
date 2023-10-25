@@ -45,8 +45,8 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    ...generate.random.triangles(2 , 0 , max_width*0.8 , 0 ,max_height*0.8, null , null , new RGBA(255,255,255,0.5) , 1 ),
     /*
+    ...generate.random.triangles(2 , 0 , max_width*0.8 , 0 ,max_height*0.8, null , null , new RGBA(255,255,255,0.5) , 1 ),
     new triangle2D( 
         new point2D(100, 200) ,
         new point2D(300, 200) ,
@@ -76,7 +76,7 @@ var triangles = [
         3 , 
         new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.6) ,
     ),
-
+        
     new triangle2D( 
         new point2D(100, 100) ,
         new point2D(100, 300) ,
@@ -84,30 +84,31 @@ var triangles = [
         1 , 
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
     ),
+    */
     new triangle2D( 
         new point2D(600, 300) ,
         new point2D(500, 255) ,
         new point2D(400, 444) ,
-        30 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
-    ),
-
-    new triangle2D( 
-        new point2D(50, 50) ,
-        new point2D(60, 255) ,
-        new point2D(400, 444) ,
-        20 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
+        50 , 
+        new RGBA(255,0,255,0.5) , new RGBA(255,255,255,1) ,
     ),
 
     new triangle2D( 
         new point2D(150, 150) ,
-        new point2D(400, 55) ,
-        new point2D(420, 80) ,
-        8 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
+        new point2D(150, 255) ,
+        new point2D(200, 255) ,
+        20 , 
+        new RGBA(150,100,180,0.5) , new RGBA(255,255,255,1) ,
     ),
-        */
+
+    new triangle2D( 
+        new point2D(450, 150) ,
+        new point2D(300, 55) ,
+        new point2D(200, 80) ,
+        8 , 
+        new RGBA(150,100,180,0.5) , new RGBA(255,255,255,1) ,
+    ),
+
     ];
 
 var circles = [
