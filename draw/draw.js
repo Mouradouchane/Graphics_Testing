@@ -502,15 +502,6 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    /*
-        function to fill triangle with a gradient of 3 colors using barycentric-coordinate 
-    */
-    static #FILL_TRIANGLE_WITH_GRADIENT( 
-        point_a = new point2D() , point_b = new point2D() , point_c = new point2D(),
-        color_a = undefined , color_b = undefined , color_c = undefined
-    ){
-        
-    }
 
     /*
         A : point A on the line
@@ -852,6 +843,108 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     
     } 
     // end of #DRAW_TRIANGLE_BORDER
+
+    
+    /*
+        function to fill triangle with a gradient of 3 colors using barycentric-coordinate 
+    */
+    static #FILL_TRIANGLE_WITH_GRADIENT( 
+        triangle = new triangle2D() 
+    ){
+        
+        point2D.round( triangle.a );
+        point2D.round( triangle.b );
+        point2D.round( triangle.c );
+
+        let slopes = {
+            // dy / dx
+            ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
+            ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
+            bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
+        };
+        
+
+        let intercepts = {
+            // b = y - mx
+
+            inside : {
+                ab : Math.round(triangle.a.y - (slopes.ab * triangle.a.x)), 
+                ac : Math.round(triangle.a.y - (slopes.ac * triangle.a.x)),
+                bc : Math.round(triangle.b.y - (slopes.bc * triangle.b.x)),
+            },
+
+        }
+
+        // we need area of triangle to compute alpha and beta 
+        let triangle_area = draw.#AREA_OF_2D_TRIANGLE( triangle.a , triangle.b , triangle.c );
+        let alpha = 0 , beta = 0 , gamma = 0;
+
+        let x_start = Math.round(triangle.a.x);
+        let x_end   = Math.round(triangle.a.x);
+        let y       = Math.round(triangle.a.y);
+
+        let p = new point2D(x_start , y);
+
+        let c_a = triangle.color_a;
+        let c_b = triangle.color_b;
+        let c_c = triangle.color_c;
+        let color = null;
+
+        // ab - ac
+        if( slopes.ab != 0 && slopes.ac != 0 ){
+
+            for( ; y < triangle.b.y ; y += 1){
+
+                debugger
+
+                x_start = Math.round( (y - intercepts.inside.ab) / slopes.ab );
+                x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
+                
+                if(x_start > x_end){
+                    [x_start , x_end] = [x_end , x_start];
+                }
+
+                // computer gradient
+                for( let x = x_start ; x <= x_end ; x += 1 ){
+
+                    p.x = x; 
+                    p.y = y;
+
+                    alpha = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.b , p , triangle.c ) / triangle_area);
+                    beta  = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.a , p , triangle.c ) / triangle_area);
+                    gamma = Math.abs(1 - alpha - beta);
+
+                    c_a = RGBA.change_by_factor( triangle.color_a , alpha );
+                    c_b = RGBA.change_by_factor( triangle.color_b , beta  );
+                    c_c = RGBA.change_by_factor( triangle.color_c , gamma );
+
+                    color = RGBA.blend( RGBA.blend( c_a , c_b ) , c_c);
+
+                    draw.#set_pixle( x , y , color );
+                }
+
+            }
+
+        }
+
+        // bc - ac
+        if( slopes.bc != 0 && slopes.ac != 0 ){
+
+            for( ; y <= triangle.c.y ; y += 1){
+
+                x_start = Math.round( (y - intercepts.inside.bc) / slopes.bc );
+                x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
+            
+              
+          
+            }
+
+        }
+
+
+    }
+    // end of #FILL_TRIANGLE_WITH_GRADIENT
+
 
     /*
         this function for drawing "non thick border" around triangle 
@@ -1549,6 +1642,30 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 else draw.#DRAW_FAST_TRIANGLE_BORDER( copy );
 
             }
+
+        }
+        else{
+            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+        }
+
+    }
+
+    static triangle_gradient( triangle_object = new triangle2D() ){
+        
+        // check canvas and triangle
+        let f1 = draw.#CHECK_BUFFER();
+        let f2 = (triangle_object instanceof triangle2D);
+        
+        if( f1 && f2 ){
+
+            // make copy for drawing usage 
+            // let copy = triangle2D.copy(triangle_object);
+
+            // sort points depend on Y-axis
+            triangle2D.sort_by_y_axis(triangle_object);
+            
+            draw.#FILL_TRIANGLE_WITH_GRADIENT( triangle_object );
 
         }
         else{

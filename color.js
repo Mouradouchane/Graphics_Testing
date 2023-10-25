@@ -159,4 +159,22 @@ export class RGBA{
 
     }
 
+    static change_by_factor( rgba_color = new RGBA() , factor_value = 1 ){
+
+        if(rgba_color instanceof RGBA ){
+
+            let new_color = new RGBA( 
+                rgba_color.red   * factor_value , 
+                rgba_color.green * factor_value , 
+                rgba_color.blue  * factor_value ,
+                rgba_color.alpha
+            );
+
+            return new_color;
+
+        }
+        else return null;
+
+    }
+
 }

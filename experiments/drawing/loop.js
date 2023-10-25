@@ -3,7 +3,7 @@ import {RGBA} from "../../color.js";
 import {line , line_with_colors} from "../../line.js";
 import {point2D, point2D_with_color} from "../../point.js";
 import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
-import {triangle2D} from "../../triangle.js";
+import {triangle2D, triangle2D_gradient} from "../../triangle.js";
 import {generate} from "../../generators.js";
 import {circle2D} from "../../circle.js";
 import {ellipse2D} from "../../ellipse.js";
@@ -30,6 +30,7 @@ var shapes_type = 3;
 var shapes_amount = 3;
 var generate_random_shapes_each_time = 1;
 var thickness  = 4;
+var gradient = true;
 var max_width  = canvas.clientWidth  / 1.5;
 var max_height = canvas.clientHeight / 1.5;
 
@@ -85,28 +86,25 @@ var triangles = [
         new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
     ),
     */
-    new triangle2D( 
+    new triangle2D_gradient( 
         new point2D(600, 300) ,
         new point2D(500, 255) ,
         new point2D(400, 444) ,
-        50 , 
-        new RGBA(255,0,255,0.5) , new RGBA(255,255,255,1) ,
+        new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
     ),
 
-    new triangle2D( 
+    new triangle2D_gradient( 
         new point2D(150, 150) ,
         new point2D(150, 255) ,
         new point2D(200, 255) ,
-        20 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,255,255,1) ,
+        new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
     ),
 
-    new triangle2D( 
+    new triangle2D_gradient( 
         new point2D(450, 150) ,
-        new point2D(300, 55) ,
-        new point2D(200, 80) ,
-        8 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,255,255,1) ,
+        new point2D(300, 55)  ,
+        new point2D(200, 80)  ,
+        new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
     ),
 
     ];
@@ -200,7 +198,8 @@ function new_frame(){
 
             for(let trig of triangles){
 
-                draw.triangle(trig);
+                if(!gradient) draw.triangle(trig);
+                else draw.triangle_gradient(trig);
 
                 if( debug_points ) check.visual_check.triangle(trig);
 

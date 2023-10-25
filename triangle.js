@@ -70,6 +70,22 @@ export class triangle2D{
     
 }
 
+export class triangle2D_gradient extends triangle2D{
+
+    constructor(
+        point_a = new point2D() , point_b = new point2D() , point_c = new point2D() , 
+        color_a = new RGBA() ,  color_b = new RGBA() ,  color_c = new RGBA() 
+    ){
+
+        super( point_a , point_b , point_c );
+
+        this.color_a = color_a;
+        this.color_b = color_b;
+        this.color_c = color_c;
+
+    }
+
+}
 
 /*
     need refactor
