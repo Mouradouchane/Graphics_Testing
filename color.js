@@ -167,7 +167,7 @@ export class RGBA{
                 rgba_color.red   * factor_value , 
                 rgba_color.green * factor_value , 
                 rgba_color.blue  * factor_value ,
-                rgba_color.alpha
+                rgba_color.alpha * factor_value
             );
 
             return new_color;

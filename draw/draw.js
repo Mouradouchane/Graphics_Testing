@@ -934,9 +934,28 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 x_start = Math.round( (y - intercepts.inside.bc) / slopes.bc );
                 x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
-            
-              
-          
+             
+                if(x_start > x_end){
+                    [x_start , x_end] = [x_end , x_start];
+                }
+
+                // computer gradient
+                for( let x = x_start ; x <= x_end ; x += 1 ){
+                    p.x = x; 
+                    p.y = y;
+
+                    alpha = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.b , p , triangle.c ) / triangle_area);
+                    beta  = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.a , p , triangle.c ) / triangle_area);
+                    gamma = Math.abs(1 - alpha - beta);
+
+                    c_a = RGBA.change_by_factor( triangle.color_a , alpha );
+                    c_b = RGBA.change_by_factor( triangle.color_b , beta  );
+                    c_c = RGBA.change_by_factor( triangle.color_c , gamma );
+
+                    color = RGBA.blend( RGBA.blend( c_a , c_b ) , c_c);
+
+                    draw.#set_pixle( x , y , color );
+                }
             }
 
         }
