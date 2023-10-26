@@ -111,7 +111,7 @@ var triangles = [
             new point2D(350, 10) ,
             new point2D(10 ,500)  ,
             new point2D(700 , 500)  ,
-            new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
+            new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
         ),
 
     ];

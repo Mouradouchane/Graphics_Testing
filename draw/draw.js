@@ -458,9 +458,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             // slope_AC = (slope_AC == 0) ? 1 : slope_AC;
         let intercept_AC = triangle.a.y - (slope_AC * triangle.a.x);
 
-        let x_start = Math.round(triangle.a.x) + 0.5;
-        let x_end   = Math.round(triangle.b.x) + 0.5;
-        let y       = Math.round(triangle.a.y) + 0.5;
+        let x_start = Math.round(triangle.a.x);
+        let x_end   = Math.round(triangle.b.x);
+        let y       = Math.round(triangle.a.y);
         
         // fill from A to B
         if( slope_AB != 0 ){
@@ -771,9 +771,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
 
-        let x_start = Math.round(border_triangle.a.x) + 0.5;
-        let x_end   = Math.round(border_triangle.a.x) + 0.5;
-        let y       = Math.round(border_triangle.a.y) + 0.5;
+        let x_start = Math.round(border_triangle.a.x);
+        let x_end   = Math.round(border_triangle.a.x);
+        let y       = Math.round(border_triangle.a.y);
 
         let in_x_start = 0;
         let in_x_end = 0;
