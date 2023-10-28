@@ -1,33 +1,33 @@
 import { RGBA } from "./color.js";
 import { Point2D } from "./point.js";
 
-export class triangle2D{
+export class Triangle2D{
 
     constructor(
         point_a = new Point2D() , point_b = new Point2D() , point_c = new Point2D() , 
-        thickness = 1 , fill_color = undefined , border_color = undefined 
+        border_thickness = 1 , fill_color = undefined , border_color = undefined 
     ){
 
         this.a = (point_a instanceof Point2D) ? point_a : new Point2D();
         this.b = (point_b instanceof Point2D) ? point_b : new Point2D();
         this.c = (point_c instanceof Point2D) ? point_c : new Point2D();
-        this.thickness = thickness;
-        this.fill_color = (fill_color instanceof RGBA) ? fill_color : undefined;
+        this.thickness = border_thickness;
+        this.fill_color   = (fill_color   instanceof RGBA) ? fill_color   : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
 
     }
 
-    static copy( triangle2D_obj = new triangle2D() ){
+    static Copy( triangle = new Triangle2D() ){
 
-        if(triangle2D_obj instanceof triangle2D){
+        if(triangle instanceof Triangle2D){
 
-            return new triangle2D(
-                Point2D.Copy(triangle2D_obj.a),
-                Point2D.Copy(triangle2D_obj.b),
-                Point2D.Copy(triangle2D_obj.c),
-                Number.parseInt(triangle2D_obj.thickness),
-                (triangle2D_obj.fill_color   instanceof RGBA) ? RGBA.Copy(triangle2D_obj.fill_color) : undefined ,
-                (triangle2D_obj.border_color instanceof RGBA) ? RGBA.Copy(triangle2D_obj.border_color) : undefined ,
+            return new Triangle2D(
+                Point2D.Copy(triangle.a),
+                Point2D.Copy(triangle.b),
+                Point2D.Copy(triangle.c),
+                Number.parseInt(triangle.thickness),
+                (triangle.fill_color   instanceof RGBA) ? RGBA.Copy(triangle.fill_color)   : undefined ,
+                (triangle.border_color instanceof RGBA) ? RGBA.Copy(triangle.border_color) : undefined ,
             );
             
         }
@@ -35,11 +35,11 @@ export class triangle2D{
 
     }
     
-    static random_triangle( 
-        max_width = 1 , max_height = 1 , thickness = 1, color = false , border_color = false
+    static RandomTriangle( 
+        max_width = 1 , max_height = 1 , thickness = 1 , color = false , border_color = false
     ){
 
-        return new triangle2D(
+        return new Triangle2D(
 
             new Point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
             new Point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
@@ -52,29 +52,29 @@ export class triangle2D{
     
     }
 
-    static sort_by_y_axis( trig = new triangle2D() ){
+    static SortByY( triangle = new Triangle2D() ){
 
-        if( trig.a.y > trig.b.y || ((trig.a.y == trig.b.y) && trig.a.x > trig.b.x) ) Point2D.Swap( trig.a , trig.b );
-        if( trig.a.y > trig.c.y || ((trig.a.y == trig.c.y) && trig.a.x > trig.c.x) ) Point2D.Swap( trig.a , trig.c );
-        if( trig.b.y > trig.c.y || ((trig.b.y == trig.c.y) && trig.b.x > trig.c.x) ) Point2D.Swap( trig.b , trig.c );
+        if( triangle.a.y > triangle.b.y || ((triangle.a.y == triangle.b.y) && triangle.a.x > triangle.b.x) ) Point2D.Swap( triangle.a , triangle.b );
+        if( triangle.a.y > triangle.c.y || ((triangle.a.y == triangle.c.y) && triangle.a.x > triangle.c.x) ) Point2D.Swap( triangle.a , triangle.c );
+        if( triangle.b.y > triangle.c.y || ((triangle.b.y == triangle.c.y) && triangle.b.x > triangle.c.x) ) Point2D.Swap( triangle.b , triangle.c );
 
     }
 
-    static sort_by_x_axis( trig = new triangle2D() ){
+    static SortByX( triangle = new Triangle2D() ){
 
-        if( trig.a.x > trig.b.x ) Point2D.Swap( trig.a , trig.b );
-        if( trig.a.x > trig.c.x ) Point2D.Swap( trig.a , trig.c );
-        if( trig.b.x > trig.c.x ) Point2D.Swap( trig.b , trig.c );
+        if( triangle.a.x > triangle.b.x ) Point2D.Swap( triangle.a , triangle.b );
+        if( triangle.a.x > triangle.c.x ) Point2D.Swap( triangle.a , triangle.c );
+        if( triangle.b.x > triangle.c.x ) Point2D.Swap( triangle.b , triangle.c );
 
     }
     
 }
 
-export class triangle2D_gradient extends triangle2D{
+export class Triangle2DGradient extends Triangle2D {
 
     constructor(
         point_a = new Point2D() , point_b = new Point2D() , point_c = new Point2D() , 
-        color_a = new RGBA() ,  color_b = new RGBA() ,  color_c = new RGBA() 
+        color_a = new RGBA()    , color_b = new RGBA()    , color_c = new RGBA() 
     ){
 
         super( point_a , point_b , point_c );

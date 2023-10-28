@@ -2,10 +2,10 @@ import {RGBA} from "./color.js";
 import {point2D , point2D_with_color} from "./point.js";
 import {Line2D , Line2DWithColors } from "./line.js";
 import {rectangle , rectangle_with_gradient} from "./rectangle.js";
-import {triangle2D} from "./triangle.js";
+import {Triangle2D} from "./triangle.js";
 import {circle2D} from "./circle.js";
 import {plane2D} from "./plane.js";
-import { ellipse2D } from "./ellipse.js";
+import { Ellipse2D } from "./ellipse.js";
 
 export class generate {
    
@@ -132,9 +132,9 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === triangle2D ){
+            if( SHAPES_TYPE === Triangle2D ){
 
-                OBJECTS[i] = new triangle2D(
+                OBJECTS[i] = new Triangle2D(
                     // Points A , B , C
                     new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
                     new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
@@ -165,9 +165,9 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === ellipse2D ){
+            if( SHAPES_TYPE === Ellipse2D ){
 
-                OBJECTS[i] = new ellipse2D(
+                OBJECTS[i] = new Ellipse2D(
                     // X , Y
                     (Math.random() * max_X) + min_X , 
                     (Math.random() * max_Y) + min_Y ,
@@ -280,7 +280,7 @@ export class generate {
         ){
 
             return generate.#main_generator(
-                triangle2D , amount_of_objects , border_thickness ,
+                Triangle2D , amount_of_objects , border_thickness ,
                 min_X , max_X ,min_Y ,max_Y , 
                 fill_color , border_color ,
                 fill_color_random_alpha , border_color_random_alpha
@@ -324,7 +324,7 @@ export class generate {
         ){
 
             return generate.#main_generator( 
-                ellipse2D , amount_of_objects , border_thickness ,
+                Ellipse2D , amount_of_objects , border_thickness ,
                 min_X , max_X ,min_Y ,max_Y ,
                 fill_color , border_color ,
                 fill_color_random_alpha , border_color_random_alpha

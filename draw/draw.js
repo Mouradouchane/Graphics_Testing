@@ -3,13 +3,13 @@ import {RGBA} from "../color.js";
 import {Point2D} from "../point.js";
 import {Line2D}  from "../line.js";
 import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../rectangle.js";
-import {triangle2D} from "../triangle.js";
+import {Triangle2D} from "../triangle.js";
 import {circle2D} from "../circle.js";
-import {ellipse2D} from "../ellipse.js";
-import {rotate} from "../rotate.js";
+import {Ellipse2D} from "../ellipse.js";
+import {Rotate} from "../rotate.js";
 import {shear} from "../shear.js";
 import {plane2D} from "../plane.js";
-import {frame_buffer} from "../buffers.js";
+import {FrameBuffer} from "../buffers.js";
 
 export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
@@ -94,7 +94,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     }
 
     static #CHECK_BUFFER(){
-        return ( Draw.#RESOURCES.Buffer instanceof frame_buffer ) ? true : false;
+        return ( Draw.#RESOURCES.Buffer instanceof FrameBuffer ) ? true : false;
     }
 
     static #SetPixle( x , y , pixle_color = null ) {
@@ -436,7 +436,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     // =========================================================================
 
     // NOTE !!! triangle points need to be sorted by "Y-axis"
-    static #FillTriangle( triangle = new triangle2D() ){
+    static #FillTriangle( triangle = new Triangle2D() ){
         
         // calc needed values for the process 
 
@@ -587,9 +587,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         Draw.#LineNoGradient( point , end_point , 1 , color );
     }
 
-    static #GenerateOutsideTriangle( triangle = new triangle2D() , round_values = false ){
+    static #GenerateOutsideTriangle( triangle = new Triangle2D() , round_values = false ){
 
-        let outside_triangle = new triangle2D();
+        let outside_triangle = new Triangle2D();
 
         // center of triangle
         let C = {
@@ -724,7 +724,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             
         }
 
-        triangle2D.sort_by_y_axis(outside_triangle);
+        Triangle2D.SortByY(outside_triangle);
   
         return outside_triangle;
     }
@@ -732,7 +732,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     /* 
         draw a thick border around 2D triangle
     */
-    static #DrawTriangleBorder( triangle = new triangle2D() ) {
+    static #DrawTriangleBorder( triangle = new Triangle2D() ) {
 
         Point2D.Round( triangle.a );
         Point2D.Round( triangle.b );
@@ -847,7 +847,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         function to fill triangle with a gradient of 3 colors using barycentric-coordinate 
     */
     static #FillTriangleWithGradient( 
-        triangle = new triangle2D() 
+        triangle = new Triangle2D() 
     ){
         
         Point2D.Round( triangle.a );
@@ -969,7 +969,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         this function for drawing "non thick border" around triangle 
         using line_draw algorithm as a fast trick
     */
-    static #DrawFastTriangleBorder( triangle = new triangle2D() ){
+    static #DrawFastTriangleBorder( triangle = new Triangle2D() ){
 
         triangle.border_color.alpha = 1;
         Draw.#LineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
@@ -1372,8 +1372,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         // let m = null; // slope
 
-        f1  = rotate.z( f1.x , f1.y , angle );
-        f2  = rotate.z( f2.x , f2.y , angle );
+        f1  = Rotate.Z( f1.x , f1.y , angle );
+        f2  = Rotate.Z( f2.x , f2.y , angle );
         
         let x = 0;
         let x_sqr = null; // x²
@@ -1420,7 +1420,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
                     for( let i = 0 ; i < 4 ; i++ ) {                    
 
-                        [ref[i].X , ref[i].Y] = rotate.z( ref[i].X , ref[i].Y , angle );
+                        [ref[i].X , ref[i].Y] = Rotate.Z( ref[i].X , ref[i].Y , angle );
 
                         if( Draw.#CalcDistance())
                         Draw.#LineNoGradient(
@@ -1492,9 +1492,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         return false;
     }
 
-    static SetBuffer( buffer_object = new frame_buffer() ){
+    static SetBuffer( buffer_object = new FrameBuffer() ){
 
-        if( buffer_object instanceof frame_buffer ){
+        if( buffer_object instanceof FrameBuffer ){
 
             Draw.#RESOURCES.Buffer = buffer_object;
             return true;
@@ -1626,19 +1626,19 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static Triangle2D( triangle_object = new triangle2D() , draw_thick_border = false ){
+    static Triangle2D( triangle_object = new Triangle2D() , draw_thick_border = false ){
 
         // check canvas and triangle
         let f1 = Draw.#CHECK_BUFFER();
-        let f2 = (triangle_object instanceof triangle2D);
+        let f2 = (triangle_object instanceof Triangle2D);
         
         if( f1 && f2 ){
 
             // make copy for drawing usage 
-            let copy = triangle2D.copy(triangle_object);
+            let copy = Triangle2D.Copy(triangle_object);
 
             // sort points depend on Y-axis
-            triangle2D.sort_by_y_axis(copy);
+            Triangle2D.SortByY(copy);
             
             if( copy.fill_color instanceof RGBA ){
 
@@ -1663,11 +1663,11 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static Triangle2DWithGradient( triangle_object = new triangle2D() ){
+    static Triangle2DWithGradient( triangle_object = new Triangle2D() ){
         
         // check canvas and triangle
         let f1 = Draw.#CHECK_BUFFER();
-        let f2 = (triangle_object instanceof triangle2D);
+        let f2 = (triangle_object instanceof Triangle2D);
         
         if( f1 && f2 ){
 
@@ -1675,7 +1675,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             // let copy = triangle2D.copy(triangle_object);
 
             // sort points depend on Y-axis
-            triangle2D.sort_by_y_axis(triangle_object);
+            Triangle2D.SortByY(triangle_object);
             
             Draw.#FillTriangleWithGradient( triangle_object );
 
@@ -1711,11 +1711,11 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static Ellipse2D( ellipse_object = new ellipse2D() ){
+    static Ellipse2D( ellipse_object = new Ellipse2D() ){
 
         // check canvas and circle
         let f1 = Draw.#CHECK_BUFFER();
-        let f2 = (ellipse_object instanceof ellipse2D);
+        let f2 = (ellipse_object instanceof Ellipse2D);
         
         if( f1 && f2 ){
         
@@ -1741,8 +1741,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                         ellipse_object.width , 
                         ellipse_object.height ,
                         ellipse_object.angle,
-                        ellipse_object.get_f1(),
-                        ellipse_object.get_f2(),
+                        ellipse_object.GetFoci1(),
+                        ellipse_object.GetFoci2(),
                         ellipse_object.fill_color
                     );
 
@@ -1761,8 +1761,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                         ellipse_object.y , 
                         ellipse_object.width , 
                         ellipse_object.height ,
-                        ellipse_object.get_f1(),
-                        ellipse_object.get_f2(),
+                        ellipse_object.GetFoci1(),
+                        ellipse_object.GetFoci2(),
                         ellipse_object.border , 
                         ellipse_object.border_color
                     );
@@ -1777,8 +1777,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                         ellipse_object.width , 
                         ellipse_object.height ,
                         ellipse_object.angle ,
-                        ellipse_object.get_f1(),
-                        ellipse_object.get_f2(),
+                        ellipse_object.GetFoci1(),
+                        ellipse_object.GetFoci2(),
                         ellipse_object.border , 
                         ellipse_object.border_color
                     );

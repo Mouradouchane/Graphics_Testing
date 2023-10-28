@@ -1,29 +1,36 @@
 
 
 /*
-    =========== STUFF FOR ROTATION IN 2D,3D ===========
+    =========== 2D/3D Rotations ===========
+
+    todo : move all of this to math moduel
+
 */
 
-export class rotate {
+export class Rotate {
 
     /*
         =========== HELPER FUNCTIONS ===========  
     */
 
-    static to_radian ( deg_angle = 0 ){
+    static ToRadian ( deg_angle = 0 ){
         return ( deg_angle * Math.PI ) / 180;
     }
 
     /* need work */
-    static to_degree( rad_angle = 0 ){ }
+    static ToDegree( rad_angle = 0 ){ }
 
     /* need work */
-    static random_x(){ }
+    static RandomAroundX(){ 
+
+    }
 
     /* need work */
-    static random_y(){ }
+    static RandomAroundY(){ 
 
-    static random_z(){
+    }
+
+    static RandomAroundZ(){
         return ( Math.PI * Math.random() );
     }
 
@@ -32,40 +39,40 @@ export class rotate {
     */
 
     // note : rotation round origin (0,0)
-    static x( y = 0 , z = 0 , radian_angle = 0 , round_it = false){
+    static X( y = 0 , z = 0 , radian_angle = 0 , round_output = false){
 
         let cos = Math.cos(radian_angle);
         let sin = Math.sin(radian_angle); 
 
         return [
-            (round_it) ? Math.round((y * cos) + (z * -sin)) : (y * cos) + (z * -sin) , // new Y position
-            (round_it) ? Math.round((y * sin) + (z *  cos)) : (y * sin) + (z *  cos)   // new Z position
+            (round_output) ? Math.round((y * cos) + (z * -sin)) : (y * cos) + (z * -sin) , // new Y position
+            (round_output) ? Math.round((y * sin) + (z *  cos)) : (y * sin) + (z *  cos)   // new Z position
         ];
 
     }
 
     // note : rotation round origin (0,0)
-    static y( x = 0 , z = 0 , radian_angle = 0 , round_it = false){
+    static Y( x = 0 , z = 0 , radian_angle = 0 , round_output = false){
 
         let cos = Math.cos(radian_angle);
         let sin = Math.sin(radian_angle); 
         
         return [
-            (round_it) ? Math.round((x *  cos) + (z * sin)) : (x *  cos) + (z * sin) , // new X position   
-            (round_it) ? Math.round((x * -sin) + (z * cos)) : (x * -sin) + (z * cos)   // new Z position
+            (round_output) ? Math.round((x *  cos) + (z * sin)) : (x *  cos) + (z * sin) , // new X position   
+            (round_output) ? Math.round((x * -sin) + (z * cos)) : (x * -sin) + (z * cos)   // new Z position
         ];
 
     }
     
     // note : rotation round origin (0,0)
-    static z( x = 0 , y = 0 , radian_angle = 0 , round_it = false){
+    static Z( x = 0 , y = 0 , radian_angle = 0 , round_output = false){
  
         let cos = Math.cos(radian_angle);
         let sin = Math.sin(radian_angle); 
         
         return [ 
-           (round_it) ? Math.round((x * cos) + -(y * sin)) : (x * cos) + -(y * sin) , // new X position
-           (round_it) ? Math.round((x * sin) +  (y * cos)) : (x * sin) +  (y * cos)   // new Y position
+           (round_output) ? Math.round((x * cos) + -(y * sin)) : (x * cos) + -(y * sin) , // new X position
+           (round_output) ? Math.round((x * sin) +  (y * cos)) : (x * sin) +  (y * cos)   // new Y position
         ];
  
     }
@@ -73,5 +80,7 @@ export class rotate {
     /*
         =========== 3D FUNCTIONS ===========  
     */
-   
+    
+    /* need work :) */
+
 }

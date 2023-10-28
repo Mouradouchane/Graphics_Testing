@@ -1,38 +1,41 @@
 import {Draw} from "../../draw/draw.js";
 import {RGBA} from "../../color.js";
-import {Point2D, Point3D} from "../../point.js";
-import {Line2D , Line3D } from "../../line.js";
-import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
-import {triangle2D, triangle2D_gradient} from "../../triangle.js";
+import {Point2D} from "../../point.js";
+import {Line2D} from "../../line.js";
+import {Rectangle2D} from "../../rectangle.js";
+import {Triangle2D, Triangle2DGradient} from "../../triangle.js";
 import {generate} from "../../generators.js";
-import {circle2D} from "../../circle.js";
-import {ellipse2D} from "../../ellipse.js";
-import {check} from "../../check.js";
-import {rotate} from "../../rotate.js";
-import {plane2D} from "../../plane.js";
+import {Circle2D} from "../../circle.js";
+import {Ellipse2D} from "../../ellipse.js";
+import {Check} from "../../check.js";
+import {Rotate} from "../../rotate.js";
 import {CURVE_2D_3_POINTS , CURVE_2D_4_POINTS} from "../../curve.js";
-import { frame_buffer } from "../../buffers.js";
+import { FrameBuffer } from "../../buffers.js";
 
-const canvas = document.querySelector("#canvas");
-const ctx = canvas.getContext("2d");
-const buffer = new frame_buffer( 800 , 600 );
+const Canvas = document.querySelector("#canvas");
+const CTX = Canvas.getContext("2d");
+const Buffer = new FrameBuffer( 800 , 600 );
 
 /*
-    rendering/drawing "options"
+    small configuration rendering/drawing/debug
 */
-var render_loop = 0;
-var grid = 0;
-var debug_points = 0;
-var interval_testing = 0;
-var interval_time = 3000;
-var anti_alias = 0;
-var shapes_type = 3;
-var shapes_amount = 3;
-var generate_random_shapes_each_time = 1;
-var thickness  = 4;
-var gradient = true;
-var max_width  = canvas.clientWidth  / 1.5;
-var max_height = canvas.clientHeight / 1.5;
+var Config = {
+
+    RenderingLoop : false ,
+    DrawGrid : false ,
+    DrawPointsForDebug : false ,
+    NewTestEachTime : false ,
+    IntervalTime : 3000 , // ms
+    AntiAlias : false ,
+    ShapesIndex  : 3 ,
+    ShapesAmount : 3 ,
+    GenerateRandomShapesEachTime : false ,
+    BorderThickness  : 4 ,
+    Gradient : true ,
+    MaxWidth  : Canvas.clientWidth  / 1.5 ,
+    MaxHeight : Canvas.clientHeight / 1.5 ,
+
+}
 
 /*
     generate random "shapes for testing"
@@ -107,7 +110,7 @@ var triangles = [
         new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
     ),
 */
-        new triangle2D_gradient( 
+        new Triangle2DGradient( 
             new point2D(350, 10) ,
             new point2D(10 ,500)  ,
             new point2D(700 , 500)  ,
@@ -115,7 +118,7 @@ var triangles = [
             new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
         ),
 
-    ];
+];
 
 var circles = [
     //...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height , 2 , null , null , true)
@@ -127,55 +130,47 @@ var circles = [
 var ellipses = [
     // ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
     // new ellipse2D(250,300, 50,150 , 0 , new RGBA(55,100,80,0.7) , new RGBA(155,80,208,0.5) , 16) , 
-    new ellipse2D(201,300, 150,50 , 0.1 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5) , 16) , 
+    new Ellipse2D(201,300, 150,50 , 0.1 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5) , 16) , 
 ];
 
-var planes = [
-    // ...generate.random.planes( shapes_amount , 0 , max_width , 0 , max_height , thickness)
-    new plane2D( 
-        new point2D(100,100) ,
-        new point2D(100,400) ,
-        new point2D(200,100) , 
-        new point2D(200,400) , 
-        new RGBA(255,0,180,0.5) 
-    )
-];
 
-Draw.set_canvas( canvas );
-Draw.set_buffer( buffer );
-check.set.buffer( buffer );
+Draw.set_canvas( Canvas );
+Draw.set_buffer( Buffer );
+Check.Set.Buffer( Buffer );
 
 /*
     render/frame functions
 */
-function clear_canvas(){
+function ClearCanvas(){
 
-    ctx.fillStyle = "rgba(0,0,0,1)";
-    ctx.fillRect( 0 , 0 , canvas.clientWidth , canvas.clientHeight );
+    CTX.fillStyle = "rgba(0,0,0,1)";
+    CTX.fillRect( 0 , 0 , Canvas.clientWidth , Canvas.clientHeight );
 
 }
 
-function clear_buffer(){
-    buffer.clear();
+function ClearBuffer(){
+
+    Buffer.Clear();
+
 }
 
-function new_frame(){
+function NewFrame(){
 
-    if( grid ) Draw.draw_grid();
+    if( Config.Draw ) Draw.DrawGrid();
     
-    ctx.fillStyle   = "white";
-    ctx.strokeStyle = "white";
+    CTX.fillStyle   = "white";
+    CTX.strokeStyle = "white";
 
-    switch( shapes_type ){
+    switch( Config.ShapesIndex ){
 
         // lines
         case 1 : {
                 
-            for(let line of lines){
+            for( let line of lines ){
 
                 Draw.line( line );
 
-                if( debug_points ) check.visual_check.line( line );
+                if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( line );
                 
             }
 
@@ -184,19 +179,20 @@ function new_frame(){
         // rectangles
         case 2 : {
 
-            for(let rect of rectangles){
+            for( let rectangle of rectangles ){
 
-                Draw.rectangle( rect ); 
+                Draw.Rectangle2D( rectangle ); 
   
-                if( debug_points ) check.visual_check.rectangle( rect );
+                if( Config.DrawPointsForDebug ) Check.VisualCheck.Rectangle2D( rectangle );
 
-                if( generate_random_shapes_each_time ){
+                if( Config.GenerateRandomShapesEachTime ){
                     
                     rectangles = generate.random.rectangles(
                         shapes_amount , 0 , max_width , 0, max_height
                     )
 
                 }
+
             }
 
         } break;
@@ -204,14 +200,18 @@ function new_frame(){
         // triangles 
         case 3 : {
 
-            for(let trig of triangles){
+            for( let triangle of triangles ){
 
-                if(!gradient) Draw.triangle(trig);
-                else Draw.triangle_gradient(trig);
+                if( !Config.Gradient ) {
+                    Draw.Triangle2D(triangle);
+                }
+                else {
+                    Draw.Triangle2DWithGradient(triangle);
+                }
 
-                if( debug_points ) check.visual_check.triangle(trig);
+                if( Config.DrawPointsForDebug ) Check.VisualCheck.Triangle2D(triangle);
 
-                if( generate_random_shapes_each_time ){
+                if( Config.GenerateRandomShapesEachTime ){
 
                     triangles = generate.random.triangles(
                         shapes_amount , 0 , max_width/2 , 0, max_height/2 , 0 , new RGBA(150,150,55,0.7) , 0 
@@ -226,11 +226,11 @@ function new_frame(){
         // cicrles
         case 4 : {
 
-            for(let circle of circles ){
+            for( let circle of circles ){
 
-                Draw.circle(circle);
+                Draw.Circle2D( circle );
 
-                if( debug_points ) check.visual_check.circle( circle );
+                if( Config.DrawPointsForDebug ) Check.VisualCheck.Circle2D( circle );
                 
 
             } 
@@ -240,77 +240,63 @@ function new_frame(){
         // ellipses
         case 5 : {
 
-            for(let ellipse of ellipses){
+            for( let ellipse of ellipses ){
             
-                Draw.ellipse( ellipse );
+                Draw.Ellipse2D( ellipse );
 
-                if( debug_points ) check.visual_check.ellipse( ellipse , true );
-
-            }
-
-        } break;
-
-        // planes
-        case 6 : {
-
-            for(let plane of planes){
-
-                Draw.plane( plane );
-
-                if(debug_points) check.visual_check.plane(plane);
-
-                if(generate_random_shapes_each_time){
-
-                    planes = generate.random.planes( 
-                        shapes_amount , 0 , max_width , 0, max_height
-                    );
-
-                }
+                if( Config.DrawPointsForDebug ) Check.VisualCheck.Ellipse2D( ellipse , true );
 
             }
 
         } break;
+
 
         
     } // end of "switch-case"
     
-    Draw.render_buffer();
+    Draw.RenderBuffer();
 
 }
 
-function render(){
 
-    clear_canvas();
-    clear_buffer();
-    new_frame();
+function Render(){
+    
+    /*
+        todo : implement buffer swap !!!!!!!!!!!!!!!!!!!
+    */
+    ClearCanvas();
+    ClearBuffer();
+    NewFrame();
 
-    requestAnimationFrame( render );
+    requestAnimationFrame( Render );
 
 }
 
-if( anti_alias )
-    ctx.imageSmoothingEnabled = true;
-else 
-    ctx.imageSmoothingEnabled = false;
+if( Config.AntiAlias ){    
+    CTX.imageSmoothingEnabled = true;
+}
+else {
+    CTX.imageSmoothingEnabled = false;
+}
 
 
-if( render_loop ) render();
+if( Config.RenderingLoop ) Render();
 else {
     
-    if( interval_testing ){
+    if( Config.NewTestEachTime ){
 
         setInterval( () => {
 
-            clear_canvas();
-            new_frame();
+            ClearCanvas();
+            NewFrame();
 
-        } , interval_time );
+        } , Config.IntervalTime );
 
     }
     else{
 
-        clear_canvas();
-        new_frame();
+        ClearCanvas();
+        NewFrame();
 
     }
 

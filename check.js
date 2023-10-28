@@ -1,22 +1,21 @@
 
 import {RGBA} from "../../color.js";
-import {draw} from "../draw/draw.js";
-import {Line2D as LINE_2D} from "./line.js";
-import {point2D as POINT_2D} from "./point.js";
-import {rectangle as RECTANGLE} from "./rectangle.js";
-import {triangle2D as TRIANGLE_2D} from "./triangle.js";
-import {circle2D as CIRCLE_2D, circle2D} from "./circle.js";
-import {ellipse2D as ELLIPSE_2D} from "./ellipse.js";
-import {rotate} from "./rotate.js";
-import {plane2D} from "./plane.js";
-import {frame_buffer} from "./buffers.js";
+import {Point2D} from "./point.js";
+import {Line2D} from "./line.js";
+import {Draw} from "../draw/draw.js";
+import {Rectangle2D} from "./rectangle.js";
+import {Triangle2D} from "./triangle.js";
+import {Circle2D} from "./circle.js";
+import {Ellipse2D} from "./ellipse.js";
+import {Rotate} from "./rotate.js";
+import {FrameBuffer} from "./buffers.js";
 
 /*
     ============================================================
             FOR VISUAL "TESTING / CHECKING" RESULT 
     ============================================================
 */
-export class check {
+export class Check {
 
     static #LOG = {
 
@@ -52,6 +51,7 @@ export class check {
             USE_THIS_TYPE_TO_THIS_FUNCTION : ( fn_name = "def" , typename = "object") => {
                 console.info(`when you use function '${fn_name}' pass a valid parameter from type '${typename}'`);
             },
+
         },
 
     }
@@ -78,195 +78,198 @@ export class check {
         =============================================================
     */
 
-    static set = {
+    static Set = {
 
-        canvas : ( canvas_object = undefined ) => {
+        Canvas : ( canvas_object = undefined ) => {
     
             if( canvas_object && canvas_object.tagName == "CANVAS" ){
 
-                check.#RESOURCES.canvas = canvas_object;
-                check.#RESOURCES.ctx = check.#RESOURCES.canvas.getContext("2d");
+                Check.#RESOURCES.canvas = canvas_object;
+                Check.#RESOURCES.ctx = Check.#RESOURCES.canvas.getContext("2d");
     
             }
             else{
-                check.#LOG.ERROR.CANVAS_INVALID();
-                check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.set.canvas" , "canvas dom");
+                Check.#LOG.ERROR.CANVAS_INVALID();
+                Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.set.canvas" , "canvas dom");
             } 
     
         },
         
-        buffer : ( buffer_object = undefined ) => {
+        Buffer : ( buffer_object = undefined ) => {
             
-            if( buffer_object instanceof frame_buffer ){
+            if( buffer_object instanceof FrameBuffer ){
 
-                check.#RESOURCES.buffer = buffer_object;
+                Check.#RESOURCES.buffer = buffer_object;
                 
             }
             else {
 
-                check.#LOG.ERROR.BUFFER_INVALID();
-                check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.set.buffer" , "frame_buffer");
+                Check.#LOG.ERROR.BUFFER_INVALID();
+                Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.set.buffer" , "frame_buffer");
 
             }
+
         }
 
     }
 
-    // NOTE  : currently support only frame_buffer
-    static visual_check = {  
+    /*
+        NOTE : currently support only frame_buffer !!!!!!!!
+    */
+    static VisualCheck = {  
 
-        point : function( point_object = new POINT_2D() , point_size = undefined , color = undefined ){
+        Point2D : function( point = new Point2D() , point_radius = undefined , color = undefined ){
             
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   =  point_object instanceof POINT_2D;
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   =  point instanceof Point2D;
 
             if( check_buffer || check_canvas ){
                 
                 if( check_type ){
                     
-                    color = (color) ? color : check.#RESOURCES.default_point_color;
-                    let psize = (point_size) ? point_size : check.#RESOURCES.default_point_size;
+                    color = (color) ? color : Check.#RESOURCES.default_point_color;
+                    let psize = (point_radius) ? point_radius : Check.#RESOURCES.default_point_size;
 
-                    draw.circle( new circle2D( point_object.x , point_object.y , psize , color ) );
+                    Draw.circle( new circle2D( point.x , point.y , psize , color ) );
 
                 }
                 else {
 
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.point" , "point2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.point" , "point2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.point" , "point2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.point" , "point2D");
                 
                 }
                 
             }
 
             if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
             }
             
         },
         
-        line : function( line_object = new LINE_2D() , point_size = undefined , color = undefined ){
+        Line2D  : function( line  = new Line2D()  , point_radius = undefined , color = undefined ){
  
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   =  line_object instanceof LINE_2D ;
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   =  line instanceof Line2D ;
 
             if( check_buffer || check_canvas ){
 
                 if( check_type ){
                 
-                    check.visual_check.point( line_object.a , point_size , color);
-                    check.visual_check.point( line_object.b , point_size , color);
+                    Check.VisualCheck.Point2D( line.a , point_radius , color);
+                    Check.VisualCheck.Point2D( line.b , point_radius , color);
             
                 }   
                 else {
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.line" , "line2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.line" , "line2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.line" , "line2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.line" , "line2D");
                 }
 
             }
 
             if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
             }
 
         },
         
-        rectangle : function( rectangle_object = new RECTANGLE() , point_size = undefined , color = undefined){
+        Rectangle2D : function( rectangle = new Rectangle2D() , point_radius = undefined , color = undefined){
             
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   =  rectangle_object instanceof RECTANGLE ;
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   =  rectangle instanceof RECTANGLE ;
 
             if( check_buffer || check_canvas ){
 
                 if( check_type ){
 
-                    let x = rectangle_object.position.x;
-                    let y = rectangle_object.position.y;
-                    let w = rectangle_object.width;
-                    let h = rectangle_object.height;
+                    let x = rectangle.position.x;
+                    let y = rectangle.position.y;
+                    let w = rectangle.width;
+                    let h = rectangle.height;
                     
-                    check.visual_check.point( new POINT_2D( x , y )     , point_size , color );
-                    check.visual_check.point( new POINT_2D( x+w , y )   , point_size , color );
-                    check.visual_check.point( new POINT_2D( x  , y+h )  , point_size , color );
-                    check.visual_check.point( new POINT_2D( x+w , y+h ) , point_size , color );
+                    Check.VisualCheck.Point2D( new Point2D( x , y )     , point_radius , color );
+                    Check.VisualCheck.Point2D( new Point2D( x+w , y )   , point_radius , color );
+                    Check.VisualCheck.Point2D( new Point2D( x  , y+h )  , point_radius , color );
+                    Check.VisualCheck.Point2D( new Point2D( x+w , y+h ) , point_radius , color );
 
                 }   
                 else {
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.rectangle" , "rectangle2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.rectangle" , "rectangle2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.rectangle" , "rectangle2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.rectangle" , "rectangle2D");
                 }
 
             }
 
             if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
             }
     
         },
         
-        triangle : function( triangle_object = new TRIANGLE_2D() ){
+        Triangle2D : function( triangle = new Triangle2D() , point_radius = undefined , color = undefined ){
 
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   = triangle_object instanceof TRIANGLE_2D ;
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   = triangle instanceof TRIANGLE_2D ;
 
             if( check_buffer || check_canvas ){
 
                 if( check_type ){
 
-                    check.visual_check.point( triangle_object.a );
-                    check.visual_check.point( triangle_object.b );
-                    check.visual_check.point( triangle_object.c );
+                    Check.VisualCheck.Point2D( triangle.a , point_radius , color );
+                    Check.VisualCheck.Point2D( triangle.b , point_radius , color );
+                    Check.VisualCheck.Point2D( triangle.c , point_radius , color );
                     
                 }
                 else {
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.triangle" , "triangle2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.triangle" , "triangle2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.triangle" , "triangle2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.triangle" , "triangle2D");
                 }
                 
             }
             
             if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
             }
 
         },
         
-        circle : function( circle_object = new CIRCLE_2D() ){
+        Circle2D  : function( circle = new Circle2D() , point_radius = undefined , color = undefined ){
 
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   =  circle_object instanceof CIRCLE_2D ;
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   =  circle instanceof Circle2D ;
 
-            if(  check_buffer || check_canvas  ){
+            if( check_buffer || check_canvas ){
 
                 if( check_type ){
 
-                    check.visual_check.point( new POINT_2D(circle_object.x , circle_object.y) );
-                    check.visual_check.point( new POINT_2D(circle_object.x , circle_object.y + circle_object.r) );
+                    Check.VisualCheck.Point2D( new Point2D(circle.x , circle.y) , point_radius , color );
+                    Check.VisualCheck.Point2D( new Point2D(circle.x , circle.y + circle.r) , point_radius , color );
 
                 }
                 else {
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.circle" , "circle2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.circle" , "circle2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.circle" , "circle2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.circle" , "circle2D");
                 }
 
             }
 
             if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
             }
 
         },
 
-        ellipse : function( ellipse_object = new ELLIPSE_2D() , show_foci = false ){
+        Ellipse2D : function( ellipse = new Ellipse2D() , show_foci = false , point_radius = undefined , color = undefined){
             
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   = ellipse_object instanceof ELLIPSE_2D;
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   = ellipse instanceof Ellipse2D;
 
             if(  check_buffer || check_canvas  ){
 
@@ -274,80 +277,51 @@ export class check {
 
                     let reflected_values = [
                         { X : 0, Y : 0 , color : "white"} ,
-                        { X :  ellipse_object.width , Y : 0 , color : "lightgreen"},
-                        { X : -ellipse_object.width , Y : 0 , color : "lightgreen"},
-                        { X : 0 , Y :  ellipse_object.height , color : "red"},
-                        { X : 0 , Y : -ellipse_object.height , color : "red"},
+                        { X :  ellipse.width , Y : 0 , color : "lightgreen"},
+                        { X : -ellipse.width , Y : 0 , color : "lightgreen"},
+                        { X : 0 , Y :  ellipse.height , color : "red"},
+                        { X : 0 , Y : -ellipse.height , color : "red"},
                     ];
 
                     for( let reflected of reflected_values ){
                     
-                        let rt = rotate.z( reflected.X , reflected.Y , ellipse_object.angle );
+                        let rt = Rotate.Z( reflected.X , reflected.Y , ellipse.angle );
 
-                        check.visual_check.point( 
-                            new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , reflected.color 
+                        Check.VisualCheck.Point2D( 
+                            new Point2D( rt[0] + ellipse.x , rt[1] + ellipse.y ) , point_radius , color
                         );
 
                     }
 
                     if( show_foci ){
 
-                        let foci = ellipse_object.get_f1();
+                        let foci = ellipse.GetFoci1();
 
-                        let rt = rotate.z( foci.x , foci.y , ellipse_object.angle );
+                        let rt = Rotate.Z( foci.x , foci.y , ellipse.angle );
 
-                        check.visual_check.point( 
-                            new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , "cyan" 
+                        Check.VisualCheck.Point2D( 
+                            new Point2D( rt[0] + ellipse.x , rt[1] + ellipse.y ) , undefined , "cyan" 
                         );
 
-                        foci = ellipse_object.get_f2();
-                        rt = rotate.z( foci.x , foci.y , ellipse_object.angle );
+                        foci = ellipse.GetFoci2();
+                        rt = Rotate.Z( foci.x , foci.y , ellipse.angle );
 
-                        check.visual_check.point( 
-                            new POINT_2D( rt[0] + ellipse_object.x , rt[1] + ellipse_object.y ) , undefined , "cyan" 
+                        Check.VisualCheck.Point2D( 
+                            new Point2D( rt[0] + ellipse.x , rt[1] + ellipse.y ) , undefined , "cyan" 
                         );
 
                     }
 
                 }
                 else {
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.ellipse" , "ellipse2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.ellipse" , "ellipse2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.ellipse" , "ellipse2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.ellipse" , "ellipse2D");
                 }
 
             }
 
             if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
-            }
-
-        },
-
-        plane : function( plane_object = new plane2D() ){
-
-            let check_buffer = check.#RESOURCES.buffer instanceof frame_buffer;
-            let check_canvas = check.#RESOURCES.canvas;
-            let check_type   =  plane_object instanceof plane2D;
-            
-            if(  check_buffer || check_canvas   ){
-
-                if( check_type ){
-                    
-                    check.visual_check.point( plane_object.a );
-                    check.visual_check.point( plane_object.b );
-                    check.visual_check.point( plane_object.c );
-                    check.visual_check.point( plane_object.d );
-
-                }
-                else {
-                    check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.plane" , "plane2D");
-                    check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.plane" , "plane2D");
-                }
-
-            }
-
-            if( !check_buffer && !check_canvas ){
-                check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
             }
 
         },
