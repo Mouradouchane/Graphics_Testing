@@ -24,9 +24,9 @@ export class circle2D {
                 Number.parseInt(circle2D_object.x) , 
                 Number.parseInt(circle2D_object.y) ,
                 Number.parseInt(circle2D_object.r) ,
-                (circle2D_object.fill_color instanceof RGBA) ? RGBA.copy(circle2D_object.fill_color) : undefined ,
+                (circle2D_object.fill_color instanceof RGBA) ? RGBA.Copy(circle2D_object.fill_color) : undefined ,
                 Number.parseInt(circle2D_object.border) ,
-                (circle2D_object.border_color instanceof RGBA) ? RGBA.copy(circle2D_object.border_color) : undefined
+                (circle2D_object.border_color instanceof RGBA) ? RGBA.Copy(circle2D_object.border_color) : undefined
             );
 
         }
@@ -43,9 +43,9 @@ export class circle2D {
             Math.random() * max_width ,
             Math.random() * max_height ,
             Math.random() * max_width/8 ,
-            (generate_fill_color) ? RGBA.random_color() : undefined ,
+            (generate_fill_color) ? RGBA.RandomColor() : undefined ,
             thickness ,
-            (generate_border_color) ? RGBA.random_color() : undefined
+            (generate_border_color) ? RGBA.RandomColor() : undefined
         );
 
     }

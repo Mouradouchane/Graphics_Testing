@@ -1,8 +1,8 @@
 
-import {point2D} from "../point.js"
-import {line , line_with_colors} from "../line.js"
-import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../rectangle.js";
 import {RGBA} from "../color.js";
+import {Point2D} from "../point.js";
+import {Line2D}  from "../line.js";
+import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../rectangle.js";
 import {triangle2D} from "../triangle.js";
 import {circle2D} from "../circle.js";
 import {ellipse2D} from "../ellipse.js";
@@ -11,7 +11,7 @@ import {shear} from "../shear.js";
 import {plane2D} from "../plane.js";
 import {frame_buffer} from "../buffers.js";
 
-export class draw {     // CLASS LIKE NAMESPACE :)
+export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     /*
         ==============================================================
@@ -72,66 +72,64 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // for needed stuff for "drawing,options,..." 
     static #RESOURCES = {
 
-        buffer : undefined, // frame_vuffer
+        Buffer : undefined, // frame_buffer
 
         // draw_to_canvas_direct : false,
-        canvas : undefined,
-        ctx : undefined,
+        Canvas : undefined,
+        Ctx : undefined,
 
-        anti_alising : false,
+        AntiAlising : false,
 
-        copy_object_for_drawing : false,
-        draw_direct_to_canvas : true ,
+        CopyObjectForDrawing : false,
+        DrawDirectToCanvas : true ,
 
-        grid_size : 1,
-        grid_distance : 10,
-        grid_color : new RGBA( 255,255,255, 0.1 ),
+        GridSize : 1,
+        GridDistance : 10,
+        GridColor : new RGBA( 255,255,255, 0.1 ),
 
     }
 
     static #CHECK_CANVAS(){
-        return ( draw.#RESOURCES.canvas != undefined && draw.#RESOURCES.ctx != undefined );
+        return ( Draw.#RESOURCES.Canvas != undefined && Draw.#RESOURCES.Ctx != undefined );
     }
 
     static #CHECK_BUFFER(){
-        return ( draw.#RESOURCES.buffer instanceof frame_buffer ) ? true : false;
+        return ( Draw.#RESOURCES.Buffer instanceof frame_buffer ) ? true : false;
     }
 
-    static #set_pixle( x , y , pixle_color = null ) {
+    static #SetPixle( x , y , pixle_color = null ) {
 
         x = Number.parseInt(x);
         y = Number.parseInt(y);
         
-        if( !(draw.#RESOURCES.draw_direct_to_canvas) ){
+        if( !(Draw.#RESOURCES.DrawDirectToCanvas) ){
 
             // if blend color's needed , no z-axis 
             if(pixle_color.alpha < 1) {
-                pixle_color = RGBA.blend( pixle_color , draw.#RESOURCES.buffer.get_pixle(x , y) );
+                pixle_color = RGBA.Blend( pixle_color , Draw.#RESOURCES.Buffer.get_pixle(x , y) );
             }
             
-            draw.#RESOURCES.buffer.set_pixle( x , y , pixle_color );
+            Draw.#RESOURCES.Buffer.set_pixle( x , y , pixle_color );
             
         } 
         else {
 
-            draw.#RESOURCES.ctx.fillStyle = RGBA.to_string( pixle_color );
-            draw.#RESOURCES.ctx.fillRect( x , y , 1 , 1 );
+            Draw.#RESOURCES.Ctx.fillStyle = RGBA.ToString( pixle_color );
+            Draw.#RESOURCES.Ctx.fillRect( x , y , 1 , 1 );
 
         }
         
     }
 
     // we need this for our color blending 
-    static #set_sample( x , y , sample_color ){
+    static #SetSample( x , y , sample_color ){
     }
-    static #canvas_get_pixle( x , y ) {
+    static #GetSample( x , y ) {
     }
-    static #buffer_get_pixle( x , y ) {
-    }
-    static #buffer_get_sample( x , y ) {
+    static #GetPixle( x , y ) {
     }
 
-    static #CALC_DISTANCE( x1 = 1 , x2 = 1 , y1 = 1 , y2 = 1 ){
+    static #CalcDistance( x1 = 1 , x2 = 1 , y1 = 1 , y2 = 1 ){
 
         return ( Math.sqrt( ((x2 - x1)**2) + ((y2 - y1)**2 ) ) );
 
@@ -142,8 +140,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // =========================================================================
 
     // standard line draw 
-    static #CUSTOM_LINE_WITH_GRADIENT(
-        point_a = new point2D() , point_b = new point2D() , width = 1 ,
+    static #LineWithGradient(
+        point_a = new Point2D() , point_b = new Point2D() , width = 1 ,
         color_a = new RGBA()  , color_b = new RGBA()
     ){
 
@@ -191,7 +189,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if(x_or_y){
 
                 do{
-                    this.#set_pixle( position , start , color );
+                    this.#SetPixle( position , start , color );
                     start += 1;
                 }
                 while(start < end);
@@ -200,7 +198,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle( start , position , color );
+                    this.#SetPixle( start , position , color );
                     start += 1;
                 }
                 while(start < end);
@@ -218,8 +216,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     } 
 
     // standard line draw 
-    static #CUSTOM_LINE_NO_GRADIENT( 
-        point_a = new point2D() , point_b = new point2D() , 
+    static #LineNoGradient( 
+        point_a = new Point2D() , point_b = new Point2D() , 
         width = 1 , color = new RGBA()
     ) {
 
@@ -260,7 +258,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if(x_or_y){
 
                 do{
-                    this.#set_pixle( position , start , color );
+                    this.#SetPixle( position , start , color );
                     start += 1;
                 }
                 while(start < end);
@@ -269,7 +267,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle( start , position , color );
+                    this.#SetPixle( start , position , color );
                     start += 1;
                 }
                 while(start < end);
@@ -281,21 +279,21 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static #DDA_LINE_DRAW_ALGORITHM(
-        line_object = new line()
+    static #DDA_LineDrawAlgorithm(
+        line_object = new Line2D()
     ){
 
         // sort points 
         if( 
-            line_object.p1.x > line_object.p2.x || line_object.p1.y > line_object.p2.y
+            line_object.a.x > line_object.b.x || line_object.a.y > line_object.b.y
         ){
-            [line_object.p1.x , line_object.p2.x] = [line_object.p2.x , line_object.p1.x];
-            [line_object.p1.y , line_object.p2.y] = [line_object.p2.y , line_object.p1.y];
+            [line_object.a.x , line_object.b.x] = [line_object.b.x , line_object.a.x];
+            [line_object.a.y , line_object.b.y] = [line_object.b.y , line_object.a.y];
         }
         
         // calc delta of X & Y
-        let delta_x = line_object.p2.x - line_object.p1.x;
-        let delta_y = line_object.p2.y - line_object.p1.y;
+        let delta_x = line_object.b.x - line_object.a.x;
+        let delta_y = line_object.b.y - line_object.a.y;
 
         // steps will be the bigger delta 
         let x_or_y  = ( Math.abs(delta_x) > Math.abs(delta_y) );
@@ -308,8 +306,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         // from "point 1" and start drawing to "point 2"
         //debugger;
 
-        let x =  line_object.p1.x;
-        let y =  line_object.p1.y;
+        let x =  line_object.a.x;
+        let y =  line_object.a.y;
 
         let isodd = (line_object.width % 2) == 0;
         let half_width = Math.floor(line_object.width / 2);
@@ -322,7 +320,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if(x_or_y){
 
                 do{
-                    this.#set_pixle(Math.round(x) , Math.round(sT) , line_object.color);
+                    this.#SetPixle(Math.round(x) , Math.round(sT) , line_object.color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -331,7 +329,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             else {
 
                 do{
-                    this.#set_pixle(Math.round(sT) , Math.round(y) , line_object.color);
+                    this.#SetPixle(Math.round(sT) , Math.round(y) , line_object.color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -347,26 +345,26 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     
     // fast and direct function for filling shapes line by line horizontaly  
-    static #DRAW_HORIZONTAL_LINE( x1 = 1 , x2 = 1 , y = 1 , color = undefined ){
+    static #DrawHorizontalLine( x1 = 1 , x2 = 1 , y = 1 , color = undefined ){
         
         if( x1 > x2 ) [x1 , x2] = [x2 , x1];
 
         for( let x = x1 ; x <= x2 ; x += 1 ){
 
-            draw.#set_pixle( x , y , color );
+            Draw.#SetPixle( x , y , color );
 
         }
 
     }
     
     // fast and direct function for filling shapes line by line verticaly  
-    static #DRAW_VERTICAL_LINE( x = 1 , y1 = 1 , y2 = 1 , color = undefined ){
+    static #DrawVerticalLine( x = 1 , y1 = 1 , y2 = 1 , color = undefined ){
 
         if( y1 > y2 ) [y1 , y2] = [y2 , y1];
 
         for( let y = y1 ; y <= y2 ; y += 1 ){
 
-            draw.#set_pixle( x , y , color );
+            Draw.#SetPixle( x , y , color );
 
         }
 
@@ -377,7 +375,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     //                      RECTANGLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
-    static #FILL_RECT(
+    static #FillRectangle(
         X = 1 , Y = 1 , W = 1 , H = 1 , color = new RGBA()
     ){
         X = Number.parseInt( X );
@@ -392,7 +390,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             
             for(let y = Y ; y <= h ; y += 1){
                 
-                draw.#set_pixle( x , y , color );
+                Draw.#SetPixle( x , y , color );
                 
             }
             
@@ -400,7 +398,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static #DRAW_RECT_BORDER(
+    static #DawRectangleBorder(
         X = 1 , Y = 1 , W = 1 , H = 1 , B = 1 , color = new RGBA()
     ){
 
@@ -422,7 +420,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             for(let x = range.x ; x <= range.w ; x += 1){
                 
                 for(let y = range.y ; y <= range.h; y += 1) {
-                    draw.#set_pixle( x , y , color );
+                    Draw.#SetPixle( x , y , color );
                 }
                 
             }
@@ -438,7 +436,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // =========================================================================
 
     // NOTE !!! triangle points need to be sorted by "Y-axis"
-    static #FILL_TRIANGLE( triangle = new triangle2D() ){
+    static #FillTriangle( triangle = new triangle2D() ){
         
         // calc needed values for the process 
 
@@ -472,13 +470,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 x_end   = (slope_AB == 0) ? y : Math.round((y - intercept_AB) / slope_AB);
                 
                 // fill range
-                draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.fill_color );
+                Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
     
             }
 
         }
         else {
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.fill_color );
+            Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
             y += 1;
         }
         
@@ -496,7 +494,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             x_start = (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
             x_end   = (slope_BC == 0) ? y : Math.round((y - intercept_BC) / slope_BC);
 
-            draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.fill_color );
+            Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
 
         }
 
@@ -513,7 +511,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         note : return gonna be "1 or 2" , 1 mean P1 is valid otherwise P2
     */ 
 
-    static #GET_OUTSIDE_POINT( A , B , CENTROID , P1 , P2 ){
+    static #GetOutSidePoint( A , B , CENTROID , P1 , P2 ){
     
         // formula : Math.sign( (Bx - Ax) * (Y - Ay) - (By - Ay) * (X - Ax) );
         // calc in which side of the line those points + centroid lies !
@@ -531,21 +529,21 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     // calc the Y or B intercept point using slope intercept form
     // y = (m*x) + b   ===========>   b = y - ( m * x )
-    static #CALC_Y_INTERCEPT( target_point = new point2D() , slope = 0){
+    static #CalcYIntercept( target_point = new Point2D() , slope = 0){
         
         return target_point.y - ( target_point.x * slope );
 
     }
 
     // compute the intersection points 
-    static #CALC_INTERSCETION_POINT_2D( point_1 , point_2 , a , b ){
+    static #CalcInterSectionPoint2D( point_1 , point_2 , a , b ){
         // debugger
         // x : ( (d - c) / ((a - b) | 1) )
         // y :( a * ( (d - c) / ((a - b) | 1) ) ) + c
 
         // calc intercept point of point 1 & 2
-        let c = draw.#CALC_Y_INTERCEPT( point_1 , a );
-        let d = draw.#CALC_Y_INTERCEPT( point_2 , b );
+        let c = Draw.#CalcYIntercept( point_1 , a );
+        let d = Draw.#CalcYIntercept( point_2 , b );
 
         let x1 = point_1.x , x2 = point_2.x;
         let y1 = point_1.y , y2 = point_2.y;
@@ -554,7 +552,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         let Y = (X * a) + c; 
 
         // the intersection point
-        return new point2D(
+        return new Point2D(
             X , Y
         );
 
@@ -563,7 +561,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     /*
         function to calculate the area of triangle using herons formula 
     */
-    static #AREA_OF_2D_TRIANGLE( a = point2D() , b = point2D() , c = point2D() ){
+    static #CalcAreaOf2DTriangle( a = Point2D() , b = Point2D() , c = Point2D() ){
 
 		// calc lengths between the points using : √((x2 – x1)² + (y2 – y1)²)
 	    let A = Math.sqrt( Math.abs(((b.x - a.x)**2) + ((b.y - a.y)**2)) );
@@ -579,17 +577,17 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     /*
         draw a line from a point and slope , this function usualy used for debug
     */
-    static #DRAW_LINE_FROM_POINT( point , M , distance  , color ){
+    static #DrawLineFromPoint( point , M , distance  , color ){
             
-        point = point2D.copy(point);
+        point = Point2D.Copy(point);
 
         let b = point.y - ( point.x * M );
-        let end_point = new point2D( point.x + distance , ((point.x+distance) * M) + b );
+        let end_point = new Point2D( point.x + distance , ((point.x+distance) * M) + b );
 
-        draw.#CUSTOM_LINE_NO_GRADIENT( point , end_point , 1 , color );
+        Draw.#LineNoGradient( point , end_point , 1 , color );
     }
 
-    static #GENERATE_OUTSIDE_TRIANLGE( triangle = new triangle2D() , round_values = false ){
+    static #GenerateOutsideTriangle( triangle = new triangle2D() , round_values = false ){
 
         let outside_triangle = new triangle2D();
 
@@ -612,29 +610,29 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             // n2 for => ( dy , -dx)
 
             ab : {
-                n1: new point2D( -(triangle.b.y - triangle.a.y) ,  (triangle.b.x - triangle.a.x) ) ,
-                n2: new point2D(  (triangle.b.y - triangle.a.y) , -(triangle.b.x - triangle.a.x) ) ,
+                n1: new Point2D( -(triangle.b.y - triangle.a.y) ,  (triangle.b.x - triangle.a.x) ) ,
+                n2: new Point2D(  (triangle.b.y - triangle.a.y) , -(triangle.b.x - triangle.a.x) ) ,
             } ,
 
             ac : {
-                n1: new point2D( -(triangle.c.y - triangle.a.y) ,  (triangle.c.x - triangle.a.x) ) ,
-                n2: new point2D(  (triangle.c.y - triangle.a.y) , -(triangle.c.x - triangle.a.x) ) ,
+                n1: new Point2D( -(triangle.c.y - triangle.a.y) ,  (triangle.c.x - triangle.a.x) ) ,
+                n2: new Point2D(  (triangle.c.y - triangle.a.y) , -(triangle.c.x - triangle.a.x) ) ,
             } , 
 
             bc : {
-                n1: new point2D( -(triangle.c.y - triangle.b.y) ,  (triangle.c.x - triangle.b.x) ) ,
-                n2: new point2D(  (triangle.c.y - triangle.b.y) , -(triangle.c.x - triangle.b.x) ) ,
+                n1: new Point2D( -(triangle.c.y - triangle.b.y) ,  (triangle.c.x - triangle.b.x) ) ,
+                n2: new Point2D(  (triangle.c.y - triangle.b.y) , -(triangle.c.x - triangle.b.x) ) ,
             }
 
         }
         
         // 2 - calc length of normals 
         let normals_lengths = {
-            ab : ( draw.#CALC_DISTANCE(triangle.b.x , triangle.a.x , triangle.b.y , triangle.a.y) | 1),
+            ab : ( Draw.#CalcDistance(triangle.b.x , triangle.a.x , triangle.b.y , triangle.a.y) | 1),
 
-            ac : ( draw.#CALC_DISTANCE(triangle.c.x , triangle.a.x , triangle.c.y , triangle.a.y) | 1),
+            ac : ( Draw.#CalcDistance(triangle.c.x , triangle.a.x , triangle.c.y , triangle.a.y) | 1),
 
-            bc : ( draw.#CALC_DISTANCE(triangle.c.x , triangle.b.x , triangle.c.y , triangle.b.y) | 1),
+            bc : ( Draw.#CalcDistance(triangle.c.x , triangle.b.x , triangle.c.y , triangle.b.y) | 1),
         }
         
         // 3 - normalaize those "length" 
@@ -660,34 +658,34 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         let scaled_points = {
 
-            ab : new point2D( 
+            ab : new Point2D( 
                 triangle.a.x + normals.ab.n1.x , 
                 triangle.a.y + normals.ab.n1.y 
             ),
     
-            ac : new point2D( 
+            ac : new Point2D( 
                 triangle.c.x + normals.ac.n1.x , 
                 triangle.c.y + normals.ac.n1.y 
             ),
 
-            bc : new point2D(
+            bc : new Point2D(
                 triangle.b.x + normals.bc.n1.x , 
                 triangle.b.y + normals.bc.n1.y 
             ),
 
             // ===================================================== 
 
-            nab : new point2D( 
+            nab : new Point2D( 
                 triangle.a.x + normals.ab.n2.x , 
                 triangle.a.y + normals.ab.n2.y 
             ),
 
-            nac : new point2D( 
+            nac : new Point2D( 
                 triangle.c.x + normals.ac.n2.x , 
                 triangle.c.y + normals.ac.n2.y 
             ),
 
-            nbc : new point2D(
+            nbc : new Point2D(
                 triangle.b.x + normals.bc.n2.x , 
                 triangle.b.y + normals.bc.n2.y 
             ),
@@ -697,9 +695,9 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         /*
             the filter process for getting outside points 
         */
-        let ab_check = draw.#GET_OUTSIDE_POINT(triangle.a , triangle.b , C , scaled_points.ab , scaled_points.nab);
-        let ac_check = draw.#GET_OUTSIDE_POINT(triangle.a , triangle.c , C , scaled_points.ac , scaled_points.nac);
-        let bc_check = draw.#GET_OUTSIDE_POINT(triangle.b , triangle.c , C , scaled_points.bc , scaled_points.nbc);
+        let ab_check = Draw.#GetOutSidePoint(triangle.a , triangle.b , C , scaled_points.ab , scaled_points.nab);
+        let ac_check = Draw.#GetOutSidePoint(triangle.a , triangle.c , C , scaled_points.ac , scaled_points.nac);
+        let bc_check = Draw.#GetOutSidePoint(triangle.b , triangle.c , C , scaled_points.bc , scaled_points.nbc);
         
         // object to hold the right points that lies outside the triangles
         // we will use those points to compute the missing intersection points
@@ -714,15 +712,15 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         new_points.C.slope = slopes.ac;
         
         
-        outside_triangle.a = (new_points.A.y < new_points.B.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
-        outside_triangle.b = (new_points.A.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
-        outside_triangle.c = (new_points.B.y < new_points.C.y) ? draw.#CALC_INTERSCETION_POINT_2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : draw.#CALC_INTERSCETION_POINT_2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
+        outside_triangle.a = (new_points.A.y < new_points.B.y) ? Draw.#CalcInterSectionPoint2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : Draw.#CalcInterSectionPoint2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
+        outside_triangle.b = (new_points.A.y < new_points.C.y) ? Draw.#CalcInterSectionPoint2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : Draw.#CalcInterSectionPoint2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
+        outside_triangle.c = (new_points.B.y < new_points.C.y) ? Draw.#CalcInterSectionPoint2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : Draw.#CalcInterSectionPoint2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
         
         if(round_values){
 
-            point2D.round( outside_triangle.a );
-            point2D.round( outside_triangle.b );
-            point2D.round( outside_triangle.c );
+            Point2D.Round( outside_triangle.a );
+            Point2D.Round( outside_triangle.b );
+            Point2D.Round( outside_triangle.c );
             
         }
 
@@ -734,16 +732,16 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     /* 
         draw a thick border around 2D triangle
     */
-    static #DRAW_TRIANGLE_BORDER( triangle = new triangle2D() ) {
+    static #DrawTriangleBorder( triangle = new triangle2D() ) {
 
-        point2D.round( triangle.a );
-        point2D.round( triangle.b );
-        point2D.round( triangle.c );
+        Point2D.Round( triangle.a );
+        Point2D.Round( triangle.b );
+        Point2D.Round( triangle.c );
 
         triangle.thickness = Math.abs( triangle.thickness ) + 1;
 
         // calculate the outside triangle that represent triangle border
-        let border_triangle = draw.#GENERATE_OUTSIDE_TRIANLGE( triangle , true );
+        let border_triangle = Draw.#GenerateOutsideTriangle( triangle , true );
 
         let slopes = {
             // dy / dx
@@ -797,12 +795,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac ) ;
                     }
 
-                    draw.#DRAW_HORIZONTAL_LINE( x_start , in_x_start , y , triangle.border_color );
-                    draw.#DRAW_HORIZONTAL_LINE( in_x_end , x_end , y , triangle.border_color );
+                    Draw.#DrawHorizontalLine( x_start , in_x_start , y , triangle.border_color );
+                    Draw.#DrawHorizontalLine( in_x_end , x_end , y , triangle.border_color );
 
                 }
                 else {
-                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.border_color );
+                    Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.border_color );
                 }
                 
             }
@@ -828,12 +826,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                         in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
                     }
 
-                    draw.#DRAW_HORIZONTAL_LINE( x_start , in_x_start , y , triangle.border_color );
-                    draw.#DRAW_HORIZONTAL_LINE( in_x_end , x_end , y , triangle.border_color );
+                    Draw.#DrawHorizontalLine( x_start , in_x_start , y , triangle.border_color );
+                    Draw.#DrawHorizontalLine( in_x_end , x_end , y , triangle.border_color );
 
                 }
                 else{
-                    draw.#DRAW_HORIZONTAL_LINE( x_start , x_end , y , triangle.border_color );
+                    Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.border_color );
                 }
                 
             }
@@ -848,13 +846,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     /*
         function to fill triangle with a gradient of 3 colors using barycentric-coordinate 
     */
-    static #FILL_TRIANGLE_WITH_GRADIENT( 
+    static #FillTriangleWithGradient( 
         triangle = new triangle2D() 
     ){
         
-        point2D.round( triangle.a );
-        point2D.round( triangle.b );
-        point2D.round( triangle.c );
+        Point2D.Round( triangle.a );
+        Point2D.Round( triangle.b );
+        Point2D.Round( triangle.c );
 
         let slopes = {
             // dy / dx
@@ -876,14 +874,14 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
 
         // we need area of triangle to compute alpha and beta 
-        let triangle_area = draw.#AREA_OF_2D_TRIANGLE( triangle.a , triangle.b , triangle.c );
+        let triangle_area = Draw.#CalcAreaOf2DTriangle( triangle.a , triangle.b , triangle.c );
         let alpha = 0 , beta = 0 , gamma = 0;
 
         let x_start = Math.round(triangle.a.x);
         let x_end   = Math.round(triangle.a.x);
         let y       = Math.round(triangle.a.y);
 
-        let p = new point2D(x_start , y);
+        let p = new Point2D(x_start , y);
 
         let c_a = triangle.color_a;
         let c_b = triangle.color_b;
@@ -910,17 +908,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     p.x = x; 
                     p.y = y;
 
-                    alpha = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.b , p , triangle.c ) / triangle_area);
-                    beta  = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.a , p , triangle.c ) / triangle_area);
+                    alpha = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.b , p , triangle.c ) / triangle_area);
+                    beta  = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.a , p , triangle.c ) / triangle_area);
                     gamma = Math.abs(1 - alpha - beta);
 
-                    c_a = RGBA.change_by_factor( triangle.color_a , alpha );
-                    c_b = RGBA.change_by_factor( triangle.color_b , beta  );
-                    c_c = RGBA.change_by_factor( triangle.color_c , gamma );
+                    c_a = RGBA.ChangeByFactor( triangle.color_a , alpha );
+                    c_b = RGBA.ChangeByFactor( triangle.color_b , beta  );
+                    c_c = RGBA.ChangeByFactor( triangle.color_c , gamma );
 
-                    color = RGBA.blend( RGBA.blend( c_a , c_b ) , c_c);
+                    // blend colors 
+                    color = RGBA.Blend( RGBA.Blend( c_a , c_b ) , c_c );
 
-                    draw.#set_pixle( x , y , color );
+                    Draw.#SetPixle( x , y , color );
                 }
 
             }
@@ -944,17 +943,18 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     p.x = x; 
                     p.y = y;
 
-                    alpha = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.b , p , triangle.c ) / triangle_area);
-                    beta  = Math.abs(draw.#AREA_OF_2D_TRIANGLE( triangle.a , p , triangle.c ) / triangle_area);
+                    alpha = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.b , p , triangle.c ) / triangle_area);
+                    beta  = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.a , p , triangle.c ) / triangle_area);
                     gamma = Math.abs(1 - alpha - beta);
 
-                    c_a = RGBA.change_by_factor( triangle.color_a , alpha );
-                    c_b = RGBA.change_by_factor( triangle.color_b , beta  );
-                    c_c = RGBA.change_by_factor( triangle.color_c , gamma );
+                    c_a = RGBA.ChangeByFactor( triangle.color_a , alpha );
+                    c_b = RGBA.ChangeByFactor( triangle.color_b , beta  );
+                    c_c = RGBA.ChangeByFactor( triangle.color_c , gamma );
+                    
+                    // blend colors 
+                    color = RGBA.Blend( RGBA.Blend( c_a , c_b ) , c_c );
 
-                    color = RGBA.blend( RGBA.blend( c_a , c_b ) , c_c);
-
-                    draw.#set_pixle( x , y , color );
+                    Draw.#SetPixle( x , y , color );
                 }
             }
 
@@ -969,12 +969,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         this function for drawing "non thick border" around triangle 
         using line_draw algorithm as a fast trick
     */
-    static #DRAW_FAST_TRIANGLE_BORDER( triangle = new triangle2D() ){
+    static #DrawFastTriangleBorder( triangle = new triangle2D() ){
 
         triangle.border_color.alpha = 1;
-        draw.#CUSTOM_LINE_NO_GRADIENT( triangle.a , triangle.b , 2 , triangle.border_color );
-        draw.#CUSTOM_LINE_NO_GRADIENT( triangle.a , triangle.c , 2 , triangle.border_color );
-        draw.#CUSTOM_LINE_NO_GRADIENT( triangle.b , triangle.c , 2 , triangle.border_color );
+        Draw.#LineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
+        Draw.#LineNoGradient( triangle.a , triangle.c , 2 , triangle.border_color );
+        Draw.#LineNoGradient( triangle.b , triangle.c , 2 , triangle.border_color );
 
     }
 
@@ -984,23 +984,23 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // =========================================================================
 
 
-    static #CIRCLE_DRAW_ALL_QUADS(
+    static #DrawCircleUsingQuads(
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
     ){
 
-        draw.#set_pixle( (X+x_org)  , (Y+y_org)  , color_ );
-        draw.#set_pixle( (X+x_org)  , (-Y+y_org) , color_ );
-        draw.#set_pixle( (-X+x_org) , (Y+y_org)  , color_ );
-        draw.#set_pixle( (-X+x_org) , (-Y+y_org) , color_ );
+        Draw.#SetPixle( (X+x_org)  , (Y+y_org)  , color_ );
+        Draw.#SetPixle( (X+x_org)  , (-Y+y_org) , color_ );
+        Draw.#SetPixle( (-X+x_org) , (Y+y_org)  , color_ );
+        Draw.#SetPixle( (-X+x_org) , (-Y+y_org) , color_ );
         
-        draw.#set_pixle( (Y+x_org)  , (X+y_org)  , color_ );
-        draw.#set_pixle( (Y+x_org)  , (-X+y_org) , color_ );
-        draw.#set_pixle( (-Y+x_org) , (X+y_org)  , color_ );
-        draw.#set_pixle( (-Y+x_org) , (-X+y_org) , color_ );
+        Draw.#SetPixle( (Y+x_org)  , (X+y_org)  , color_ );
+        Draw.#SetPixle( (Y+x_org)  , (-X+y_org) , color_ );
+        Draw.#SetPixle( (-Y+x_org) , (X+y_org)  , color_ );
+        Draw.#SetPixle( (-Y+x_org) , (-X+y_org) , color_ );
 
     }
 
-    static #CIRCLE_FILL_ALL_QUADS(
+    static #FillCircleUsingQuads(
         x_org = 1 , y_org = 1 , radius = 1 , color_ = "white"
     ){
 
@@ -1014,7 +1014,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 if( x*x + ysqr <= rsqr ){
 
-                    draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org + y , color_ );
+                    Draw.#DrawHorizontalLine( x_org + x , x_org - x , y_org + y , color_ );
 
                     break;
                 } 
@@ -1028,7 +1028,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     //   mid point algorithm with :
     // - no support to border thickness
     // - no support to fill    
-    static #MID_POINT_CIRCLE_DRAW(
+    static #DrawCircleUsingMidPoint(
         x_org = 1 , y_org = 1 , r = 1 , border_color = undefined
     ){
           
@@ -1050,7 +1050,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             
             // draw or fill in all the QUAD's
             if( border_color ) 
-                draw.#CIRCLE_DRAW_ALL_QUADS( X , Y , x_org , y_org , border_color );
+                Draw.#DrawCircleUsingQuads( X , Y , x_org , y_org , border_color );
             
         }
         while( Y > X );
@@ -1058,7 +1058,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     }
 
     // draw circle using soultion of mix bettween "mid-point" and "scan-line" 
-    static #DRAW_CIRCLE(
+    static #DrawCircle(
         x_org = 1 , y_org = 1 , r = 1 , thickness = 1 , fill_color = undefined , border_color = undefined
     ){
 
@@ -1083,8 +1083,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                 for( let x = -t ; x <= 0 ; x++ ){
                     if( (x * x) + ysqr <= T_sqr ){
-                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org + y , border_color);
-                        draw.#DRAW_HORIZONTAL_LINE( x_org + x , x_org - x , y_org - y , border_color);
+                        Draw.#DrawHorizontalLine( x_org + x , x_org - x , y_org + y , border_color);
+                        Draw.#DrawHorizontalLine( x_org + x , x_org - x , y_org - y , border_color);
                         break;
                     }
                 }
@@ -1126,11 +1126,11 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 // after getting start/end 
                 // fill in it in left and right side of circle
 
-                draw.#DRAW_HORIZONTAL_LINE( 
+                Draw.#DrawHorizontalLine( 
                     x_org + start , x_org + end -1, y_org + ty , border_color
                 );
                 
-                draw.#DRAW_HORIZONTAL_LINE( 
+                Draw.#DrawHorizontalLine( 
                     x_org - start , x_org - end +1, y_org + ty , border_color
                 );
                 
@@ -1144,7 +1144,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
 
         // in case "fill circle" wanted
-        if( fill_color ) draw.#CIRCLE_FILL_ALL_QUADS( x_org , y_org , r , fill_color );
+        if( fill_color ) Draw.#FillCircleUsingQuads( x_org , y_org , r , fill_color );
 
     }
     
@@ -1154,7 +1154,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
     // =========================================================================
 
     // draw ellipse border with no rotation support
-    static #DRAW_ELLIPSE_SCANLINE(
+    static #DrawEllipseUsingScanLine(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , f1 = 0 , f2 = 0 , 
         border_thickness = 1 , border_color = undefined 
     ){
@@ -1214,7 +1214,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     // draw all other ellipse parts using reflection
                     for( let reflecte of reflected_values ){
 
-                        draw.#DRAW_HORIZONTAL_LINE(
+                        Draw.#DrawHorizontalLine(
                             x_org + reflecte.Xo , x_org + reflecte.X , y_org + reflecte.Y , border_color
                         );
 
@@ -1230,10 +1230,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
 
-        draw.#DRAW_HORIZONTAL_LINE(
+        Draw.#DrawHorizontalLine(
             x_org + A - 1, x_org + Aout - 1 , y_org , border_color
         );
-        draw.#DRAW_HORIZONTAL_LINE(
+        Draw.#DrawHorizontalLine(
             x_org - A + 1, x_org - Aout + 1, y_org , border_color
         );
 
@@ -1266,7 +1266,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                     // draw ellipse using reflection values
                     for( let reflecte of reflected_values ){
 
-                        draw.#DRAW_HORIZONTAL_LINE(
+                        Draw.#DrawHorizontalLine(
                             x_org + reflecte.Xo , x_org + reflecte.X , y_org + reflecte.Y , border_color
                         );
 
@@ -1279,13 +1279,13 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
  
-        draw.#DRAW_VERTICAL_LINE(x_org + x_start - 1 , y_org + B , y_org + B+ border_thickness - 1 , border_color)
-        draw.#DRAW_VERTICAL_LINE(x_org + x_start - 1 , y_org - B , y_org - B - border_thickness + 1 , border_color)
+        Draw.#DrawVerticalLine(x_org + x_start - 1 , y_org + B , y_org + B+ border_thickness - 1 , border_color)
+        Draw.#DrawVerticalLine(x_org + x_start - 1 , y_org - B , y_org - B - border_thickness + 1 , border_color)
     
     }
 
     // note : no rotation support
-    static #FILL_ELLIPSE_WITH_NO_ROTATION(
+    static #FillEllipseWithNoRotation(
         x_org = 1 , y_org = 1 , A = 1 , B = 1 , fill_color = undefined 
     ){
         let safety_factor = 4;
@@ -1302,7 +1302,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         if( A >= B ){
 
             // fill ellipse process
-            draw.#DRAW_VERTICAL_LINE( x_org , y_org - y - 1 , y_org + y + 1 , fill_color );
+            Draw.#DrawVerticalLine( x_org , y_org - y - 1 , y_org + y + 1 , fill_color );
 
             for(  ; x < A ; x++ ){
 
@@ -1314,8 +1314,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( x_sqr / A_sqr ) + ( (y*y) / B_sqr ) <= 1 ){
 
-                        draw.#DRAW_VERTICAL_LINE( x_org - x , y_org - y , y_org + y , fill_color );
-                        draw.#DRAW_VERTICAL_LINE( x_org + x , y_org - y , y_org + y , fill_color );
+                        Draw.#DrawVerticalLine( x_org - x , y_org - y , y_org + y , fill_color );
+                        Draw.#DrawVerticalLine( x_org + x , y_org - y , y_org + y , fill_color );
 
                         break;
                     }
@@ -1328,7 +1328,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         else {
 
             // fill ellipse process
-            draw.#DRAW_HORIZONTAL_LINE( x_org - A +1, x_org + A-1 , y_org , fill_color );
+            Draw.#DrawHorizontalLine( x_org - A +1, x_org + A-1 , y_org , fill_color );
             
             for( ; y < 0 ; y++ ){
 
@@ -1339,8 +1339,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                     if( ( (x*x) / A_sqr ) + ( y_sqr / B_sqr ) <= 1 ){
 
-                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org + y , fill_color );
-                        draw.#DRAW_HORIZONTAL_LINE( x_org - x , x_org + x , y_org - y , fill_color );
+                        Draw.#DrawHorizontalLine( x_org - x , x_org + x , y_org + y , fill_color );
+                        Draw.#DrawHorizontalLine( x_org - x , x_org + x , y_org - y , fill_color );
 
                         break;
                     }
@@ -1353,8 +1353,8 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    static #DRAW_ELLIPSE_WITH_ROTATION(
-        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
+    static #DrawEllipseWithRotation(
+        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new Point2D() , f2 = new Point2D() , 
         border = 1 , border_color = undefined 
     ){k
  
@@ -1422,10 +1422,10 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
                         [ref[i].X , ref[i].Y] = rotate.z( ref[i].X , ref[i].Y , angle );
 
-                        if( draw.#CALC_DISTANCE())
-                        draw.#CUSTOM_LINE_NO_GRADIENT(
-                            new point2D( x_org + ref[i].X , y_org + ref[i].Y ) ,
-                            new point2D( x_org + old_ref[i].X , y_org + old_ref[i].Y ) ,
+                        if( Draw.#CalcDistance())
+                        Draw.#LineNoGradient(
+                            new Point2D( x_org + ref[i].X , y_org + ref[i].Y ) ,
+                            new Point2D( x_org + old_ref[i].X , y_org + old_ref[i].Y ) ,
                             1 , border_color 
                         );
                         
@@ -1443,91 +1443,83 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
     }
 
-    /* need work */
-    static #FILL_ELLIPSE_WITH_ROTATION(
-        x_org = 1 , y_org = 1 , A = 1 , B = 1 , angle = 0, f1 = new point2D() , f2 = new point2D() , 
-        fill_color = undefined 
-    ){
-
-    }
-
 
     /*
         ==============================================================
-                PUBLIC FUCNTIONS AS INTERFACE FOR DRAWING 
+                PUBLIC FUCNTIONS AS INTERFACE FOR DRAW CLASS
         ==============================================================
     */
 
-    static set_grid_setting( size = 1 , distance = 10 , color = new RGBA(255,255,255,0.5) ){
+    static SetGridSetting( size = 1 , distance = 10 , color = new RGBA(255,255,255,0.5) ){
 
-        draw.#RESOURCES.grid_size = (typeof(size) == "number") ? size : 1;
-        draw.#RESOURCES.grid_distance = (typeof(distance) == "number") ? distance : 4;
-        draw.#RESOURCES.grid_color = (color instanceof RGBA ) ? color : new RGBA(255,255,255,1);
+        Draw.#RESOURCES.GridSize = (typeof(size) == "number") ? size : 1;
+        Draw.#RESOURCES.GridDistance = (typeof(distance) == "number") ? distance : 4;
+        Draw.#RESOURCES.GridColor = (color instanceof RGBA ) ? color : new RGBA(255,255,255,1);
 
     }
 
-    static draw_grid(){
+    static DrawGrid(){
 
-        for( let x = 0 ; x <= draw.#RESOURCES.canvas.width ; x += draw.#RESOURCES.grid_distance ){
+        for( let x = 0 ; x <= Draw.#RESOURCES.Canvas.width ; x += Draw.#RESOURCES.GridDistance ){
 
-            draw.#DRAW_VERTICAL_LINE( 
-                x , 0 , draw.#RESOURCES.canvas.height , draw.#RESOURCES.grid_color 
+            Draw.#DrawVerticalLine( 
+                x , 0 , Draw.#RESOURCES.Canvas.height , Draw.#RESOURCES.GridColor 
             );
 
         }
 
-        for( let y = 0 ; y <= draw.#RESOURCES.canvas.height ; y += draw.#RESOURCES.grid_distance ){
+        for( let y = 0 ; y <= Draw.#RESOURCES.Canvas.height ; y += Draw.#RESOURCES.GridDistance ){
         
-            draw.#DRAW_HORIZONTAL_LINE( 
-                0 , draw.#RESOURCES.canvas.width , y , draw.#RESOURCES.grid_color
+            Draw.#DrawHorizontalLine( 
+                0 , Draw.#RESOURCES.Canvas.width , y , Draw.#RESOURCES.GridColor
             );
             
         }
 
     }
 
-    static set_canvas( canvas_object = undefined ){
+    static SetCanvas( canvas_object = undefined ){
 
         if( canvas_object && canvas_object.tagName == "CANVAS" ){
 
-            draw.#RESOURCES.canvas = canvas_object;
-            draw.#RESOURCES.ctx = draw.#RESOURCES.canvas.getContext("2d");
+            Draw.#RESOURCES.Canvas = canvas_object;
+            Draw.#RESOURCES.Ctx = Draw.#RESOURCES.Canvas.getContext("2d");
 
             return true;
         }
-        else draw.#LOG.ERROR.CANVAS.INVALID();
+        else Draw.#LOG.ERROR.CANVAS.INVALID();
 
         return false;
     }
 
-    static set_buffer( buffer_object = new frame_buffer() ){
+    static SetBuffer( buffer_object = new frame_buffer() ){
 
         if( buffer_object instanceof frame_buffer ){
 
-            draw.#RESOURCES.buffer = buffer_object;
+            Draw.#RESOURCES.Buffer = buffer_object;
             return true;
 
         }
-        else draw.#LOG.ERROR.BUFFER.INVALID();
+        else Draw.#LOG.ERROR.BUFFER.INVALID();
 
         return false;
     }
 
-    static render_buffer(){
+    static RenderBuffer(){
 
-        let f1 = draw.#CHECK_CANVAS();
-        let f2 = draw.#CHECK_BUFFER();
+        let f1 = Draw.#CHECK_CANVAS();
+        let f2 = Draw.#CHECK_BUFFER();
 
-        if( !(draw.#RESOURCES.draw_direct_to_canvas) ){
+        if( !(Draw.#RESOURCES.DrawDirectToCanvas) ){
 
         if( f1 && f2 ){
 
-            for( let y = 0 ; y <= draw.#RESOURCES.buffer.height() ; y++ ){
+            for( let y = 0 ; y <= Draw.#RESOURCES.Buffer.height() ; y++ ){
 
-                for( let x = 0 ; x <= draw.#RESOURCES.buffer.width() ; x++ ){
+                for( let x = 0 ; x <= Draw.#RESOURCES.Buffer.width() ; x++ ){
 
-                    draw.#RESOURCES.ctx.fillStyle = RGBA.to_string(draw.#RESOURCES.buffer.get_pixle(x,y));
-                    draw.#RESOURCES.ctx.fillRect( x , y , 1 , 1);
+                    Draw.#RESOURCES.Ctx.fillStyle = RGBA.ToString(Draw.#RESOURCES.Buffer.get_pixle(x,y));
+                    Draw.#RESOURCES.Ctx.fillRect( x , y , 1 , 1);
 
                 }
                 
@@ -1537,106 +1529,107 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.CANVAS.MISSING();
-            if(!f2) draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f1) Draw.#LOG.ERROR.CANVAS.MISSING();
+            if(!f2) Draw.#LOG.ERROR.BUFFER.MISSING();
         }
 
         }
 
     }
 
-    static line( 
-        line_object = new line()
+    static Line2D( 
+        line_object = new Line2D()
     ) { 
 
-        let f1 = draw.#CHECK_BUFFER();
-        let f2 = (line_object instanceof line);
+        let f1 = Draw.#CHECK_BUFFER();
+        let f2 = (line_object instanceof Line2D);
 
         if( f1 && f2 ){
 
-            this.#CUSTOM_LINE_NO_GRADIENT(
-                line_object.p1 , line_object.p2 , 
+            this.#LineNoGradient(
+                line_object.a , line_object.b , 
                 line_object.width , line_object.color , line_object.anti_alias
             );
 
         } 
         else {
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
     
-    static line_with_gradient( 
-        line_object = new line_with_colors()
+    // need refactor !!!!
+    static Line2DWithGradient( 
+        line_object = new Line2D() , point_a_color = new RGBA() , point_b_color = new RGBA() 
     ) {
 
-        let f1 = draw.#CHECK_BUFFER();
-        let f2 = (line_object instanceof line_with_colors);
+        let f1 = Draw.#CHECK_BUFFER();
+        let f2 = (line_object instanceof Line2D);
 
         if( f1 && f2 ){
 
-            this.#CUSTOM_LINE_WITH_GRADIENT(
-                line_object.p1 , line_object.p2 , line_object.width , 
-                line_object.p1.color , line_object.p2.color , line_object.anti_alias
+            this.#LineWithGradient(
+                line_object.a , line_object.b , line_object.width , 
+                point_a_color , point_b_color
             );
     
         } 
         else {
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
 
-    static rectangle( rectangle_obejct = new RECT() ){
+    static Rectangle2D( rectangle_object = new RECT() ){
 
-        let f1 = draw.#CHECK_BUFFER();
-        let f2 = (rectangle_obejct instanceof RECT);
+        let f1 = Draw.#CHECK_BUFFER();
+        let f2 = (rectangle_object instanceof RECT);
 
         // debugger
         if( f1 && f2 ){
 
-            if( rectangle_obejct.fill_color ){
+            if( rectangle_object.fill_color ){
 
                 // fill rectangle 
-                draw.#FILL_RECT(
-                    rectangle_obejct.position.x , 
-                    rectangle_obejct.position.y , 
-                    rectangle_obejct.width , 
-                    rectangle_obejct.height , 
-                    rectangle_obejct.fill_color
+                Draw.#FillRectangle(
+                    rectangle_object.position.x , 
+                    rectangle_object.position.y , 
+                    rectangle_object.width , 
+                    rectangle_object.height , 
+                    rectangle_object.fill_color
                 );
 
             }
             
             // if rectangle want border around
-            if( rectangle_obejct.border > 0){
+            if( rectangle_object.border > 0){
 
                 // draw border process in "FILL_RECT_BORDER"
-                draw.#DRAW_RECT_BORDER( 
-                    rectangle_obejct.position.x,
-                    rectangle_obejct.position.y,
-                    rectangle_obejct.width,
-                    rectangle_obejct.height,
-                    rectangle_obejct.border,
-                    rectangle_obejct.border_color
+                Draw.#DawRectangleBorder( 
+                    rectangle_object.position.x,
+                    rectangle_object.position.y,
+                    rectangle_object.width,
+                    rectangle_object.height,
+                    rectangle_object.border,
+                    rectangle_object.border_color
                 ); 
 
             }
 
         }
         else {
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
 
-    static triangle( triangle_object = new triangle2D() , draw_thick_border = false ){
+    static Triangle2D( triangle_object = new triangle2D() , draw_thick_border = false ){
 
         // check canvas and triangle
-        let f1 = draw.#CHECK_BUFFER();
+        let f1 = Draw.#CHECK_BUFFER();
         let f2 = (triangle_object instanceof triangle2D);
         
         if( f1 && f2 ){
@@ -1650,30 +1643,30 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             if( copy.fill_color instanceof RGBA ){
 
                 // fill triangle  
-                draw.#FILL_TRIANGLE( copy );
+                Draw.#FillTriangle( copy );
                 
             }
 
             if( copy.border_color instanceof RGBA ){
                 
                 
-                if(draw_thick_border) draw.#DRAW_TRIANGLE_BORDER( copy );
-                else draw.#DRAW_FAST_TRIANGLE_BORDER( copy );
+                if(draw_thick_border) Draw.#DrawTriangleBorder( copy );
+                else Draw.#DrawFastTriangleBorder( copy );
 
             }
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
 
-    static triangle_gradient( triangle_object = new triangle2D() ){
+    static Triangle2DWithGradient( triangle_object = new triangle2D() ){
         
         // check canvas and triangle
-        let f1 = draw.#CHECK_BUFFER();
+        let f1 = Draw.#CHECK_BUFFER();
         let f2 = (triangle_object instanceof triangle2D);
         
         if( f1 && f2 ){
@@ -1684,20 +1677,20 @@ export class draw {     // CLASS LIKE NAMESPACE :)
             // sort points depend on Y-axis
             triangle2D.sort_by_y_axis(triangle_object);
             
-            draw.#FILL_TRIANGLE_WITH_GRADIENT( triangle_object );
+            Draw.#FillTriangleWithGradient( triangle_object );
 
         }
         else{
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
 
-    static circle( circle_object = new circle2D() ){
+    static Circle2D( circle_object = new circle2D() ){
 
         // check canvas and circle
-        let f1 = draw.#CHECK_BUFFER();
+        let f1 = Draw.#CHECK_BUFFER();
         let f2 = (circle_object instanceof circle2D);
 
         if( f1 && f2 ){
@@ -1706,22 +1699,22 @@ export class draw {     // CLASS LIKE NAMESPACE :)
 
             if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
 
-                draw.#DRAW_CIRCLE( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , Math.round(copy.border) , copy.fill_color , copy.border_color);
+                Draw.#DrawCircle( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , Math.round(copy.border) , copy.fill_color , copy.border_color);
 
             }
         
         }
         else{
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
         }
 
     }
 
-    static ellipse( ellipse_object = new ellipse2D() ){
+    static Ellipse2D( ellipse_object = new ellipse2D() ){
 
         // check canvas and circle
-        let f1 = draw.#CHECK_BUFFER();
+        let f1 = Draw.#CHECK_BUFFER();
         let f2 = (ellipse_object instanceof ellipse2D);
         
         if( f1 && f2 ){
@@ -1731,7 +1724,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 // if ellipse fill require no rotation
                 if( ellipse_object.angle == 0 ){
 
-                    draw.#FILL_ELLIPSE_WITH_NO_ROTATION( 
+                    Draw.#FillEllipseWithNoRotation( 
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
@@ -1742,7 +1735,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 }
                 else { // if ellipse fill require rotation
 
-                    draw.#FILL_ELLIPSE_WITH_ROTATION( 
+                    Draw.#FILL_ELLIPSE_WITH_ROTATION( 
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
@@ -1763,7 +1756,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 // ellipse with rotation
                 if( ellipse_object.angle == 0 ){
 
-                    draw.#DRAW_ELLIPSE_SCANLINE(
+                    Draw.#DrawEllipseUsingScanLine(
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
@@ -1778,7 +1771,7 @@ export class draw {     // CLASS LIKE NAMESPACE :)
                 // ellipse with no rotation
                 else {
 
-                    draw.#DRAW_ELLIPSE_WITH_ROTATION(
+                    Draw.#DrawEllipseWithRotation(
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
@@ -1797,105 +1790,12 @@ export class draw {     // CLASS LIKE NAMESPACE :)
         }
         else{
 
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
 
         }
 
     } 
+ 
 
-    static plane( plane_2D_object = new plane2D() ){
-
-        // check canvas and circle
-        let f1 = draw.#CHECK_BUFFER();
-        let f2 = (plane_2D_object instanceof plane2D);
-    
-        if( f1 && f2 ){ 
-    
-            if( plane_2D_object.fill_color instanceof RGBA ){
-    
-                
-    
-            }
-    
-        }
-        else{
-            if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-            if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
-        }
-    
-    
-    }
-    
-    
-    /*
-
-        famous drawing algorithms 
-
-    */
-    static algorithms = {
-
-
-        // line algorithms 
-
-        DDA_LINE_DRAW( line_object = new line() ){
-
-            let f1 = draw.#CHECK_BUFFER();
-            let f2 = ( line_object instanceof line );
-
-            if( f1 && f2 ){
-                draw.#DDA_LINE_DRAW_ALGORITHM( line_object );
-            }
-            else{
-                if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-                if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
-            }
-
-        } ,
-
-        GUPTA_SPROULL_LINE_DRAW( line_object = new line() ){
-
-        } ,
-
-        BRESENHAM_LINE_DRAW( line_object = new line() ){
-
-        } ,
-        
-
-        // circle algorithms
-
-        MID_POINT_CIRCLE_DRAW( circle_object = new circle2D() ){
-
-            // check canvas and circle
-            let f1 = ( draw.#RESOURCES.draw_to_canvas_direct ) ? draw.#CHECK_CANVAS() : draw.#CHECK_BUFFER();
-            let f2 = (circle_object instanceof circle2D);
-
-            if( f1 && f2 ){
-                
-                let copy = circle2D.copy( circle_object );
-
-                if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
-
-                    draw.#MID_POINT_CIRCLE_DRAW( Math.round(copy.x) , Math.round(copy.y) , Math.round(copy.r) , copy.border_color);
-
-                }
-            
-            }
-            else{
-                if(!f1) draw.#LOG.ERROR.BUFFER.MISSING();
-                if(!f2) draw.#LOG.ERROR.OBJECT.INVALID();
-            }
-
-        } ,
-
-
-        // ellipse algorithms
-
-        ELLIPSE_MID_POINT_ALGORITHM( ellipse_object = new ellipse2D() ){
-
-        } ,
-
-    }
-
-
-}
+} // end of class Draw

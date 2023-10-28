@@ -1,51 +1,50 @@
 
 export class RGBA{
 
-    // static private values for RGBA class usage
+    // macros for RGBA class usage
     static #RGB_MAX_VALUE = 255;
     static #RGB_MIN_VALUE = 0;
     static #ALPHA_MIN_VALUE = 0;
     static #ALPHA_MAX_VALUE = 1;
 
-    constructor( red = 255, green = 255 , blue = 255 , alpha = 1) {
+    
+    constructor( 
+            red = 255, green = 255 , blue = 255 , alpha = 1 
+    ) {
 
-        let min = RGBA.#RGB_MIN_VALUE;
-        let max = RGBA.#RGB_MAX_VALUE;
+        // filter values
 
-        this.red = (red > max) ? max: (red < min) ? min : red;
-        this.green = (green > max) ? max : (green < min) ? min : green;
-        this.blue = (blue > max) ? max : (blue < min) ? min : blue;
+        this.red   = (red   > RGBA.#RGB_MAX_VALUE) ? RGBA.#RGB_MAX_VALUE : (red   < RGBA.#RGB_MIN_VALUE) ? RGBA.#RGB_MIN_VALUE : red;
+        this.green = (green > RGBA.#RGB_MAX_VALUE) ? RGBA.#RGB_MAX_VALUE : (green < RGBA.#RGB_MIN_VALUE) ? RGBA.#RGB_MIN_VALUE : green;
+        this.blue  = (blue  > RGBA.#RGB_MAX_VALUE) ? RGBA.#RGB_MAX_VALUE : (blue  < RGBA.#RGB_MIN_VALUE) ? RGBA.#RGB_MIN_VALUE : blue;
 
-        min = RGBA.#ALPHA_MIN_VALUE;
-        max = RGBA.#ALPHA_MAX_VALUE;
-
-        this.alpha = (alpha > max) ? max : (alpha < min) ? min : alpha;
+        this.alpha = (alpha > RGBA.#ALPHA_MAX_VALUE) ? RGBA.#ALPHA_MAX_VALUE : (alpha < RGBA.#ALPHA_MIN_VALUE) ? RGBA.#ALPHA_MIN_VALUE : alpha;
 
     }
     
-    static to_string( RGBA_object = new RGBA() ) {
+    static ToString( rgba_object = new RGBA() ) {
 
-        if(RGBA_object instanceof RGBA){
+        if(rgba_object instanceof RGBA){
 
-            return `rgba(${RGBA_object.red},${RGBA_object.green},${RGBA_object.blue},${RGBA_object.alpha})`;
+            return `rgba(${rgba_object.red},${rgba_object.green},${rgba_object.blue},${rgba_object.alpha})`;
         
         }
         else return null;
 
     }
 
-    static to_hexa( RGBA_object = new RGBA() ) {
+    static ToHexa( rgba_object = new RGBA() ) {
 
-        if(RGBA_object instanceof RGBA){
+        if(rgba_object instanceof RGBA){
 
-            return `#${RGBA_object.red.toString(16)}${RGBA_object.green.toString(16)}${RGBA_object.blue.toString(16),RGBA_object.alpha}`;
+            return `#${rgba_object.red.toString(16)}${rgba_object.green.toString(16)}${rgba_object.blue.toString(16),rgba_object.alpha}`;
         
         }
         else return null;
 
     }
 
-    static blend( fg_color = new RGBA() , bg_color = new RGBA() ){
+    static Blend( fg_color = new RGBA() , bg_color = new RGBA() ){
 
         if( fg_color instanceof RGBA && bg_color instanceof RGBA ){
             
@@ -57,7 +56,7 @@ export class RGBA{
             let new_color = new RGBA(); // new color 
             
             // solve for "a" alpha first
-            // blend alpha's formula ======> a = af + ( 1 - af ) * ab
+            // alpha's formula : a = af + ( 1 - af ) * ab
             
             let alpha_A = fg_color.alpha; // af
             let alpha_B = bg_color.alpha; // ab
@@ -65,13 +64,14 @@ export class RGBA{
             new_color.alpha = alpha_A + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * alpha_B; // a
 
             // blend colors
-            /* ============== formula =======================
+
+            /* ================ blend formula ====================
                     af * cf + ( 1 - af ) * cb 
                 c = _______________________________
                                 a
             */
             for( let color of ["red","green","blue"] ){
-                RGBA.set[color]( 
+                RGBA.Set[color]( 
                     new_color , 
                     Math.round( 
                         ( alpha_A * fg_color[color] + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * bg_color[color] ) / new_color.alpha  
@@ -86,7 +86,7 @@ export class RGBA{
 
     }
 
-    static random_color( random_alpha = false){
+    static RandomColor( random_alpha = false){
 
         return new RGBA(
             Math.floor( Math.random() * 255 ), 
@@ -97,69 +97,21 @@ export class RGBA{
 
     }
 
-    static set = {
+    static Copy( rgba_object = new RGBA() ){
 
-        red( RGBA_color_object = new RGBA() , red_value = 0 ){
-
-            if( RGBA_color_object instanceof RGBA ){
-
-                RGBA_color_object.red = (red_value > RGBA.#RGB_MAX_VALUE) ? RGBA.#RGB_MAX_VALUE: (red_value < RGBA.#RGB_MIN_VALUE) ? RGBA.#RGB_MIN_VALUE : red_value;
-                return true;
-
-            }
-            return false;
-        },
-
-        green( RGBA_color_object = new RGBA() , green_value = 0 ){
-
-            if( RGBA_color_object instanceof RGBA ){
-
-                RGBA_color_object.green = (green_value > RGBA.#RGB_MAX_VALUE) ? RGBA.#RGB_MAX_VALUE: (green_value < RGBA.#RGB_MIN_VALUE) ? RGBA.#RGB_MIN_VALUE : green_value;
-                return true;
-                
-            }
-            return false;
-        },
-
-        blue( RGBA_color_object = new RGBA() , blue_value = 0 ){
-
-            if( RGBA_color_object instanceof RGBA ){
-
-                RGBA_color_object.blue = (blue_value > RGBA.#RGB_MAX_VALUE) ? RGBA.#RGB_MAX_VALUE: (blue_value < RGBA.#RGB_MIN_VALUE) ? RGBA.#RGB_MIN_VALUE : blue_value;
-                return true;
-                
-            }
-            return false;
-        },
-
-        alpha( RGBA_color_object = new RGBA() , alpha_value = 0 ){
-
-            if( RGBA_color_object instanceof RGBA ){
-
-                RGBA_color_object.alpha = (alpha_value > RGBA.#ALPHA_MAX_VALUE ) ? RGBA.#ALPHA_MAX_VALUE: (alpha_value < RGBA.#ALPHA_MIN_VALUE) ? RGBA.#ALPHA_MIN_VALUE : alpha_value;
-                return true;
-                
-            }
-            return false;
-        }
-
-    }
-
-    static copy( rgba_color = new RGBA() ){
-
-        if( rgba_color instanceof RGBA ){
+        if( rgba_object instanceof RGBA ){
             return new RGBA( 
-                Number.parseInt(rgba_color.red) , 
-                Number.parseInt(rgba_color.green) , 
-                Number.parseInt(rgba_color.blue) , 
-                Number.parseFloat(rgba_color.alpha) 
+                Number.parseInt(rgba_object.red) , 
+                Number.parseInt(rgba_object.green) , 
+                Number.parseInt(rgba_object.blue) , 
+                Number.parseFloat(rgba_object.alpha) 
             );
         }
         else return null;
 
     }
 
-    static change_by_factor( rgba_color = new RGBA() , factor_value = 1 ){
+    static ChangeByFactor( rgba_color = new RGBA() , factor_value = 1 ){
 
         if(rgba_color instanceof RGBA ){
 

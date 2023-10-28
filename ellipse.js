@@ -1,5 +1,5 @@
 import { RGBA } from "./color.js";
-import { point2D } from "./point.js";
+import { Point2D } from "./point.js";
 
 export class ellipse2D{
 
@@ -30,24 +30,24 @@ export class ellipse2D{
         if( width > height ){
 
             let fvalue = Math.sqrt( (width*width) - (height*height) );
-            this.#f2 = new point2D( fvalue , 0 );
-            this.#f1 = new point2D(-fvalue , 0 );
+            this.#f2 = new Point2D( fvalue , 0 );
+            this.#f1 = new Point2D(-fvalue , 0 );
 
         }
         else {
 
             let fvalue = Math.sqrt( (height*height) - (width*width) );
-            this.#f2 = new point2D( 0 ,  fvalue );
-            this.#f1 = new point2D( 0 , -fvalue );
+            this.#f2 = new Point2D( 0 ,  fvalue );
+            this.#f1 = new Point2D( 0 , -fvalue );
 
         }
 
         this.get_f1 = () => {
-            return point2D.copy( this.#f1 );
+            return Point2D.Copy( this.#f1 );
         }
 
         this.get_f2 = () => {
-            return point2D.copy( this.#f2 );
+            return Point2D.Copy( this.#f2 );
         }
 
     }

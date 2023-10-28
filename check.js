@@ -1,7 +1,7 @@
 
 import {RGBA} from "../../color.js";
 import {draw} from "../draw/draw.js";
-import {line as LINE_2D} from "./line.js";
+import {Line2D as LINE_2D} from "./line.js";
 import {point2D as POINT_2D} from "./point.js";
 import {rectangle as RECTANGLE} from "./rectangle.js";
 import {triangle2D as TRIANGLE_2D} from "./triangle.js";
@@ -156,8 +156,8 @@ export class check {
 
                 if( check_type ){
                 
-                    check.visual_check.point( line_object.p1 , point_size , color);
-                    check.visual_check.point( line_object.p2 , point_size , color);
+                    check.visual_check.point( line_object.a , point_size , color);
+                    check.visual_check.point( line_object.b , point_size , color);
             
                 }   
                 else {

@@ -1,7 +1,7 @@
-import {draw} from "../../draw/draw.js";
+import {Draw} from "../../draw/draw.js";
 import {RGBA} from "../../color.js";
-import {line , line_with_colors} from "../../line.js";
-import {point2D, point2D_with_color} from "../../point.js";
+import {Point2D, Point3D} from "../../point.js";
+import {Line2D , Line3D } from "../../line.js";
 import {rectangle , rectangle_with_gradient} from "../../rectangle.js";
 import {triangle2D, triangle2D_gradient} from "../../triangle.js";
 import {generate} from "../../generators.js";
@@ -111,7 +111,8 @@ var triangles = [
             new point2D(350, 10) ,
             new point2D(10 ,500)  ,
             new point2D(700 , 500)  ,
-            new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
+            // new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
+            new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
         ),
 
     ];
@@ -140,8 +141,8 @@ var planes = [
     )
 ];
 
-draw.set_canvas( canvas );
-draw.set_buffer( buffer );
+Draw.set_canvas( canvas );
+Draw.set_buffer( buffer );
 check.set.buffer( buffer );
 
 /*
@@ -160,7 +161,7 @@ function clear_buffer(){
 
 function new_frame(){
 
-    if( grid ) draw.draw_grid();
+    if( grid ) Draw.draw_grid();
     
     ctx.fillStyle   = "white";
     ctx.strokeStyle = "white";
@@ -172,7 +173,7 @@ function new_frame(){
                 
             for(let line of lines){
 
-                draw.line( line );
+                Draw.line( line );
 
                 if( debug_points ) check.visual_check.line( line );
                 
@@ -185,7 +186,7 @@ function new_frame(){
 
             for(let rect of rectangles){
 
-                draw.rectangle( rect ); 
+                Draw.rectangle( rect ); 
   
                 if( debug_points ) check.visual_check.rectangle( rect );
 
@@ -205,8 +206,8 @@ function new_frame(){
 
             for(let trig of triangles){
 
-                if(!gradient) draw.triangle(trig);
-                else draw.triangle_gradient(trig);
+                if(!gradient) Draw.triangle(trig);
+                else Draw.triangle_gradient(trig);
 
                 if( debug_points ) check.visual_check.triangle(trig);
 
@@ -227,7 +228,7 @@ function new_frame(){
 
             for(let circle of circles ){
 
-                draw.circle(circle);
+                Draw.circle(circle);
 
                 if( debug_points ) check.visual_check.circle( circle );
                 
@@ -241,7 +242,7 @@ function new_frame(){
 
             for(let ellipse of ellipses){
             
-                draw.ellipse( ellipse );
+                Draw.ellipse( ellipse );
 
                 if( debug_points ) check.visual_check.ellipse( ellipse , true );
 
@@ -254,7 +255,7 @@ function new_frame(){
 
             for(let plane of planes){
 
-                draw.plane( plane );
+                Draw.plane( plane );
 
                 if(debug_points) check.visual_check.plane(plane);
 
@@ -273,7 +274,7 @@ function new_frame(){
         
     } // end of "switch-case"
     
-    draw.render_buffer();
+    Draw.render_buffer();
 
 }
 

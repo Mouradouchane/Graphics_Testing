@@ -1,81 +1,96 @@
 
 import { RGBA }  from "./color.js";
-import { point2D , point2D_with_color } from "./point.js";
+import { Point2D , Point3D } from "./point.js";
 
-export class line{
 
-    constructor(point_a = new point2D() , point_b = new point2D() , thickness = 1 , color_a = new RGBA()){
+export class Line2D{
 
-        this.p1 = point_a;
-        this.p2 = point_b;
-        this.width = thickness < 1 ? 1 : thickness;
-        this.color = color_a;
+    constructor(
+        point_a = new Point2D() , point_b = new Point2D() , 
+        thickness = 1 , line_color = new RGBA()
+    ){
+
+        this.a = point_a;
+        this.b = point_b;
+        this.width = (thickness < 1) ? 1 : thickness;
+        this.color = line_color;
 
     }
 
-    static copy( ln = new line() ) {
+    static Copy( line = new Line2D() ) {
 
-        return new line( ln.p1.copy() , ln.p2.copy() , this.width );
+        return new Line2D( line.a.Copy() , line.b.Copy() , this.width );
 
     }
     
-    static random_line( max_width = 1 , max_height = 1 , thickness = 2){
+    static RandomLine( max_width = 1 , max_height = 1 , thickness = 2 ){
 
-        return new line(
+        return new Line2D(
 
-            new point2D(
+            new Point2D(
                 Math.floor( Math.random() * max_width  ),
                 Math.floor( Math.random() * max_height )
             ),
 
-            new point2D(
+            new Point2D(
                 Math.floor( Math.random() * max_width  ),
                 Math.floor( Math.random() * max_height )
             ),
 
             thickness,
 
-            RGBA.random_color()
+            RGBA.RandomColor()
+
         );
         
     }
 
-}
+} // end of class Line2D
 
-export class line_with_colors{
 
-    constructor(point_a = new point2D_with_color() , point_b = new point2D_with_color() , thickness = 1){
+export class Line3D {
 
-        this.p1 = point_a;
-        this.p2 = point_b;
-        this.width = thickness < 1 ? 1 : thickness;
+    constructor(
+        point_a = new Point3D() , point_b = new Point3D() , 
+        color = new RGBA() , width = 1 , 
+    ){
+
+        this.a = (point_a instanceof Point3D) ? point_a : null;
+        this.b = (point_b instanceof Point3D) ? point_b : null;
+
+        this.color = (color instanceof RGBA) ? color : null;
+        this.width = width;
 
     }
 
-    static copy( ln = new line() ) {
+    static Copy( line = new Line3D() ) {
 
-        return new line_with_colors( ln.p1.copy() , ln.p2.copy() , this.width );
+        return new Line3D( line.a.Copy() , line.b.Copy() , line.color , this.width );
 
     }
-    
-    static random_line( max_width = 1 , max_height = 1 , thickness = 2 ){
 
-        return new line_with_colors(
+    static RandomLine( max_width = 1 , max_height = 1 , max_deepth = 1 ,  thickness = 2 ){
 
-            new point2D_with_color(
+        return new Line3D(
+
+            new Point3D(
                 Math.floor( Math.random() * max_width  ),
                 Math.floor( Math.random() * max_height ),
-                RGBA.random_color() 
+                Math.floor( Math.random() * max_deepth ),
             ),
 
-            new point2D_with_color(
+            new Point3D(
                 Math.floor( Math.random() * max_width  ),
                 Math.floor( Math.random() * max_height ),
-                RGBA.random_color() 
+                Math.floor( Math.random() * max_deepth ),
             ),
 
-            thickness
+            thickness,
+
+            RGBA.RandomColor()
+
         );
         
     }
-}
+
+} // end of class Line3D

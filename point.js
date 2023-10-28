@@ -1,11 +1,11 @@
-import { RGBA } from "./color.js";
 
 /*
     ===================================================
                             2D
     ===================================================
 */
-export class point2D{
+
+export class Point2D{
 
     constructor(x = 0 , y = 0){
 
@@ -14,15 +14,15 @@ export class point2D{
 
     }
 
-    static copy( POINT = new point2D() ){
-        return new point2D( Number.parseFloat( POINT.x ) , Number.parseFloat( POINT.y ) );
+    static Copy( point = new Point2D() ){
+        return new Point2D( Number.parseFloat( point.x ) , Number.parseFloat( point.y ) );
     }
 
-    static swap( point_a = new point2D() , point_b = new point2D() ){
+    static Swap( point_a = new Point2D() , point_b = new Point2D() ){
 
-        if( (point_a instanceof point2D) && (point_b instanceof point2D) ){
+        if( (point_a instanceof Point2D) && (point_b instanceof Point2D) ){
 
-            let temp = new point2D(point_b.x , point_b.y);
+            let temp = new Point2D(point_b.x , point_b.y);
 
             point_b.x = point_a.x;
             point_b.y = point_a.y;
@@ -34,36 +34,24 @@ export class point2D{
 
     }
 
-    static round( point_a = new point2D() ){
+    static Round( point = new Point2D() ){
 
-        if( point_a instanceof point2D ){
-            point_a.x = Math.round( point_a.x );
-            point_a.y = Math.round( point_a.y );
+        if( point instanceof Point2D ){
+            point.x = Math.round( point.x );
+            point.y = Math.round( point.y );
         }
+
     }
 
 }
-
-export class point2D_with_color extends point2D{
-
-    constructor( x , y , color = new RGBA() ){
-        super( x , y );
-        this.color = (color instanceof RGBA) ? color : new RGBA(); // color should be object from RGBA
-    }
-
-    static copy( POINT = new point2D_with_color() ){
-        return new point2D_with_color(POINT.x , POINT.y , POINT.color);
-    }
-
-}
-
 
 /*
     ===================================================
                             3D
     ===================================================
 */
-export class point3D extends point2D{
+
+export class Point3D extends Point2D {
 
     constructor( x = 0 , y = 0 , z = 0 ){
 
@@ -72,53 +60,29 @@ export class point3D extends point2D{
 
     }
 
-    static copy( POINT = new point3D() ){
-        return new point3D(POINT.x, POINT.y , POINT.z);
+    static Copy( point = new Point3D() ){
+        return new Point3D( point.x , point.y , point.z );
     }
 
 }
-
-export class point3D_with_color extends point3D{
-
-    constructor(  x = 0 , y = 0 , z = 0 , color = new RGBA()){
-        super( x , y , z );
-        this.color = (color instanceof RGBA) ? color : new RGBA();
-    }
-
-    static copy( POINT = new point3D_with_color() ){
-        return new point3D_with_color(POINT.x, POINT.y , POINT.z , POINT.color);
-    }
-
-}
-
 
 /*
     ===================================================
                             4D
     ===================================================
 */
-export class point4D extends point3D{
+
+export class Point4D extends Point3D{
 
     constructor( x = 0 , y = 0 , z = 0 , w = 1){
+
         super( x , y , z );
         this.w = w;
+        
     }
 
-    static copy( POINT = new point4D() ){
-        return new point4D(POINT.x , POINT.y , POINT.z , POINT.w);
-    }
-
-}
-
-export class point4D_with_color extends point4D{
-
-    constructor(  x = 0 , y = 0 , z = 0 , w = 1 , color = new RGBA()){
-        super( x , y , z , w );
-        this.color = (color instanceof RGBA) ? color : new RGBA();
-    }
-
-    static copy( POINT = new point4D_with_color() ){
-        return new point4D_with_color(POINT.x, POINT.y , POINT.z , POINT.w , POINT.color);
+    static Copy( point = new Point4D() ){
+        return new Point4D(point.x , point.y , point.z , point.w);
     }
 
 }

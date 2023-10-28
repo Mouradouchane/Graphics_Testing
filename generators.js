@@ -1,6 +1,6 @@
 import {RGBA} from "./color.js";
 import {point2D , point2D_with_color} from "./point.js";
-import {line , line_with_colors } from "./line.js";
+import {Line2D , Line2DWithColors } from "./line.js";
 import {rectangle , rectangle_with_gradient} from "./rectangle.js";
 import {triangle2D} from "./triangle.js";
 import {circle2D} from "./circle.js";
@@ -98,9 +98,9 @@ export class generate {
                 continue;
             }
             
-            if( SHAPES_TYPE === line ){
+            if( SHAPES_TYPE === Line2D ){
                 
-                OBJECTS[i] = new line(
+                OBJECTS[i] = new Line2D(
                     new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
                     new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
                     ( thickness == undefined || thickness <= 0 ) ? generate.#default.thickness : thickness ,
@@ -241,7 +241,7 @@ export class generate {
         ){
 
             return generate.#main_generator( 
-                line , amount_of_objects , thickness , min_X , max_X , min_Y , max_Y ,
+                Line2D , amount_of_objects , thickness , min_X , max_X , min_Y , max_Y ,
                 fill_color , undefined , fill_color_random_alpha 
             );
 

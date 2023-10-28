@@ -1,16 +1,16 @@
 import { RGBA } from "./color.js";
-import { point2D } from "./point.js";
+import { Point2D } from "./point.js";
 
 export class triangle2D{
 
     constructor(
-        point_a = new point2D() , point_b = new point2D() , point_c = new point2D() , 
+        point_a = new Point2D() , point_b = new Point2D() , point_c = new Point2D() , 
         thickness = 1 , fill_color = undefined , border_color = undefined 
     ){
 
-        this.a = (point_a instanceof point2D) ? point_a : new point2D();
-        this.b = (point_b instanceof point2D) ? point_b : new point2D();
-        this.c = (point_c instanceof point2D) ? point_c : new point2D();
+        this.a = (point_a instanceof Point2D) ? point_a : new Point2D();
+        this.b = (point_b instanceof Point2D) ? point_b : new Point2D();
+        this.c = (point_c instanceof Point2D) ? point_c : new Point2D();
         this.thickness = thickness;
         this.fill_color = (fill_color instanceof RGBA) ? fill_color : undefined;
         this.border_color = (border_color instanceof RGBA) ? border_color : undefined;
@@ -22,12 +22,12 @@ export class triangle2D{
         if(triangle2D_obj instanceof triangle2D){
 
             return new triangle2D(
-                point2D.copy(triangle2D_obj.a),
-                point2D.copy(triangle2D_obj.b),
-                point2D.copy(triangle2D_obj.c),
+                Point2D.Copy(triangle2D_obj.a),
+                Point2D.Copy(triangle2D_obj.b),
+                Point2D.Copy(triangle2D_obj.c),
                 Number.parseInt(triangle2D_obj.thickness),
-                (triangle2D_obj.fill_color   instanceof RGBA) ? RGBA.copy(triangle2D_obj.fill_color) : undefined ,
-                (triangle2D_obj.border_color instanceof RGBA) ? RGBA.copy(triangle2D_obj.border_color) : undefined ,
+                (triangle2D_obj.fill_color   instanceof RGBA) ? RGBA.Copy(triangle2D_obj.fill_color) : undefined ,
+                (triangle2D_obj.border_color instanceof RGBA) ? RGBA.Copy(triangle2D_obj.border_color) : undefined ,
             );
             
         }
@@ -41,12 +41,12 @@ export class triangle2D{
 
         return new triangle2D(
 
-            new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
-            new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
-            new point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
+            new Point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
+            new Point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
+            new Point2D( Math.floor( Math.random() * max_width ) , Math.floor( Math.random() * max_height ) ),
             thickness,
-            (color) ? RGBA.random_color() : undefined,
-            (border_color) ? RGBA.random_color() : undefined 
+            (color) ? RGBA.RandomColor() : undefined,
+            (border_color) ? RGBA.RandomColor() : undefined 
 
         );
     
@@ -54,17 +54,17 @@ export class triangle2D{
 
     static sort_by_y_axis( trig = new triangle2D() ){
 
-        if( trig.a.y > trig.b.y || ((trig.a.y == trig.b.y) && trig.a.x > trig.b.x) ) point2D.swap( trig.a , trig.b );
-        if( trig.a.y > trig.c.y || ((trig.a.y == trig.c.y) && trig.a.x > trig.c.x) ) point2D.swap( trig.a , trig.c );
-        if( trig.b.y > trig.c.y || ((trig.b.y == trig.c.y) && trig.b.x > trig.c.x) ) point2D.swap( trig.b , trig.c );
+        if( trig.a.y > trig.b.y || ((trig.a.y == trig.b.y) && trig.a.x > trig.b.x) ) Point2D.Swap( trig.a , trig.b );
+        if( trig.a.y > trig.c.y || ((trig.a.y == trig.c.y) && trig.a.x > trig.c.x) ) Point2D.Swap( trig.a , trig.c );
+        if( trig.b.y > trig.c.y || ((trig.b.y == trig.c.y) && trig.b.x > trig.c.x) ) Point2D.Swap( trig.b , trig.c );
 
     }
 
     static sort_by_x_axis( trig = new triangle2D() ){
 
-        if( trig.a.x > trig.b.x ) point2D.swap( trig.a , trig.b );
-        if( trig.a.x > trig.c.x ) point2D.swap( trig.a , trig.c );
-        if( trig.b.x > trig.c.x ) point2D.swap( trig.b , trig.c );
+        if( trig.a.x > trig.b.x ) Point2D.Swap( trig.a , trig.b );
+        if( trig.a.x > trig.c.x ) Point2D.Swap( trig.a , trig.c );
+        if( trig.b.x > trig.c.x ) Point2D.Swap( trig.b , trig.c );
 
     }
     
@@ -73,7 +73,7 @@ export class triangle2D{
 export class triangle2D_gradient extends triangle2D{
 
     constructor(
-        point_a = new point2D() , point_b = new point2D() , point_c = new point2D() , 
+        point_a = new Point2D() , point_b = new Point2D() , point_c = new Point2D() , 
         color_a = new RGBA() ,  color_b = new RGBA() ,  color_c = new RGBA() 
     ){
 
