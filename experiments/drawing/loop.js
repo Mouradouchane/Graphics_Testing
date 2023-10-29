@@ -23,13 +23,13 @@ var Config = {
 
     RenderingLoop : false ,
     DrawGrid : false ,
-    DrawPointsForDebug : false ,
-    NewTestEachTime : false ,
+    DrawPointsForDebug : true ,
+    GenerateRandomShapesEachTime : true ,
+    NewTestEachTime : true ,
     IntervalTime : 3000 , // ms
     AntiAlias : false ,
     ShapesIndex  : 6 ,
     ShapesAmount : 3 ,
-    GenerateRandomShapesEachTime : false ,
     BorderThickness  : 4 ,
     Gradient : true ,
     MaxWidth  : Canvas.clientWidth  / 1.5 ,
@@ -147,14 +147,8 @@ var ellipses = [
 ];
 
 var curves = [
-    new Curve2D( 
-        new Point2D(230,50) , 
-        new Point2D(134,246) , 
-        new Point2D(634,246) , 
-        new Point2D(300,446) ,
-        1 / 32 , new RGBA(255,0,0,1) 
-    )
-]
+   ...Generator.Random.Curves2D( 1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 2 , 1/32 , null , false ) , 
+];
 
 
 Draw.SetCanvas( Canvas );
@@ -269,6 +263,7 @@ function NewFrame(){
 
                 if( Config.DrawPointsForDebug ) Check.VisualCheck.Ellipse2D( ellipse , true );
 
+
             }
 
         } break;
@@ -279,6 +274,17 @@ function NewFrame(){
             for( let curve of curves ){
             
                 Draw.Curve2D( curve );
+
+                if( Config.DrawPointsForDebug ) {
+                    Check.VisualCheck.Curves2D( curve , true );
+                }
+
+                if( Config.GenerateRandomShapesEachTime ) {    
+                    curves = Generator.Random.Curves2D( 
+                        1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight
+                        , 2 , 1/32 , null , false 
+                    );
+                }
 
             }
 

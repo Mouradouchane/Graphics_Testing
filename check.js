@@ -9,6 +9,7 @@ import {Circle2D} from "./circle.js";
 import {Ellipse2D} from "./ellipse.js";
 import {Rotate} from "./rotate.js";
 import {FrameBuffer} from "./buffers.js";
+import {Curve2D} from "./curve.js";
 
 /*
     ============================================================
@@ -68,7 +69,7 @@ export class Check {
 
         default_point_size  : 2 ,
         default_point_color : new RGBA(255,0,160,1) ,
-        default_line_color  : new RGBA(255,255,0,1)   ,
+        default_line_color  : new RGBA(255,255,255,1) ,
 
     }
 
@@ -131,7 +132,7 @@ export class Check {
                     color = (color) ? color : Check.#RESOURCES.default_point_color;
                     let psize = (point_radius) ? point_radius : Check.#RESOURCES.default_point_size;
 
-                    Draw.circle( new circle2D( point.x , point.y , psize , color ) );
+                    Draw.Circle2D( new Circle2D( point.x , point.y , psize , color ) );
 
                 }
                 else {
@@ -161,7 +162,7 @@ export class Check {
                 
                     Check.VisualCheck.Point2D( line.a , point_radius , color);
                     Check.VisualCheck.Point2D( line.b , point_radius , color);
-            
+                
                 }   
                 else {
                     Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.line" , "line2D");
@@ -253,8 +254,8 @@ export class Check {
 
                 }
                 else {
-                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.circle" , "circle2D");
-                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.circle" , "circle2D");
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.circle" , "Circle2D");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.circle" , "Circle2D");
                 }
 
             }
@@ -325,6 +326,50 @@ export class Check {
             }
 
         },
+
+        Curves2D : function(
+            curve = new Curve2D( ) , connect_debug_points_with_lines = false 
+        ){
+
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   =  curve instanceof Curve2D ;
+
+            if( check_buffer || check_canvas ){
+
+                if( check_type ){
+
+                    Check.VisualCheck.Point2D( curve.a );
+                    Check.VisualCheck.Point2D( curve.b );
+                    Check.VisualCheck.Point2D( curve.c );
+                    Check.VisualCheck.Point2D( curve.d );
+
+                    if( connect_debug_points_with_lines ){
+
+                        Draw.Line2D( 
+                            new Line2D(curve.a , curve.b , 1 , Check.#RESOURCES.default_line_color ) 
+                        );
+
+                        Draw.Line2D( 
+                            new Line2D(curve.b , curve.c , 1 , Check.#RESOURCES.default_line_color ) 
+                        );
+
+                        Draw.Line2D( 
+                            new Line2D(curve.c , curve.d , 1 , Check.#RESOURCES.default_line_color ) 
+                        );
+
+                    }
+
+
+                }   
+
+            }
+
+            if( !check_buffer && !check_canvas ){
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+            }
+
+        }
 
     }
     

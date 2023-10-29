@@ -216,9 +216,12 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     // standard line draw 
     static #LineNoGradient( 
-        point_a = new Point2D() , point_b = new Point2D() , 
+        point_1 = new Point2D() , point_2 = new Point2D() , 
         width = 1 , color = new RGBA()
     ) {
+
+        let point_a = Point2D.Copy(point_1);
+        let point_b = Point2D.Copy(point_2);
 
         width = Math.abs(width);
         let width_mod = Math.floor(width) % 2;
@@ -1450,31 +1453,41 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static #DrawCubicBuzierCurve( curve = new Curve2D() ){
 
         let k1 ,k2 ,k3 ,k4 ;
-        let p = new Point2D(0,0);
 
-        for(let t = 0 ; t <= 1 ; t += curve.accuracy){
+        let old_point = Point2D.Copy(curve.a);
+        let new_point = Point2D.Copy(curve.a);
+
+        // for debug only 
+        /*
+        Draw.#LineNoGradient( Point2D.Copy(curve.a) , Point2D.Copy(curve.b) , 1 , new RGBA(255,255,255,0.7) );
+        Draw.#LineNoGradient( Point2D.Copy(curve.b) , Point2D.Copy(curve.c) , 1 , new RGBA(255,255,255,0.7) );
+        Draw.#LineNoGradient( Point2D.Copy(curve.c) , Point2D.Copy(curve.d) , 1 , new RGBA(255,255,255,0.7) );
+        */
+
+        for( let t = curve.accuracy ; t <= 1 ; t += curve.accuracy ){
     
             k1 = (1-t) * (1-t) * (1-t);
             k2 = 3 * Math.pow((1-t),2) * t;
             k3 = 3 * (1-t) * Math.pow(t,2);
             k4 = Math.pow(t,3);
 
-		    p.x = Math.round( (curve.a.x * k1) + (curve.b.x * k2) + (curve.c.x * k3) + (curve.d.x * k4) );			
-			p.y = Math.round( (curve.a.y * k1) + (curve.b.y * k2) + (curve.c.y * k3) + (curve.d.y * k4) );			
+		    new_point.x = Math.round( (curve.a.x * k1) + (curve.b.x * k2) + (curve.c.x * k3) + (curve.d.x * k4) );			
+			new_point.y = Math.round( (curve.a.y * k1) + (curve.b.y * k2) + (curve.c.y * k3) + (curve.d.y * k4) );			
 
-            Draw.#DrawCircle( p.x , p.y , 2 , 0 , curve.color );
+            Draw.#LineNoGradient( Point2D.Copy(old_point) , Point2D.Copy(new_point) , curve.thickness , curve.color );
             
-        }
-        
-        // for debug only 
-        Draw.#LineNoGradient( curve.a , curve.b , 1 , new RGBA(255,255,255,0.7) );
-        Draw.#LineNoGradient( curve.b , curve.c , 1 , new RGBA(255,255,255,0.7) );
-        Draw.#LineNoGradient( curve.c , curve.d , 1 , new RGBA(255,255,255,0.7) );
+            // Draw.#DrawCircle( new_point.x , new_point.y , 1 , 0 , new RGBA(0,255,255,0.7) );
 
+            old_point = Point2D.Copy(new_point);
+
+        }
+
+        /*
         Draw.#DrawCircle( curve.a.x, curve.a.y , 3 , 0 , new RGBA(100,100,255,1) );
         Draw.#DrawCircle( curve.b.x, curve.b.y , 3 , 0 , new RGBA(100,100,255,1) );
         Draw.#DrawCircle( curve.c.x, curve.c.y , 3 , 0 , new RGBA(100,100,255,1) );
         Draw.#DrawCircle( curve.d.x, curve.d.y , 3 , 0 , new RGBA(100,100,255,1) );
+        */
 
     }
 

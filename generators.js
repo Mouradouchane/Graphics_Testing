@@ -5,6 +5,7 @@ import {Triangle2D} from "./triangle.js";
 import {Circle2D} from "./circle.js";
 import {Ellipse2D} from "./ellipse.js";
 import {Rectangle2D} from "./rectangle.js";
+import { Curve2D } from "./curve.js";
 
 export class Generator {
    
@@ -310,6 +311,37 @@ export class Generator {
                 fill_color_random_alpha , border_color_random_alpha
             );
 
+        },
+
+        Curves2D(  
+            amount_of_objects = 1 ,
+            
+            min_X = undefined , max_X = undefined , 
+            min_Y = undefined , max_Y = undefined ,
+            border_thickness = 0 ,
+            accuracy = 1/32 , 
+            fill_color = undefined ,
+            random_alpha = false
+        ){
+
+            let OBJECTS = [];
+
+            for( let i = 0 ; i < amount_of_objects ; i += 1){
+
+
+                OBJECTS[i] = new Curve2D(
+                    ...Generator.Random.Points2D( 1 , min_X , max_X , min_Y , max_Y ) ,
+                    ...Generator.Random.Points2D( 1 , min_X , max_X , min_Y , max_Y ) ,
+                    ...Generator.Random.Points2D( 1 , min_X , max_X , min_Y , max_Y ) ,
+                    ...Generator.Random.Points2D( 1 , min_X , max_X , min_Y , max_Y ) ,
+                    accuracy ,
+                    (fill_color instanceof RGBA) ? fill_color : Generator.Random.Colors(random_alpha)
+                );
+
+            }
+
+            return OBJECTS;
+  
         },
 
     } // end of Random object
