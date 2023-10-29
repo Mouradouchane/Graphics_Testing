@@ -1,16 +1,15 @@
 import {RGBA} from "./color.js";
-import {point2D , point2D_with_color} from "./point.js";
-import {Line2D , Line2DWithColors } from "./line.js";
-import {rectangle , rectangle_with_gradient} from "./rectangle.js";
+import {Point2D} from "./point.js";
+import {Line2D} from "./line.js";
 import {Triangle2D} from "./triangle.js";
-import {circle2D} from "./circle.js";
-import {plane2D} from "./plane.js";
-import { Ellipse2D } from "./ellipse.js";
+import {Circle2D} from "./circle.js";
+import {Ellipse2D} from "./ellipse.js";
+import {Rectangle2D} from "./rectangle.js";
 
-export class generate {
+export class Generator {
    
     // default options for shapes generation in case some parameters "undefined"
-    static #default = {
+    static #DEFAULT = {
 
         thickness : 6 ,
 
@@ -23,13 +22,13 @@ export class generate {
     } 
 
 
-    // the main function who generate all the shapes 
-    static #main_generator(
+    // main generator function used in all other functions to generate all the shapes
+    static #MAIN_GENERATOR(
 
         // class name
-        SHAPES_TYPE = undefined , 
+        shape_type = undefined , 
     
-        AMOUNT_OF_OBJECTS = 1 , 
+        amount_of_objects = 1 , 
 
         thickness = undefined , 
 
@@ -43,21 +42,21 @@ export class generate {
 
         // check parameter's before generate
 
-        if( SHAPES_TYPE === undefined || SHAPES_TYPE === null ) return null;
+        if( shape_type === undefined || shape_type === null ) return null;
 
-        AMOUNT_OF_OBJECTS = ( AMOUNT_OF_OBJECTS <= 0 ) ? 1 : AMOUNT_OF_OBJECTS;
+        amount_of_objects = ( amount_of_objects <= 0 ) ? 1 : amount_of_objects;
 
-        min_X = (min_X == undefined) ? generate.#default.min_width : min_X;
-        max_X = (max_X == undefined) ? generate.#default.max_width : max_X;
+        min_X = (min_X == undefined) ? Generator.#DEFAULT.min_width : min_X;
+        max_X = (max_X == undefined) ? Generator.#DEFAULT.max_width : max_X;
         
-        min_Y = (min_Y == undefined) ? generate.#default.min_height : min_Y;
-        max_Y = (max_Y == undefined) ? generate.#default.max_height : max_Y;
+        min_Y = (min_Y == undefined) ? Generator.#DEFAULT.min_height : min_Y;
+        max_Y = (max_Y == undefined) ? Generator.#DEFAULT.max_height : max_Y;
 
         let allow_fill = false;
         if( fill_color == undefined || !(fill_color instanceof RGBA) ) {
 
             allow_fill = true;
-            fill_color = generate.random.color( fill_color_random_alpha );
+            fill_color = Generator.Random.Colors( fill_color_random_alpha );
 
         } 
 
@@ -65,7 +64,7 @@ export class generate {
         if( border_color == undefined || !(border_color instanceof RGBA) ){
 
             allow_border = true;
-            border_color = generate.random.color( border_color_random_alpha );
+            border_color = Generator.Random.Colors( border_color_random_alpha );
 
         } 
         
@@ -73,7 +72,7 @@ export class generate {
         if( thickness == undefined || thickness <= 0 ) {
 
             allow_thickness = true;
-            thickness = generate.#default.thickness;
+            thickness = Generator.#DEFAULT.thickness;
 
         }
 
@@ -82,15 +81,15 @@ export class generate {
         
         var OBJECTS = [];
 
-        for( let i = 0 ; i < AMOUNT_OF_OBJECTS ; i += 1){
+        for( let i = 0 ; i < amount_of_objects ; i += 1){
             
-            if(allow_fill)      fill_color      = generate.random.color( fill_color_random_alpha );
-            if(allow_border)    border_color    = generate.random.color( border_color_random_alpha );
-            if(allow_thickness) thickness       = Math.ceil((Math.random() * generate.#default.thickness) + 1);
+            if(allow_fill)      fill_color      = Generator.Random.Colors( fill_color_random_alpha );
+            if(allow_border)    border_color    = Generator.Random.Colors( border_color_random_alpha );
+            if(allow_thickness) thickness       = Math.ceil((Math.random() * Generator.#DEFAULT.thickness) + 1);
             
-            if( SHAPES_TYPE === point2D ){
+            if( shape_type === Point2D ){
 
-                OBJECTS[i] = new point2D(
+                OBJECTS[i] = new Point2D(
                     (Math.random() * max_X) + min_X , 
                     (Math.random() * max_Y) + min_Y 
                 );
@@ -98,19 +97,19 @@ export class generate {
                 continue;
             }
             
-            if( SHAPES_TYPE === Line2D ){
+            if( shape_type === Line2D ){
                 
                 OBJECTS[i] = new Line2D(
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
-                    ( thickness == undefined || thickness <= 0 ) ? generate.#default.thickness : thickness ,
-                    ( fill_color == undefined || !(fill_color instanceof RGBA) ) ? generate.random.color(fill_color_random_alpha) : fill_color
+                    new Point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
+                    new Point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
+                    ( thickness == undefined || thickness <= 0 ) ? Generator.#DEFAULT.thickness : thickness ,
+                    ( fill_color == undefined || !(fill_color instanceof RGBA) ) ? Generator.Random.Colors(fill_color_random_alpha) : fill_color
                 );
                 continue;
 
             }
 
-            if( SHAPES_TYPE === rectangle ){
+            if( shape_type === Rectangle2D ){
 
                 // X , Y
                 let x = ( Math.random() * max_X / 2) + min_X ;
@@ -119,7 +118,7 @@ export class generate {
                 let w = ( Math.random() * max_X );
                 let h = ( Math.random() * max_Y );
 
-                OBJECTS[i] = new rectangle(
+                OBJECTS[i] = new Rectangle2D(
                     x , y ,
                     ( x + w > max_X) ? max_X - x - thickness: w, 
                     ( y + h > max_Y) ? max_Y - y - thickness: h,
@@ -132,13 +131,13 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === Triangle2D ){
+            if( shape_type === Triangle2D ){
 
                 OBJECTS[i] = new Triangle2D(
                     // Points A , B , C
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
+                    new Point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
+                    new Point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
+                    new Point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ),
                     
                     thickness,
                     fill_color ,
@@ -148,9 +147,9 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === circle2D ){    
+            if( shape_type === Circle2D ){    
                 
-                OBJECTS[i] = new circle2D(
+                OBJECTS[i] = new Circle2D(
                     // X , Y
                     (Math.random() * max_X) + min_X , 
                     (Math.random() * max_Y) + min_Y , 
@@ -165,7 +164,7 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === Ellipse2D ){
+            if( shape_type === Ellipse2D ){
 
                 OBJECTS[i] = new Ellipse2D(
                     // X , Y
@@ -187,67 +186,48 @@ export class generate {
                 continue;
             }
 
-            if( SHAPES_TYPE === plane2D ){
-
-                OBJECTS[i] = new plane2D(
-                    // POINTS A , B , C , D
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,  
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,  
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,  
-                    new point2D( (Math.random() * max_X) + min_X , (Math.random() * max_Y) + min_Y ) ,
-                    fill_color , border_color , thickness 
-                );
-
-                continue;
-            }
-
         }
 
         return OBJECTS;
 
     }
 
-    static random = {
 
-        color( random_alpha = undefined ){
+    static Random = {
 
-            return new RGBA(
-                Math.floor( Math.random() * 255 ) ,
-                Math.floor( Math.random() * 255 ) ,
-                Math.floor( Math.random() * 255 ) ,
-                ( random_alpha ) ? Math.random() + 0.1 : 1
-            );
+        Colors( random_alpha = false ){
+
+            return RGBA.RandomColor(random_alpha);
 
         },
 
-        point2D(  
+        Points2D(  
             amount_of_points = 1 , 
-            min_X = undefined , max_X = undefined , 
-            min_Y = undefined , max_Y = undefined , 
+            min_X = undefined , max_X = undefined , min_Y = undefined , max_Y = undefined , 
         ){
 
-            return generate.#main_generator( 
-                point2D , amount_of_points , undefined , min_X , max_X , min_Y , max_Y 
+            return Generator.#MAIN_GENERATOR( 
+                Point2D , amount_of_points , undefined , min_X , max_X , min_Y , max_Y 
             );
 
         },
 
-        lines( 
+        Lines2D( 
             amount_of_objects = 1 ,
             min_X = undefined , max_X = undefined , 
             min_Y = undefined , max_Y = undefined ,
             fill_color = undefined , fill_color_random_alpha = false ,
-            thickness = undefined , 
+            border_thickness = undefined , 
         ){
 
-            return generate.#main_generator( 
-                Line2D , amount_of_objects , thickness , min_X , max_X , min_Y , max_Y ,
+            return Generator.#MAIN_GENERATOR( 
+                Line2D , amount_of_objects , border_thickness , min_X , max_X , min_Y , max_Y ,
                 fill_color , undefined , fill_color_random_alpha 
             );
 
         },
 
-        rectangles( 
+        Rectangles2D( 
             amount_of_objects = 1 ,
             min_X = undefined , max_X = undefined , 
             min_Y = undefined , max_Y = undefined ,
@@ -256,8 +236,8 @@ export class generate {
             border_thickness = undefined, 
         ){
 
-            return generate.#main_generator( 
-                rectangle , amount_of_objects ,
+            return Generator.#MAIN_GENERATOR( 
+                Rectangle2D , amount_of_objects ,
                 border_thickness,
                 min_X , max_X , min_Y , max_Y , 
                 fill_color , border_color , 
@@ -266,7 +246,7 @@ export class generate {
 
         },
 
-        triangles(
+        Triangles2D(
             amount_of_objects = 1 ,
 
             min_X = undefined , max_X = undefined , 
@@ -279,7 +259,7 @@ export class generate {
             border_color_random_alpha = undefined
         ){
 
-            return generate.#main_generator(
+            return Generator.#MAIN_GENERATOR(
                 Triangle2D , amount_of_objects , border_thickness ,
                 min_X , max_X ,min_Y ,max_Y , 
                 fill_color , border_color ,
@@ -288,7 +268,7 @@ export class generate {
             
         },
 
-        cicrles( 
+        Cicrles2D( 
             amount_of_objects = 1 ,
             
             min_X = undefined , max_X = undefined , 
@@ -301,8 +281,8 @@ export class generate {
             border_color_random_alpha = undefined
         ){
 
-            return generate.#main_generator(
-                circle2D , amount_of_objects , border_thickness ,
+            return Generator.#MAIN_GENERATOR(
+                Circle2D , amount_of_objects , border_thickness ,
                 min_X , max_X ,min_Y ,max_Y ,
                 fill_color , border_color ,
                 fill_color_random_alpha , border_color_random_alpha
@@ -310,7 +290,7 @@ export class generate {
 
         },
 
-        ellipses(
+        Ellipses2D(
             amount_of_objects = 1 ,
             
             min_X = undefined , max_X = undefined , 
@@ -323,7 +303,7 @@ export class generate {
             border_color_random_alpha = undefined
         ){
 
-            return generate.#main_generator( 
+            return Generator.#MAIN_GENERATOR( 
                 Ellipse2D , amount_of_objects , border_thickness ,
                 min_X , max_X ,min_Y ,max_Y ,
                 fill_color , border_color ,
@@ -332,28 +312,6 @@ export class generate {
 
         },
 
-        planes(
-            amount_of_objects = 1 ,  
+    } // end of Random object
 
-            min_X = undefined , max_X = undefined , 
-            min_Y = undefined , max_Y = undefined ,
-            border_thickness = 0 ,
-
-            fill_color = undefined , border_color = undefined ,
-
-            fill_color_random_alpha = undefined , 
-            border_color_random_alpha = undefined
-        ){
-
-            return generate.#main_generator(
-                plane2D , amount_of_objects , border_thickness ,
-                min_X , max_X ,min_Y ,max_Y ,
-                fill_color , border_color ,
-                fill_color_random_alpha , border_color_random_alpha
-            );
-
-        }
-
-    }
-
-}
+} // end of Generator class

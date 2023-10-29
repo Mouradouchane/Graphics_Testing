@@ -61,7 +61,7 @@ export class RGBA{
             let alpha_A = fg_color.alpha; // af
             let alpha_B = bg_color.alpha; // ab
 
-            new_color.alpha = alpha_A + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * alpha_B; // a
+            new_color.alpha = alpha_A + ( 1 - alpha_A ) * alpha_B; // a
 
             // blend colors
 
@@ -70,14 +70,17 @@ export class RGBA{
                 c = _______________________________
                                 a
             */
-            for( let color of ["red","green","blue"] ){
-                RGBA.Set[color]( 
-                    new_color , 
-                    Math.round( 
-                        ( alpha_A * fg_color[color] + ( RGBA.#ALPHA_MAX_VALUE - alpha_A ) * bg_color[color] ) / new_color.alpha  
-                    )
-                );
-            }
+ 
+            new_color.red = Math.round( 
+                ( alpha_A * fg_color.red   + ( 1 - alpha_A ) * bg_color.red  )  / new_color.alpha 
+            );
+            new_color.green = Math.round(
+                ( alpha_A * fg_color.green + ( 1 - alpha_A ) * bg_color.green ) / new_color.alpha 
+            );
+
+            new_color.blue = Math.round( 
+                ( alpha_A * fg_color.blue  + ( 1 - alpha_A ) * bg_color.blue )  / new_color.alpha 
+            );
 
             return new_color;
             

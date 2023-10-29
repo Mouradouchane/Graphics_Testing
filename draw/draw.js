@@ -2,13 +2,12 @@
 import {RGBA} from "../color.js";
 import {Point2D} from "../point.js";
 import {Line2D}  from "../line.js";
-import {rectangle as RECT , rectangle_with_gradient as RECT_WITH_GRADIENT} from "../rectangle.js";
+import {Rectangle2D} from "../rectangle.js";
 import {Triangle2D} from "../triangle.js";
-import {circle2D} from "../circle.js";
+import {Circle2D} from "../circle.js";
 import {Ellipse2D} from "../ellipse.js";
+import {Curve2D} from "../curve.js";
 import {Rotate} from "../rotate.js";
-import {shear} from "../shear.js";
-import {plane2D} from "../plane.js";
 import {FrameBuffer} from "../buffers.js";
 
 export class Draw {     // CLASS LIKE NAMESPACE LOL :)
@@ -1444,6 +1443,42 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     }
 
 
+    // =========================================================================
+    //                       CURVES DRAW PRIVATE FUNCTIONS
+    // =========================================================================
+
+    static #DrawCubicBuzierCurve( curve = new Curve2D() ){
+
+        let k1 ,k2 ,k3 ,k4 ;
+        let p = new Point2D(0,0);
+
+        for(let t = 0 ; t <= 1 ; t += curve.accuracy){
+    
+            k1 = (1-t) * (1-t) * (1-t);
+            k2 = 3 * Math.pow((1-t),2) * t;
+            k3 = 3 * (1-t) * Math.pow(t,2);
+            k4 = Math.pow(t,3);
+
+		    p.x = Math.round( (curve.a.x * k1) + (curve.b.x * k2) + (curve.c.x * k3) + (curve.d.x * k4) );			
+			p.y = Math.round( (curve.a.y * k1) + (curve.b.y * k2) + (curve.c.y * k3) + (curve.d.y * k4) );			
+
+            Draw.#DrawCircle( p.x , p.y , 2 , 0 , curve.color );
+            
+        }
+        
+        // for debug only 
+        Draw.#LineNoGradient( curve.a , curve.b , 1 , new RGBA(255,255,255,0.7) );
+        Draw.#LineNoGradient( curve.b , curve.c , 1 , new RGBA(255,255,255,0.7) );
+        Draw.#LineNoGradient( curve.c , curve.d , 1 , new RGBA(255,255,255,0.7) );
+
+        Draw.#DrawCircle( curve.a.x, curve.a.y , 3 , 0 , new RGBA(100,100,255,1) );
+        Draw.#DrawCircle( curve.b.x, curve.b.y , 3 , 0 , new RGBA(100,100,255,1) );
+        Draw.#DrawCircle( curve.c.x, curve.c.y , 3 , 0 , new RGBA(100,100,255,1) );
+        Draw.#DrawCircle( curve.d.x, curve.d.y , 3 , 0 , new RGBA(100,100,255,1) );
+
+    }
+
+
     /*
         ==============================================================
                 PUBLIC FUCNTIONS AS INTERFACE FOR DRAW CLASS
@@ -1687,15 +1722,15 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static Circle2D( circle_object = new circle2D() ){
+    static Circle2D( circle_object = new Circle2D() ){
 
         // check canvas and circle
         let f1 = Draw.#CHECK_BUFFER();
-        let f2 = (circle_object instanceof circle2D);
+        let f2 = (circle_object instanceof Circle2D);
 
         if( f1 && f2 ){
             
-            let copy = circle2D.copy( circle_object );
+            let copy = Circle2D.Copy( circle_object );
 
             if( copy.border_color instanceof RGBA || copy.fill_color instanceof RGBA ){
 
@@ -1735,7 +1770,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                 }
                 else { // if ellipse fill require rotation
 
-                    Draw.#FILL_ELLIPSE_WITH_ROTATION( 
+                    Draw.#DrawEllipseWithRotation( 
                         ellipse_object.x , 
                         ellipse_object.y , 
                         ellipse_object.width , 
@@ -1797,5 +1832,32 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     } 
  
+    static Curve2D( curve_object = new Curve2D() ){
+
+        // check canvas and circle
+        let f1 = Draw.#CHECK_BUFFER();
+        let f2 = (curve_object instanceof Curve2D );
+        
+        if( f1 && f2 ){
+
+            if( 
+                (curve_object.thickness > 0) && 
+                (curve_object.color instanceof RGBA) && 
+                (curve_object.accuracy > 0)
+            ){
+
+                Draw.#DrawCubicBuzierCurve( Curve2D.Copy(curve_object) );
+
+            }
+
+        }
+        else{
+
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
+ 
+        }
+
+    }
 
 } // end of class Draw

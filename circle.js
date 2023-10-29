@@ -1,6 +1,6 @@
 import { RGBA } from "./color.js";
 
-export class circle2D {
+export class Circle2D {
 
     constructor( 
         x = 1 , y = 1 , radius = 1 , fill_color = undefined , border_thickness = 1 , border_color = undefined
@@ -16,11 +16,11 @@ export class circle2D {
     }
 
 
-    static copy( circle2D_object = new circle2D() ){
+    static Copy( circle2D_object = new Circle2D() ){
 
-        if( circle2D_object instanceof circle2D ) {
+        if( circle2D_object instanceof Circle2D ) {
 
-            return new circle2D( 
+            return new Circle2D( 
                 Number.parseInt(circle2D_object.x) , 
                 Number.parseInt(circle2D_object.y) ,
                 Number.parseInt(circle2D_object.r) ,
@@ -34,12 +34,12 @@ export class circle2D {
 
     }
 
-    static random_circle( 
+    static RandomCircle( 
         max_width = 1, max_height = 1 , thickness = 1 , 
         generate_fill_color = false , generate_border_color = true 
     ){
 
-        return new circle2D(
+        return new Circle2D(
             Math.random() * max_width ,
             Math.random() * max_height ,
             Math.random() * max_width/8 ,

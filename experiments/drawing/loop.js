@@ -1,16 +1,16 @@
-import {Draw} from "../../draw/draw.js";
 import {RGBA} from "../../color.js";
 import {Point2D} from "../../point.js";
 import {Line2D} from "../../line.js";
+import {Curve2D} from "../../curve.js";
 import {Rectangle2D} from "../../rectangle.js";
 import {Triangle2D, Triangle2DGradient} from "../../triangle.js";
-import {generate} from "../../generators.js";
+import {Generator} from "../../generators.js";
 import {Circle2D} from "../../circle.js";
 import {Ellipse2D} from "../../ellipse.js";
 import {Check} from "../../check.js";
 import {Rotate} from "../../rotate.js";
-import {CURVE_2D_3_POINTS , CURVE_2D_4_POINTS} from "../../curve.js";
-import { FrameBuffer } from "../../buffers.js";
+import {Draw} from "../../draw/draw.js";
+import {FrameBuffer} from "../../buffers.js";
 
 const Canvas = document.querySelector("#canvas");
 const CTX = Canvas.getContext("2d");
@@ -27,7 +27,7 @@ var Config = {
     NewTestEachTime : false ,
     IntervalTime : 3000 , // ms
     AntiAlias : false ,
-    ShapesIndex  : 3 ,
+    ShapesIndex  : 6 ,
     ShapesAmount : 3 ,
     GenerateRandomShapesEachTime : false ,
     BorderThickness  : 4 ,
@@ -40,12 +40,17 @@ var Config = {
 /*
     generate random "shapes for testing"
 */
+
 var lines = [
-    ...generate.random.lines(shapes_amount , 0 , max_width , 0, max_height )
+    ...Generator.Random.Lines2D(
+        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight 
+    )
 ];
 
 var rectangles = [
-    ...generate.random.rectangles(shapes_amount , 0 , max_width , 0, max_height , null , true , null , true , 3)
+    ...Generator.Random.Rectangles2D(
+        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , null , true , null , true , 3
+    )
 ]; 
 
 var triangles = [ 
@@ -110,32 +115,50 @@ var triangles = [
         new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
     ),
 */
-        new Triangle2DGradient( 
-            new point2D(350, 10) ,
-            new point2D(10 ,500)  ,
-            new point2D(700 , 500)  ,
-            // new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
-            new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
-        ),
+    new Triangle2DGradient( 
+        new Point2D(350, 10) ,
+        new Point2D(10 ,500)  ,
+        new Point2D(700 , 500)  ,
+        // new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
+        new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
+    ),
 
 ];
 
 var circles = [
-    //...generate.random.cicrles(shapes_amount , 0 , max_width , 0 , max_height , 2 , null , null , true)
-    new circle2D( 250 , 300 , 50 , new RGBA(0,255,0, 0.4) ) ,
-    new circle2D( 300 , 300 , 50 , new RGBA(0,0,255, 0.5) ) ,
-    new circle2D( 270 , 250 , 50 , new RGBA(255,0,0, 0.6) ) ,
+    /*
+    ...Generator.Random.Circles2D(
+        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 2 , null , null , true
+    ),
+    */
+    new Circle2D( 250 , 300 , 50 , new RGBA(0,255,0, 0.4) ) ,
+    new Circle2D( 300 , 300 , 50 , new RGBA(0,0,255, 0.5) ) ,
+    new Circle2D( 270 , 250 , 50 , new RGBA(255,0,0, 0.6) ) ,
 ];
 
 var ellipses = [
-    // ...generate.random.ellipses(shapes_amount , 0 , max_width , 0 , max_height )
-    // new ellipse2D(250,300, 50,150 , 0 , new RGBA(55,100,80,0.7) , new RGBA(155,80,208,0.5) , 16) , 
-    new Ellipse2D(201,300, 150,50 , 0.1 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5) , 16) , 
+    /*
+    ...Generator.Random.Ellipses2D(
+        shapes_amount , 0 , max_width , 0 , max_height 
+    ),
+    */
+    new Ellipse2D(250,300, 50,150 , 0   , new RGBA(55,100,80,0.7)   , new RGBA(155,80,208,0.5) , 16) , 
+    new Ellipse2D(201,300, 150,50 , 0.1 , new RGBA(105,200,180,0.7) , new RGBA(255,0,180,0.5)  , 16) , 
 ];
 
+var curves = [
+    new Curve2D( 
+        new Point2D(230,50) , 
+        new Point2D(134,246) , 
+        new Point2D(634,246) , 
+        new Point2D(300,446) ,
+        1 / 32 , new RGBA(255,0,0,1) 
+    )
+]
 
-Draw.set_canvas( Canvas );
-Draw.set_buffer( Buffer );
+
+Draw.SetCanvas( Canvas );
+Draw.SetBuffer( Buffer );
 Check.Set.Buffer( Buffer );
 
 /*
@@ -187,7 +210,7 @@ function NewFrame(){
 
                 if( Config.GenerateRandomShapesEachTime ){
                     
-                    rectangles = generate.random.rectangles(
+                    rectangles = Generator.Random.Rectangles2D(
                         shapes_amount , 0 , max_width , 0, max_height
                     )
 
@@ -213,7 +236,7 @@ function NewFrame(){
 
                 if( Config.GenerateRandomShapesEachTime ){
 
-                    triangles = generate.random.triangles(
+                    triangles = Generator.Random.Triangles2D(
                         shapes_amount , 0 , max_width/2 , 0, max_height/2 , 0 , new RGBA(150,150,55,0.7) , 0 
                     );
 
@@ -250,7 +273,16 @@ function NewFrame(){
 
         } break;
 
+        // curves 
+        case 6 : {
 
+            for( let curve of curves ){
+            
+                Draw.Curve2D( curve );
+
+            }
+
+        } break;
         
     } // end of "switch-case"
     
