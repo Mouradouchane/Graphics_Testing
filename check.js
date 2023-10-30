@@ -339,11 +339,6 @@ export class Check {
 
                 if( check_type ){
 
-                    Check.VisualCheck.Point2D( curve.a );
-                    Check.VisualCheck.Point2D( curve.b );
-                    Check.VisualCheck.Point2D( curve.c );
-                    Check.VisualCheck.Point2D( curve.d );
-
                     if( connect_debug_points_with_lines ){
 
                         Draw.Line2D( 
@@ -360,6 +355,10 @@ export class Check {
 
                     }
 
+                    Check.VisualCheck.Point2D( curve.a );
+                    Check.VisualCheck.Point2D( curve.b );
+                    Check.VisualCheck.Point2D( curve.c );
+                    Check.VisualCheck.Point2D( curve.d );
 
                 }   
 

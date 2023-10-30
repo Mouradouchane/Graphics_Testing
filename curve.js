@@ -50,3 +50,30 @@ export class Curve2D {
 
 
 };
+
+export class LongCurve2D{
+
+    constructor( accuracy = 1/32 , color = new RGBA() , thickness = 1 , ...points ){
+        
+        this.curves = [];
+        this.accuracy = (accuracy > 0 && accuracy <= 1) ? accuracy : 1/32;
+        this.color = (color instanceof RGBA) ? color : new RGBA();
+        this.thickness = thickness;
+
+        for( let i = 0 ; i < points.length ; i += 4 ){
+
+            let new_curve = new Curve2D();
+
+            new_curve.a = (points[i  ] instanceof Point2D ) ? points[i  ] : new Point2D();
+            new_curve.b = (points[i+1] instanceof Point2D ) ? points[i+1] : new Point2D();
+            new_curve.c = (points[i+2] instanceof Point2D ) ? points[i+2] : new Point2D();
+            new_curve.d = (points[i+3] instanceof Point2D ) ? points[i+3] : new Point2D();
+      
+            this.curves.push( new_curve );
+
+        }
+
+    }
+
+
+}

@@ -6,7 +6,7 @@ import {Rectangle2D} from "../rectangle.js";
 import {Triangle2D} from "../triangle.js";
 import {Circle2D} from "../circle.js";
 import {Ellipse2D} from "../ellipse.js";
-import {Curve2D} from "../curve.js";
+import {Curve2D , LongCurve2D} from "../curve.js";
 import {Rotate} from "../rotate.js";
 import {FrameBuffer} from "../buffers.js";
 
@@ -120,7 +120,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         
     }
 
-    // we need this for our color blending 
+    // needed for sampling :)
     static #SetSample( x , y , sample_color ){
     }
     static #GetSample( x , y ) {
@@ -139,10 +139,13 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     // =========================================================================
 
     // standard line draw 
-    static #LineWithGradient(
-        point_a = new Point2D() , point_b = new Point2D() , width = 1 ,
-        color_a = new RGBA()  , color_b = new RGBA()
+    static #DrawLineWithGradient(
+        point_1 = new Point2D() , point_2 = new Point2D() , width = 1 ,
+        color_1 = new RGBA()  , color_2 = new RGBA()
     ){
+        
+        point_a = Point2D.Copy(point_1);
+        point_b = Point2D.Copy(point_2);
 
         width = Math.abs(width);
         let width_mod = Math.floor(width) % 2;
@@ -159,11 +162,11 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let x_or_y = Math.abs(delta_x) >= Math.abs(delta_y); 
 
         let g_delta     = Math.abs( x_or_y ? delta_x : delta_y );
-        let delta_red   = (color_b.red   - color_a.red)   / g_delta;
-        let delta_green = (color_b.green - color_a.green) / g_delta;
-        let delta_blue  = (color_b.blue  - color_a.blue)  / g_delta;
-        let delta_alpha = (color_b.alpha - color_a.alpha) / g_delta;
-        let color = new RGBA(color_a.red , color_a.green , color_a.blue , color_a.alpha);
+        let delta_red   = (color_2.red   - color_1.red)   / g_delta;
+        let delta_green = (color_2.green - color_1.green) / g_delta;
+        let delta_blue  = (color_2.blue  - color_1.blue)  / g_delta;
+        let delta_alpha = (color_2.alpha - color_1.alpha) / g_delta;
+        let color = new RGBA(color_1.red , color_1.green , color_1.blue , color_1.alpha);
 
         // sort point for proper drawing 
         if( x_or_y && point_a.x > point_b.x || !x_or_y && point_a.y > point_b.y) {
@@ -215,7 +218,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     } 
 
     // standard line draw 
-    static #LineNoGradient( 
+    static #DrawLineNoGradient( 
         point_1 = new Point2D() , point_2 = new Point2D() , 
         width = 1 , color = new RGBA()
     ) {
@@ -281,7 +284,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static #DDA_LineDrawAlgorithm(
+    static #DDALineDrawAlgorithm(
         line_object = new Line2D()
     ){
 
@@ -345,7 +348,6 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
  
     }
 
-    
     // fast and direct function for filling shapes line by line horizontaly  
     static #DrawHorizontalLine( x1 = 1 , x2 = 1 , y = 1 , color = undefined ){
         
@@ -586,7 +588,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let b = point.y - ( point.x * M );
         let end_point = new Point2D( point.x + distance , ((point.x+distance) * M) + b );
 
-        Draw.#LineNoGradient( point , end_point , 1 , color );
+        Draw.#DrawLineNoGradient( point , end_point , 1 , color );
     }
 
     static #GenerateOutsideTriangle( triangle = new Triangle2D() , round_values = false ){
@@ -974,9 +976,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static #DrawFastTriangleBorder( triangle = new Triangle2D() ){
 
         triangle.border_color.alpha = 1;
-        Draw.#LineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
-        Draw.#LineNoGradient( triangle.a , triangle.c , 2 , triangle.border_color );
-        Draw.#LineNoGradient( triangle.b , triangle.c , 2 , triangle.border_color );
+        Draw.#DrawLineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
+        Draw.#DrawLineNoGradient( triangle.a , triangle.c , 2 , triangle.border_color );
+        Draw.#DrawLineNoGradient( triangle.b , triangle.c , 2 , triangle.border_color );
 
     }
 
@@ -1425,7 +1427,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                         [ref[i].X , ref[i].Y] = Rotate.Z( ref[i].X , ref[i].Y , angle );
 
                         if( Draw.#CalcDistance())
-                        Draw.#LineNoGradient(
+                        Draw.#DrawLineNoGradient(
                             new Point2D( x_org + ref[i].X , y_org + ref[i].Y ) ,
                             new Point2D( x_org + old_ref[i].X , y_org + old_ref[i].Y ) ,
                             1 , border_color 
@@ -1452,17 +1454,10 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     static #DrawCubicBuzierCurve( curve = new Curve2D() ){
 
-        let k1 ,k2 ,k3 ,k4 ;
-
         let old_point = Point2D.Copy(curve.a);
         let new_point = Point2D.Copy(curve.a);
 
-        // for debug only 
-        /*
-        Draw.#LineNoGradient( Point2D.Copy(curve.a) , Point2D.Copy(curve.b) , 1 , new RGBA(255,255,255,0.7) );
-        Draw.#LineNoGradient( Point2D.Copy(curve.b) , Point2D.Copy(curve.c) , 1 , new RGBA(255,255,255,0.7) );
-        Draw.#LineNoGradient( Point2D.Copy(curve.c) , Point2D.Copy(curve.d) , 1 , new RGBA(255,255,255,0.7) );
-        */
+        let k1 , k2 , k3 , k4 ;
 
         for( let t = curve.accuracy ; t <= 1 ; t += curve.accuracy ){
     
@@ -1474,23 +1469,33 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 		    new_point.x = Math.round( (curve.a.x * k1) + (curve.b.x * k2) + (curve.c.x * k3) + (curve.d.x * k4) );			
 			new_point.y = Math.round( (curve.a.y * k1) + (curve.b.y * k2) + (curve.c.y * k3) + (curve.d.y * k4) );			
 
-            Draw.#LineNoGradient( Point2D.Copy(old_point) , Point2D.Copy(new_point) , curve.thickness , curve.color );
-            
-            // Draw.#DrawCircle( new_point.x , new_point.y , 1 , 0 , new RGBA(0,255,255,0.7) );
+            Draw.#DrawLineNoGradient( 
+                Point2D.Copy(old_point) , Point2D.Copy(new_point) , curve.thickness , curve.color 
+            );
 
             old_point = Point2D.Copy(new_point);
 
         }
 
-        /*
-        Draw.#DrawCircle( curve.a.x, curve.a.y , 3 , 0 , new RGBA(100,100,255,1) );
-        Draw.#DrawCircle( curve.b.x, curve.b.y , 3 , 0 , new RGBA(100,100,255,1) );
-        Draw.#DrawCircle( curve.c.x, curve.c.y , 3 , 0 , new RGBA(100,100,255,1) );
-        Draw.#DrawCircle( curve.d.x, curve.d.y , 3 , 0 , new RGBA(100,100,255,1) );
-        */
-
     }
 
+    static #DrawLongCubicCurve( long_curves = new LongCurve2D() ){
+
+        if( long_curves instanceof LongCurve2D ){
+
+            for( let curve of long_curves.curves ){
+
+                curve.accuracy  = long_curves.accuracy;
+                curve.thickness = long_curves.thickness;
+                curve.color     = long_curves.color;
+
+                Draw.#DrawCubicBuzierCurve( Curve2D.Copy(curve) );
+
+            }
+
+        }
+
+    }
 
     /*
         ==============================================================
@@ -1594,7 +1599,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         if( f1 && f2 ){
 
-            this.#LineNoGradient(
+            this.#DrawLineNoGradient(
                 line_object.a , line_object.b , 
                 line_object.width , line_object.color , line_object.anti_alias
             );
@@ -1617,7 +1622,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         if( f1 && f2 ){
 
-            this.#LineWithGradient(
+            this.#DrawLineWithGradient(
                 line_object.a , line_object.b , line_object.width , 
                 point_a_color , point_b_color
             );
@@ -1860,6 +1865,34 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             ){
 
                 Draw.#DrawCubicBuzierCurve( Curve2D.Copy(curve_object) );
+
+            }
+
+        }
+        else{
+
+            if(!f1) Draw.#LOG.ERROR.BUFFER.MISSING();
+            if(!f2) Draw.#LOG.ERROR.OBJECT.INVALID();
+ 
+        }
+
+    }
+
+    static LongCurve2D( curve_object = new LongCurve2D() ){
+        
+        // check canvas and circle
+        let f1 = Draw.#CHECK_BUFFER();
+        let f2 = ( curve_object instanceof LongCurve2D );
+        
+        if( f1 && f2 ){
+
+            if( 
+                (curve_object.thickness > 0) && 
+                (curve_object.color instanceof RGBA) && 
+                (curve_object.accuracy > 0 && curve_object.accuracy <= 1)
+            ){
+
+                Draw.#DrawLongCubicCurve( curve_object );
 
             }
 

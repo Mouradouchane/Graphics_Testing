@@ -1,7 +1,7 @@
 import {RGBA} from "../../color.js";
 import {Point2D} from "../../point.js";
 import {Line2D} from "../../line.js";
-import {Curve2D} from "../../curve.js";
+import {Curve2D, LongCurve2D} from "../../curve.js";
 import {Rectangle2D} from "../../rectangle.js";
 import {Triangle2D, Triangle2DGradient} from "../../triangle.js";
 import {Generator} from "../../generators.js";
@@ -16,6 +16,9 @@ const Canvas = document.querySelector("#canvas");
 const CTX = Canvas.getContext("2d");
 const Buffer = new FrameBuffer( 800 , 600 );
 
+var FPS = 0;
+var FpsCounter = 0;
+
 /*
     small configuration rendering/drawing/debug
 */
@@ -25,7 +28,7 @@ var Config = {
     DrawGrid : false ,
     DrawPointsForDebug : true ,
     GenerateRandomShapesEachTime : true ,
-    NewTestEachTime : true ,
+    NewTestEachTime : false ,
     IntervalTime : 3000 , // ms
     AntiAlias : false ,
     ShapesIndex  : 6 ,
@@ -35,6 +38,8 @@ var Config = {
     MaxWidth  : Canvas.clientWidth  / 1.5 ,
     MaxHeight : Canvas.clientHeight / 1.5 ,
 
+    ShowFps : true,
+    
 }
 
 /*
@@ -149,6 +154,11 @@ var ellipses = [
 var curves = [
    ...Generator.Random.Curves2D( 1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 2 , 1/32 , null , false ) , 
 ];
+
+var longcurve = new LongCurve2D(
+    1/32 , new RGBA(255,0,0,1), 2 ,
+    ...Generator.Random.Points2D( 8 , 0 , Config.MaxWidth , 0 , Config.MaxHeight)
+)
 
 
 Draw.SetCanvas( Canvas );
@@ -271,7 +281,9 @@ function NewFrame(){
         // curves 
         case 6 : {
 
-            for( let curve of curves ){
+            Draw.LongCurve2D(longcurve);
+            /*
+            for( let curve of longcurve.curves ){
             
                 Draw.Curve2D( curve );
 
@@ -287,6 +299,7 @@ function NewFrame(){
                 }
 
             }
+            */
 
         } break;
         
@@ -294,48 +307,108 @@ function NewFrame(){
     
     Draw.RenderBuffer();
 
+
 }
 
+
+function ShowFps(){
+
+    CTX.fillStyle = "white";
+    CTX.font = "18px serif";
+    CTX.fillText(`FPS : ${FPS}` , 5 , 20 );
+
+}
 
 function Render(){
     
     /*
         todo : implement buffer swap !!!!!!!!!!!!!!!!!!!
     */
-    ClearCanvas();
-    ClearBuffer();
-    NewFrame();
 
-    requestAnimationFrame( Render );
+    if( Config.RenderingLoop ){
 
-}
+        ClearCanvas();
+        ClearBuffer();
+        NewFrame();
 
-if( Config.AntiAlias ){    
-    CTX.imageSmoothingEnabled = true;
-}
-else {
-    CTX.imageSmoothingEnabled = false;
-}
+        FpsCounter += 1;
 
-
-if( Config.RenderingLoop ) Render();
-else {
+        if(Config.ShowFps) ShowFps();
     
-    if( Config.NewTestEachTime ){
+        requestAnimationFrame( Render );
+
+    }
+
+}
+
+function HandleKeys( e ){
+
+    switch(e.code) {
+
+        case "Space" : { // stop rendering loop
+
+            Config.RenderingLoop = false;
+
+        } break;
+
+        case "ShiftLeft" : { // start rendering loop
+
+            Config.RenderingLoop = true;
+            Render();
+
+        }
+    }
+
+}
+
+(
+function main(){
+
+    if( Config.AntiAlias ){    
+        CTX.imageSmoothingEnabled = true;
+    }
+    else {
+        CTX.imageSmoothingEnabled = false;
+    }
+
+    document.addEventListener("keyup" , HandleKeys );
+
+    if( Config.ShowFps ){
 
         setInterval( () => {
+            FPS = FpsCounter;
+            FpsCounter = 0;
+        }, 1000 );
+
+    }
+
+    if( Config.RenderingLoop ){
+
+        Render();
+
+    }
+    else {
+        
+        if( Config.NewTestEachTime ){
+
+            setInterval( () => {
+
+                ClearCanvas();
+                NewFrame();
+
+            } , Config.IntervalTime );
+
+        }
+        else{
 
             ClearCanvas();
             NewFrame();
 
-        } , Config.IntervalTime );
-
-    }
-    else{
-
-        ClearCanvas();
-        NewFrame();
+        }
 
     }
 
 }
+)();
+
+
