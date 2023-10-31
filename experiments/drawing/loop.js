@@ -59,67 +59,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    /*
-    ...generate.random.triangles(2 , 0 , max_width*0.8 , 0 ,max_height*0.8, null , null , new RGBA(255,255,255,0.5) , 1 ),
-    new triangle2D( 
-        new point2D(100, 200) ,
-        new point2D(300, 200) ,
-        new point2D(300, 240) ,
-        thickness, 0 , 
-        new RGBA(0,100,80,0.5) 
-    ),
-    new triangle2D( 
-        new point2D(300 , 200-100) ,
-        new point2D(100 , 200-100) ,
-        new point2D(300 , 240-100) ,
-        thickness, 
-        new RGBA(0,100,80,0.5) , 0
-    ),
-    new triangle2D( 
-        new point2D(200, 300) ,
-        new point2D(200, 400) ,
-        new point2D(100, 300) ,
-        thickness, 
-        new RGBA(150,100,180,0.5) , 0
-    ),
- 
-    new triangle2D( 
-        new point2D(200, 400+110) ,
-        new point2D(200, 300+110) ,
-        new point2D(100, 300+110) ,
-        3 , 
-        new RGBA(150,100,180,0.5), new RGBA(255,0,0,0.6) ,
-    ),
-        
-    new triangle2D( 
-        new point2D(100, 100) ,
-        new point2D(100, 300) ,
-        new point2D(300, 300) ,
-        1 , 
-        new RGBA(150,100,180,0.5) , new RGBA(255,0,0,0.6) ,
-    ),
-
-    new triangle2D_gradient( 
-        new point2D(600, 300) ,
-        new point2D(500, 255) ,
-        new point2D(400, 444) ,
-        new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
-    ),
-
-    new triangle2D_gradient( 
-        new point2D(150, 150) ,
-        new point2D(150, 255) ,
-        new point2D(200, 255) ,
-        new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
-    ),
-
-    new triangle2D_gradient( 
-        new point2D(450, 150) ,
-        new point2D(300, 55)  ,
-        new point2D(200, 80)  ,
-        new RGBA(255,0,0,1) , new RGBA(0,255,0,1) , new RGBA(0,0,255,1) ,
-    ),
-*/
+    
     new Triangle2DGradient( 
         new Point2D(350, 10) ,
         new Point2D(10 ,500)  ,
@@ -157,7 +97,23 @@ var curves = [
 
 var longcurve = new LongCurve2D(
     1/32 , new RGBA(255,0,0,1), 2 ,
-    ...Generator.Random.Points2D( 8 , 0 , Config.MaxWidth , 0 , Config.MaxHeight)
+    // ...Generator.Random.Points2D(9, 0 , Config.MaxWidth , 0 , Config.MaxHeight)
+
+    new Point2D( 100 , 100 ),
+    new Point2D( 290 , 200 ),
+    new Point2D( 390 , 300 ),
+
+    new Point2D( 400 , 400 ),
+
+    new Point2D( 500 , 500 ),
+    new Point2D( 650 , 400 ),
+
+    new Point2D( 600 , 350 ),
+
+    new Point2D( 500 , 250 ),
+    new Point2D( 650 , 200 ),
+    new Point2D( 600 , 100 ),
+
 )
 
 
@@ -281,25 +237,31 @@ function NewFrame(){
         // curves 
         case 6 : {
 
-            Draw.LongCurve2D(longcurve);
-            /*
-            for( let curve of longcurve.curves ){
-            
-                Draw.Curve2D( curve );
-
-                if( Config.DrawPointsForDebug ) {
-                    Check.VisualCheck.Curves2D( curve , true );
-                }
-
-                if( Config.GenerateRandomShapesEachTime ) {    
-                    curves = Generator.Random.Curves2D( 
-                        1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight
-                        , 2 , 1/32 , null , false 
-                    );
-                }
-
+            if( Config.DrawPointsForDebug ) {
+                Check.VisualCheck.LongCurve2D( longcurve , true );
             }
-            */
+
+            Draw.LongCurve2D(longcurve);
+
+
+            if(false){
+                for( let curve of longcurve.curves ){
+                
+                    Draw.Curve2D( curve );
+
+                    if( Config.DrawPointsForDebug ) {
+                        Check.VisualCheck.Curves2D( curve , true );
+                    }
+
+                    if( Config.GenerateRandomShapesEachTime ) {    
+                        curves = Generator.Random.Curves2D( 
+                            1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight
+                            , 2 , 1/32 , null , false 
+                        );
+                    }
+
+                }
+            }
 
         } break;
         

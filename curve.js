@@ -59,15 +59,17 @@ export class LongCurve2D{
         this.accuracy = (accuracy > 0 && accuracy <= 1) ? accuracy : 1/32;
         this.color = (color instanceof RGBA) ? color : new RGBA();
         this.thickness = thickness;
+        
+        for( let i = 0 ; i < points.length ; i += 3 ){
 
-        for( let i = 0 ; i < points.length ; i += 4 ){
+            if( (i+3) >= points.length ) break;
 
             let new_curve = new Curve2D();
 
-            new_curve.a = (points[i  ] instanceof Point2D ) ? points[i  ] : new Point2D();
-            new_curve.b = (points[i+1] instanceof Point2D ) ? points[i+1] : new Point2D();
-            new_curve.c = (points[i+2] instanceof Point2D ) ? points[i+2] : new Point2D();
-            new_curve.d = (points[i+3] instanceof Point2D ) ? points[i+3] : new Point2D();
+            new_curve.a = (points[i  ] instanceof Point2D ) ? points[i  ] : null ;
+            new_curve.b = (points[i+1] instanceof Point2D ) ? points[i+1] : null ;
+            new_curve.c = (points[i+2] instanceof Point2D ) ? points[i+2] : null ;
+            new_curve.d = (points[i+3] instanceof Point2D ) ? points[i+3] : null ;
       
             this.curves.push( new_curve );
 
