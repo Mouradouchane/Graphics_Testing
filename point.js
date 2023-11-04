@@ -45,6 +45,16 @@ export class Point2D{
 
 }
 
+// same as point :)
+export class Vector2D extends Point2D{
+
+
+    constructor(x = 0 , y = 0){
+        super(x , y);
+    }
+
+}
+
 /*
     ===================================================
                             3D

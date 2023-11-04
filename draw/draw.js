@@ -2,6 +2,7 @@
 import {RGBA} from "../color.js";
 import {Point2D} from "../point.js";
 import {Line2D}  from "../line.js";
+import {MATH} from "../math.js";
 import {Rectangle2D} from "../rectangle.js";
 import {Triangle2D} from "../triangle.js";
 import {Circle2D} from "../circle.js";
@@ -69,7 +70,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     }
 
     // for needed stuff for "drawing,options,..." 
-    static #RESOURCES = {
+    static #Resource = {
 
         Buffer : undefined, // frame_buffer
 
@@ -88,12 +89,12 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static #CHECK_CANVAS(){
-        return ( Draw.#RESOURCES.Canvas != undefined && Draw.#RESOURCES.Ctx != undefined );
+    static #CheckForCanvas(){
+        return ( Draw.#Resource.Canvas != undefined && Draw.#Resource.Ctx != undefined );
     }
 
-    static #CHECK_BUFFER(){
-        return ( Draw.#RESOURCES.Buffer instanceof FrameBuffer ) ? true : false;
+    static #CheckForBuffer(){
+        return ( Draw.#Resource.Buffer instanceof FrameBuffer ) ? true : false;
     }
 
     static #SetPixle( x , y , pixle_color = null ) {
@@ -101,37 +102,37 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         x = Number.parseInt(x);
         y = Number.parseInt(y);
         
-        if( !(Draw.#RESOURCES.DrawDirectToCanvas) ){
+        if( !(Draw.#Resource.DrawDirectToCanvas) ){
 
             // if blend color's needed , no z-axis 
             if(pixle_color.alpha < 1) {
-                pixle_color = RGBA.Blend( pixle_color , Draw.#RESOURCES.Buffer.get_pixle(x , y) );
+                pixle_color = RGBA.Blend( pixle_color , Draw.#Resource.Buffer.get_pixle(x , y) );
             }
             
-            Draw.#RESOURCES.Buffer.set_pixle( x , y , pixle_color );
+            Draw.#Resource.Buffer.set_pixle( x , y , pixle_color );
             
         } 
         else {
 
-            Draw.#RESOURCES.Ctx.fillStyle = RGBA.ToString( pixle_color );
-            Draw.#RESOURCES.Ctx.fillRect( x , y , 1 , 1 );
+            Draw.#Resource.Ctx.fillStyle = RGBA.ToString( pixle_color );
+            Draw.#Resource.Ctx.fillRect( x , y , 1 , 1 );
 
         }
         
     }
 
+    /* need work */
+    static #GetPixle( x , y ){
+
+    }
+    
     // needed for sampling :)
+
+    /* need work */
     static #SetSample( x , y , sample_color ){
     }
+    /* need work */
     static #GetSample( x , y ) {
-    }
-    static #GetPixle( x , y ) {
-    }
-
-    static #CalcDistance( x1 = 1 , x2 = 1 , y1 = 1 , y2 = 1 ){
-
-        return ( Math.sqrt( ((x2 - x1)**2) + ((y2 - y1)**2 ) ) );
-
     }
 
     // =========================================================================
@@ -531,37 +532,6 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    // calc the Y or B intercept point using slope intercept form
-    // y = (m*x) + b   ===========>   b = y - ( m * x )
-    static #CalcYIntercept( target_point = new Point2D() , slope = 0){
-        
-        return target_point.y - ( target_point.x * slope );
-
-    }
-
-    // compute the intersection points 
-    static #CalcInterSectionPoint2D( point_1 , point_2 , a , b ){
-        // debugger
-        // x : ( (d - c) / ((a - b) | 1) )
-        // y :( a * ( (d - c) / ((a - b) | 1) ) ) + c
-
-        // calc intercept point of point 1 & 2
-        let c = Draw.#CalcYIntercept( point_1 , a );
-        let d = Draw.#CalcYIntercept( point_2 , b );
-
-        let x1 = point_1.x , x2 = point_2.x;
-        let y1 = point_1.y , y2 = point_2.y;
-
-        let X = (y2 - y1 + a * x1 - b * x2) / (a - b);
-        let Y = (X * a) + c; 
-
-        // the intersection point
-        return new Point2D(
-            X , Y
-        );
-
-    }
-
     /*
         function to calculate the area of triangle using herons formula 
     */
@@ -581,14 +551,11 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     /*
         draw a line from a point and slope , this function usualy used for debug
     */
-    static #DrawLineFromPoint( point , M , distance  , color ){
+    static #DrawLineFromPoint( point , M , distance  , thickness , color ){
             
-        point = Point2D.Copy(point);
+        let end_point = MATH.Point2DAtLine( point , M , distance );
 
-        let b = point.y - ( point.x * M );
-        let end_point = new Point2D( point.x + distance , ((point.x+distance) * M) + b );
-
-        Draw.#DrawLineNoGradient( point , end_point , 1 , color );
+        Draw.#DrawLineNoGradient( point , end_point , thickness , color );
     }
 
     static #GenerateOutsideTriangle( triangle = new Triangle2D() , round_values = false ){
@@ -596,103 +563,54 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let outside_triangle = new Triangle2D();
 
         // center of triangle
-        let C = {
-            x : ((triangle.a.x + triangle.b.x + triangle.c.x) / 3) ,
-            y : ((triangle.a.y + triangle.b.y + triangle.c.y) / 3)
-        };
+        let C = MATH.Triangle2DCentroid( triangle.a , triangle.b , triangle.c );
+         
 
         let slopes = {
-            ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
-            ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
-            bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
+            ab : MATH.Slope2D( triangle.a , triangle.b ),
+            ac : MATH.Slope2D( triangle.a , triangle.c ),
+            bc : MATH.Slope2D( triangle.b , triangle.c ),
         };
 
         // normals in triangle 
         let normals = {
-
-            // n1 for => (-dy ,  dx)
-            // n2 for => ( dy , -dx)
-
-            ab : {
-                n1: new Point2D( -(triangle.b.y - triangle.a.y) ,  (triangle.b.x - triangle.a.x) ) ,
-                n2: new Point2D(  (triangle.b.y - triangle.a.y) , -(triangle.b.x - triangle.a.x) ) ,
-            } ,
-
-            ac : {
-                n1: new Point2D( -(triangle.c.y - triangle.a.y) ,  (triangle.c.x - triangle.a.x) ) ,
-                n2: new Point2D(  (triangle.c.y - triangle.a.y) , -(triangle.c.x - triangle.a.x) ) ,
-            } , 
-
-            bc : {
-                n1: new Point2D( -(triangle.c.y - triangle.b.y) ,  (triangle.c.x - triangle.b.x) ) ,
-                n2: new Point2D(  (triangle.c.y - triangle.b.y) , -(triangle.c.x - triangle.b.x) ) ,
-            }
-
+            ab : MATH.Normals2D( triangle.a , triangle.b ) ,
+            ac : MATH.Normals2D( triangle.a , triangle.c ) , 
+            bc : MATH.Normals2D( triangle.b , triangle.c ) ,
         }
         
         // 2 - calc length of normals 
+        /*
         let normals_lengths = {
-            ab : ( Draw.#CalcDistance(triangle.b.x , triangle.a.x , triangle.b.y , triangle.a.y) | 1),
-
-            ac : ( Draw.#CalcDistance(triangle.c.x , triangle.a.x , triangle.c.y , triangle.a.y) | 1),
-
-            bc : ( Draw.#CalcDistance(triangle.c.x , triangle.b.x , triangle.c.y , triangle.b.y) | 1),
+            ab : ( MATH.Distance( triangle.b , triangle.a ) || 1),
+            ac : ( MATH.Distance( triangle.c , triangle.a ) || 1),
+            bc : ( MATH.Distance( triangle.c , triangle.b ) || 1),
         }
+        */
         
         // 3 - normalaize those "length" 
         // + 
         // 4 - scale by thickness value 
-        normals.ab.n1.x = (normals.ab.n1.x / normals_lengths.ab) * triangle.thickness;
-        normals.ab.n1.y = (normals.ab.n1.y / normals_lengths.ab) * triangle.thickness;
+        normals.ab.n1 = MATH.Vector2DNormalaizeAndScale( normals.ab.n1 , triangle.thickness);
+        normals.ab.n2 = MATH.Vector2DNormalaizeAndScale( normals.ab.n2 , triangle.thickness);
+   
+        normals.ac.n1 = MATH.Vector2DNormalaizeAndScale( normals.ac.n1 , triangle.thickness);
+        normals.ac.n2 = MATH.Vector2DNormalaizeAndScale( normals.ac.n2 , triangle.thickness);
 
-        normals.ac.n1.x = (normals.ac.n1.x / normals_lengths.ac) * triangle.thickness;
-        normals.ac.n1.y = (normals.ac.n1.y / normals_lengths.ac) * triangle.thickness;
-
-        normals.bc.n1.x = (normals.bc.n1.x / normals_lengths.bc) * triangle.thickness;
-        normals.bc.n1.y = (normals.bc.n1.y / normals_lengths.bc) * triangle.thickness;
-
-        normals.ab.n2.x = (normals.ab.n2.x / normals_lengths.ab) * triangle.thickness;
-        normals.ab.n2.y = (normals.ab.n2.y / normals_lengths.ab) * triangle.thickness;
-
-        normals.ac.n2.x = (normals.ac.n2.x / normals_lengths.ac) * triangle.thickness;
-        normals.ac.n2.y = (normals.ac.n2.y / normals_lengths.ac) * triangle.thickness;
-
-        normals.bc.n2.x = (normals.bc.n2.x / normals_lengths.bc) * triangle.thickness;
-        normals.bc.n2.y = (normals.bc.n2.y / normals_lengths.bc) * triangle.thickness;
+        normals.bc.n1 = MATH.Vector2DNormalaizeAndScale( normals.bc.n1 , triangle.thickness);
+        normals.bc.n2 = MATH.Vector2DNormalaizeAndScale( normals.bc.n2 , triangle.thickness);
 
         let scaled_points = {
 
-            ab : new Point2D( 
-                triangle.a.x + normals.ab.n1.x , 
-                triangle.a.y + normals.ab.n1.y 
-            ),
+            ab  : MATH.Add2DPoints( triangle.a , normals.ab.n1 ) ,
+            nab : MATH.Add2DPoints( triangle.a , normals.ab.n2 ) ,
     
-            ac : new Point2D( 
-                triangle.c.x + normals.ac.n1.x , 
-                triangle.c.y + normals.ac.n1.y 
-            ),
-
-            bc : new Point2D(
-                triangle.b.x + normals.bc.n1.x , 
-                triangle.b.y + normals.bc.n1.y 
-            ),
-
-            // ===================================================== 
-
-            nab : new Point2D( 
-                triangle.a.x + normals.ab.n2.x , 
-                triangle.a.y + normals.ab.n2.y 
-            ),
-
-            nac : new Point2D( 
-                triangle.c.x + normals.ac.n2.x , 
-                triangle.c.y + normals.ac.n2.y 
-            ),
-
-            nbc : new Point2D(
-                triangle.b.x + normals.bc.n2.x , 
-                triangle.b.y + normals.bc.n2.y 
-            ),
+            ac  : MATH.Add2DPoints( triangle.c , normals.ac.n1 ),
+            nac : MATH.Add2DPoints( triangle.c , normals.ac.n2 ),
+               
+            bc  : MATH.Add2DPoints( triangle.b , normals.bc.n1 ),
+            nbc : MATH.Add2DPoints( triangle.b , normals.bc.n2 ),
+            
         }
 
 
@@ -704,7 +622,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let bc_check = Draw.#GetOutSidePoint(triangle.b , triangle.c , C , scaled_points.bc , scaled_points.nbc);
         
         // object to hold the right points that lies outside the triangles
-        // we will use those points to compute the missing intersection points
+        // we will use those points to compute the missing intersection points to comple the outside triangle
         let new_points = {
             A : (ab_check == 1) ? scaled_points.ab : scaled_points.nab,
             B : (bc_check == 1) ? scaled_points.bc : scaled_points.nbc,
@@ -715,10 +633,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         new_points.B.slope = slopes.bc;
         new_points.C.slope = slopes.ac;
         
-        
-        outside_triangle.a = (new_points.A.y < new_points.B.y) ? Draw.#CalcInterSectionPoint2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : Draw.#CalcInterSectionPoint2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
-        outside_triangle.b = (new_points.A.y < new_points.C.y) ? Draw.#CalcInterSectionPoint2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : Draw.#CalcInterSectionPoint2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
-        outside_triangle.c = (new_points.B.y < new_points.C.y) ? Draw.#CalcInterSectionPoint2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : Draw.#CalcInterSectionPoint2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
+        outside_triangle.a = (new_points.A.y < new_points.B.y) ? MATH.TowPointsInterceptAt_2D( new_points.A , new_points.B , new_points.A.slope , new_points.B.slope ) : MATH.TowPointsInterceptAt_2D( new_points.B , new_points.A , new_points.B.slope , new_points.A.slope );
+        outside_triangle.b = (new_points.A.y < new_points.C.y) ? MATH.TowPointsInterceptAt_2D( new_points.A , new_points.C , new_points.A.slope , new_points.C.slope ) : MATH.TowPointsInterceptAt_2D( new_points.C , new_points.A , new_points.C.slope , new_points.A.slope );
+        outside_triangle.c = (new_points.B.y < new_points.C.y) ? MATH.TowPointsInterceptAt_2D( new_points.B , new_points.C , new_points.B.slope , new_points.C.slope ) : MATH.TowPointsInterceptAt_2D( new_points.C , new_points.B , new_points.C.slope , new_points.B.slope );
         
         if(round_values){
 
@@ -1426,7 +1343,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
                         [ref[i].X , ref[i].Y] = Rotate.Z( ref[i].X , ref[i].Y , angle );
 
-                        if( Draw.#CalcDistance())
+                        // todo : fix this bug 
+                        // if( Draw.#CalcDistance())
+
                         Draw.#DrawLineNoGradient(
                             new Point2D( x_org + ref[i].X , y_org + ref[i].Y ) ,
                             new Point2D( x_org + old_ref[i].X , y_org + old_ref[i].Y ) ,
@@ -1505,26 +1424,26 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     static SetGridSetting( size = 1 , distance = 10 , color = new RGBA(255,255,255,0.5) ){
 
-        Draw.#RESOURCES.GridSize = (typeof(size) == "number") ? size : 1;
-        Draw.#RESOURCES.GridDistance = (typeof(distance) == "number") ? distance : 4;
-        Draw.#RESOURCES.GridColor = (color instanceof RGBA ) ? color : new RGBA(255,255,255,1);
+        Draw.#Resource.GridSize = (typeof(size) == "number") ? size : 1;
+        Draw.#Resource.GridDistance = (typeof(distance) == "number") ? distance : 4;
+        Draw.#Resource.GridColor = (color instanceof RGBA ) ? color : new RGBA(255,255,255,1);
 
     }
 
     static DrawGrid(){
 
-        for( let x = 0 ; x <= Draw.#RESOURCES.Canvas.width ; x += Draw.#RESOURCES.GridDistance ){
+        for( let x = 0 ; x <= Draw.#Resource.Canvas.width ; x += Draw.#Resource.GridDistance ){
 
             Draw.#DrawVerticalLine( 
-                x , 0 , Draw.#RESOURCES.Canvas.height , Draw.#RESOURCES.GridColor 
+                x , 0 , Draw.#Resource.Canvas.height , Draw.#Resource.GridColor 
             );
 
         }
 
-        for( let y = 0 ; y <= Draw.#RESOURCES.Canvas.height ; y += Draw.#RESOURCES.GridDistance ){
+        for( let y = 0 ; y <= Draw.#Resource.Canvas.height ; y += Draw.#Resource.GridDistance ){
         
             Draw.#DrawHorizontalLine( 
-                0 , Draw.#RESOURCES.Canvas.width , y , Draw.#RESOURCES.GridColor
+                0 , Draw.#Resource.Canvas.width , y , Draw.#Resource.GridColor
             );
             
         }
@@ -1535,8 +1454,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         if( canvas_object && canvas_object.tagName == "CANVAS" ){
 
-            Draw.#RESOURCES.Canvas = canvas_object;
-            Draw.#RESOURCES.Ctx = Draw.#RESOURCES.Canvas.getContext("2d");
+            Draw.#Resource.Canvas = canvas_object;
+            Draw.#Resource.Ctx = Draw.#Resource.Canvas.getContext("2d");
 
             return true;
         }
@@ -1549,7 +1468,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         if( buffer_object instanceof FrameBuffer ){
 
-            Draw.#RESOURCES.Buffer = buffer_object;
+            Draw.#Resource.Buffer = buffer_object;
             return true;
 
         }
@@ -1560,19 +1479,19 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     static RenderBuffer(){
 
-        let f1 = Draw.#CHECK_CANVAS();
-        let f2 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForCanvas();
+        let f2 = Draw.#CheckForBuffer();
 
-        if( !(Draw.#RESOURCES.DrawDirectToCanvas) ){
+        if( !(Draw.#Resource.DrawDirectToCanvas) ){
 
         if( f1 && f2 ){
 
-            for( let y = 0 ; y <= Draw.#RESOURCES.Buffer.height() ; y++ ){
+            for( let y = 0 ; y <= Draw.#Resource.Buffer.height() ; y++ ){
 
-                for( let x = 0 ; x <= Draw.#RESOURCES.Buffer.width() ; x++ ){
+                for( let x = 0 ; x <= Draw.#Resource.Buffer.width() ; x++ ){
 
-                    Draw.#RESOURCES.Ctx.fillStyle = RGBA.ToString(Draw.#RESOURCES.Buffer.get_pixle(x,y));
-                    Draw.#RESOURCES.Ctx.fillRect( x , y , 1 , 1);
+                    Draw.#Resource.Ctx.fillStyle = RGBA.ToString(Draw.#Resource.Buffer.get_pixle(x,y));
+                    Draw.#Resource.Ctx.fillRect( x , y , 1 , 1);
 
                 }
                 
@@ -1594,7 +1513,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         line_object = new Line2D()
     ) { 
 
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (line_object instanceof Line2D);
 
         if( f1 && f2 ){
@@ -1617,7 +1536,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         line_object = new Line2D() , point_a_color = new RGBA() , point_b_color = new RGBA() 
     ) {
 
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (line_object instanceof Line2D);
 
         if( f1 && f2 ){
@@ -1637,7 +1556,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     static Rectangle2D( rectangle_object = new RECT() ){
 
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (rectangle_object instanceof RECT);
 
         // debugger
@@ -1682,7 +1601,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static Triangle2D( triangle_object = new Triangle2D() , draw_thick_border = false ){
 
         // check canvas and triangle
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (triangle_object instanceof Triangle2D);
         
         if( f1 && f2 ){
@@ -1719,7 +1638,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static Triangle2DWithGradient( triangle_object = new Triangle2D() ){
         
         // check canvas and triangle
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (triangle_object instanceof Triangle2D);
         
         if( f1 && f2 ){
@@ -1743,7 +1662,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static Circle2D( circle_object = new Circle2D() ){
 
         // check canvas and circle
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (circle_object instanceof Circle2D);
 
         if( f1 && f2 ){
@@ -1767,7 +1686,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static Ellipse2D( ellipse_object = new Ellipse2D() ){
 
         // check canvas and circle
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (ellipse_object instanceof Ellipse2D);
         
         if( f1 && f2 ){
@@ -1853,7 +1772,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static Curve2D( curve_object = new Curve2D() ){
 
         // check canvas and circle
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = (curve_object instanceof Curve2D );
         
         if( f1 && f2 ){
@@ -1881,7 +1800,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static LongCurve2D( curve_object = new LongCurve2D() ){
         
         // check canvas and circle
-        let f1 = Draw.#CHECK_BUFFER();
+        let f1 = Draw.#CheckForBuffer();
         let f2 = ( curve_object instanceof LongCurve2D );
         
         if( f1 && f2 ){

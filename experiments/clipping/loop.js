@@ -29,7 +29,6 @@ function check_xy(p = new point() , xmin = 0 , xmax = canvas.clientWidth , ymin 
     if( p.y < ymin ) outcode += 8;
     if( p.y > ymax ) outcode += 4;
 
-
     return outcode;
 }
 
@@ -51,8 +50,8 @@ function calc_x_intercept( p1 , p2 , xintercept = 0 ){
 
 function calc_y_intercept( p1 , p2 , yintercept = 0 ){
     debugger
-    //   slope = (y1 - y0) / (x1 - x0)
-    //   x = x0 + (1 / slope) * (ym - y0), where ym is ymin or ymax
+    //  slope = (y1 - y0) / (x1 - x0)
+    // x = x0 + (1 / slope) * (ym - y0), where ym is ymin or ymax
     
     let slope = (p2.y - p1.y) / (p2.x - p1.x);
 
