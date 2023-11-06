@@ -533,22 +533,6 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     }
 
     /*
-        function to calculate the area of triangle using herons formula 
-    */
-    static #CalcAreaOf2DTriangle( a = Point2D() , b = Point2D() , c = Point2D() ){
-
-		// calc lengths between the points using : √((x2 – x1)² + (y2 – y1)²)
-	    let A = Math.sqrt( Math.abs(((b.x - a.x)**2) + ((b.y - a.y)**2)) );
-	    let B = Math.sqrt( Math.abs(((c.x - b.x)**2) + ((c.y - b.y)**2)) );
-	    let C = Math.sqrt( Math.abs(((c.x - a.x)**2) + ((c.y - a.y)**2)) );
-
-		let p = (A+B+C) / 2;
-
-		return  Math.sqrt(p * (p - A) * (p - B) * (p - C));
-
-    }
-
-    /*
         draw a line from a point and slope , this function usualy used for debug
     */
     static #DrawLineFromPoint( point , M , distance  , thickness , color ){
@@ -558,14 +542,14 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         Draw.#DrawLineNoGradient( point , end_point , thickness , color );
     }
 
+    // generate a 3 points outside triangle by certain distance
     static #GenerateOutsideTriangle( triangle = new Triangle2D() , round_values = false ){
 
         let outside_triangle = new Triangle2D();
 
         // center of triangle
-        let C = MATH.Triangle2DCentroid( triangle.a , triangle.b , triangle.c );
-         
-
+        let centroid = MATH.Triangle2DCentroid( triangle.a , triangle.b , triangle.c );
+  
         let slopes = {
             ab : MATH.Slope2D( triangle.a , triangle.b ),
             ac : MATH.Slope2D( triangle.a , triangle.c ),
@@ -617,9 +601,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         /*
             the filter process for getting outside points 
         */
-        let ab_check = Draw.#GetOutSidePoint(triangle.a , triangle.b , C , scaled_points.ab , scaled_points.nab);
-        let ac_check = Draw.#GetOutSidePoint(triangle.a , triangle.c , C , scaled_points.ac , scaled_points.nac);
-        let bc_check = Draw.#GetOutSidePoint(triangle.b , triangle.c , C , scaled_points.bc , scaled_points.nbc);
+        let ab_check = Draw.#GetOutSidePoint(triangle.a , triangle.b , centroid , scaled_points.ab , scaled_points.nab);
+        let ac_check = Draw.#GetOutSidePoint(triangle.a , triangle.c , centroid , scaled_points.ac , scaled_points.nac);
+        let bc_check = Draw.#GetOutSidePoint(triangle.b , triangle.c , centroid , scaled_points.bc , scaled_points.nbc);
         
         // object to hold the right points that lies outside the triangles
         // we will use those points to compute the missing intersection points to comple the outside triangle
@@ -659,33 +643,33 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         Point2D.Round( triangle.b );
         Point2D.Round( triangle.c );
 
-        triangle.thickness = Math.abs( triangle.thickness ) + 1;
+        triangle.thickness = Math.abs( triangle.thickness );
 
         // calculate the outside triangle that represent triangle border
-        let border_triangle = Draw.#GenerateOutsideTriangle( triangle , true );
+        let border_triangle = Draw.#GenerateOutsideTriangle( Triangle2D.Copy(triangle) , true );
 
+        // slopes of triangle lines
         let slopes = {
-            // dy / dx
-            ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
-            ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
-            bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
+            ab : MATH.Slope2D( triangle.a , triangle.b ),
+            ac : MATH.Slope2D( triangle.a , triangle.c ),
+            bc : MATH.Slope2D( triangle.b , triangle.c ),
         };
         
         // intercepts of both triangles inside and outside 
-        // we need them for edges calculations
+        // we need those intercepts for border rasterzation
         let intercepts = {
-            // b = y - mx
+            // b = y - (slope * x)
 
             inside : {
-                ab : Math.round(triangle.a.y - (slopes.ab * triangle.a.x)), 
-                ac : Math.round(triangle.a.y - (slopes.ac * triangle.a.x)),
-                bc : Math.round(triangle.b.y - (slopes.bc * triangle.b.x)),
+                ab : Math.round( MATH.Yintercept_At_X0_2D(triangle.a , slopes.ab) ), 
+                ac : Math.round( MATH.Yintercept_At_X0_2D(triangle.a , slopes.ac) ),
+                bc : Math.round( MATH.Yintercept_At_X0_2D(triangle.b , slopes.bc) ),
             },
             
             outside : {
-                ab : Math.round(border_triangle.a.y - (slopes.ab * border_triangle.a.x)),
-                ac : Math.round(border_triangle.a.y - (slopes.ac * border_triangle.a.x)),
-                bc : Math.round(border_triangle.b.y - (slopes.bc * border_triangle.b.x)),
+                ab : Math.round( MATH.Yintercept_At_X0_2D(border_triangle.a , slopes.ab) ), 
+                ac : Math.round( MATH.Yintercept_At_X0_2D(border_triangle.a , slopes.ac) ),
+                bc : Math.round( MATH.Yintercept_At_X0_2D(border_triangle.b , slopes.bc) ),
             }
 
         }
@@ -697,23 +681,25 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let in_x_start = 0;
         let in_x_end = 0;
 
+        // debugger
         // ab - ac
         if( slopes.ab != 0 && slopes.ac != 0 ){
 
             for( ; y < border_triangle.b.y ; y += 1){
+               
+                x_start = Math.round(MATH.Xintercept2D(y , slopes.ab , intercepts.outside.ab));
+                x_end   = Math.round(MATH.Xintercept2D(y , slopes.ac , intercepts.outside.ac));
 
-                x_start = Math.round( (y - intercepts.outside.ab) / slopes.ab );
-                x_end   = Math.round( (y - intercepts.outside.ac) / slopes.ac );
-
-                if( y <= triangle.c.y && y >= triangle.a.y ){
+                if( y < triangle.c.y && y > triangle.a.y ){
                     
                     if( y < triangle.b.y ){
-                        in_x_start = Math.round( (y - intercepts.inside.ab) / slopes.ab ) ;
-                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac ) ;
+                       
+                        in_x_start = Math.round(MATH.Xintercept2D(y , slopes.ab , intercepts.inside.ab));
+                        in_x_end   = Math.round(MATH.Xintercept2D(y , slopes.ac , intercepts.inside.ac));
                     }
                     else{
-                        in_x_start = Math.round( (y - intercepts.inside.bc) / ( (slopes.bc == 0) ? 1 : slopes.bc) ) ;
-                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac ) ;
+                        in_x_start = Math.round(MATH.Xintercept2D(y , slopes.bc , intercepts.inside.bc));
+                        in_x_end   = Math.round(MATH.Xintercept2D(y , slopes.ac , intercepts.inside.ac));
                     }
 
                     Draw.#DrawHorizontalLine( x_start , in_x_start , y , triangle.border_color );
@@ -728,23 +714,24 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         }
 
+        // debugger
         // bc - ac
         if( slopes.bc != 0 && slopes.ac != 0 ){
 
             for( ; y <= border_triangle.c.y ; y += 1){
 
-                x_start = Math.round( (y - intercepts.outside.bc) / slopes.bc );
-                x_end   = Math.round( (y - intercepts.outside.ac) / slopes.ac );
-            
-                if( y >= triangle.a.y && y <= triangle.c.y ){
+                x_start = Math.round(MATH.Xintercept2D(y , slopes.bc , intercepts.outside.bc));
+                x_end   = Math.round(MATH.Xintercept2D(y , slopes.ac , intercepts.outside.ac));
+
+                if( y > triangle.a.y && y < triangle.c.y ){
 
                     if( y < triangle.b.y ){
-                        in_x_start = Math.round( (y - intercepts.inside.ab) / ((slopes.ab == 0) ? 1 : slopes.ab) ) ;
-                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
+                        in_x_start = Math.round(MATH.Xintercept2D(y , slopes.ab , intercepts.inside.ab));                        
+                        in_x_end   = Math.round(MATH.Xintercept2D(y , slopes.ac , intercepts.inside.ac));
                     }
                     else{
-                        in_x_start = Math.round( (y - intercepts.inside.bc) / slopes.bc );
-                        in_x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
+                        in_x_start = Math.round(MATH.Xintercept2D(y , slopes.bc , intercepts.inside.bc));                        
+                        in_x_end   = Math.round(MATH.Xintercept2D(y , slopes.ac , intercepts.inside.ac));
                     }
 
                     Draw.#DrawHorizontalLine( x_start , in_x_start , y , triangle.border_color );
@@ -759,7 +746,12 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         }
 
-    
+        /*
+        Draw.#DrawCircle(border_triangle.a.x ,  border_triangle.a.y , 2 , 0 , new RGBA(200,200,0,1));
+        Draw.#DrawCircle(border_triangle.b.x ,  border_triangle.b.y , 2 , 0 , new RGBA(200,200,0,1));
+        Draw.#DrawCircle(border_triangle.c.x ,  border_triangle.c.y , 2 , 0 , new RGBA(200,200,0,1));
+        */
+
     } 
     // end of #DRAW_TRIANGLE_BORDER
 
@@ -775,11 +767,11 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         Point2D.Round( triangle.b );
         Point2D.Round( triangle.c );
 
+        // dy / dx
         let slopes = {
-            // dy / dx
-            ab : ( triangle.a.y - triangle.b.y ) / ( (triangle.a.x - triangle.b.x) | 1 ) ,
-            ac : ( triangle.a.y - triangle.c.y ) / ( (triangle.a.x - triangle.c.x) | 1 ) ,
-            bc : ( triangle.b.y - triangle.c.y ) / ( (triangle.b.x - triangle.c.x) | 1 ) , 
+            ab : MATH.Slope2D( triangle.a  , triangle.b ) ,
+            ac : MATH.Slope2D( triangle.a  , triangle.c ) ,
+            bc : MATH.Slope2D( triangle.b  , triangle.b ) , 
         };
         
 
@@ -787,15 +779,17 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             // b = y - mx
 
             inside : {
-                ab : Math.round(triangle.a.y - (slopes.ab * triangle.a.x)), 
-                ac : Math.round(triangle.a.y - (slopes.ac * triangle.a.x)),
-                bc : Math.round(triangle.b.y - (slopes.bc * triangle.b.x)),
+                ab : Math.round( MATH.Yintercept_At_X0_2D(triangle.a , slopes.ab) ) ,
+                ac : Math.round( MATH.Yintercept_At_X0_2D(triangle.a , slopes.ac) ) ,
+                bc : Math.round( MATH.Yintercept_At_X0_2D(triangle.b , slopes.bc) ) ,
             },
 
         }
 
         // we need area of triangle to compute alpha and beta 
-        let triangle_area = Draw.#CalcAreaOf2DTriangle( triangle.a , triangle.b , triangle.c );
+        let triangle_area = (MATH.AreaOfTriangle2D( triangle.a , triangle.b , triangle.c ) || 1);
+        
+        // represent the areas of each sub triangle 
         let alpha = 0 , beta = 0 , gamma = 0;
 
         let x_start = Math.round(triangle.a.x);
@@ -804,9 +798,11 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         let p = new Point2D(x_start , y);
 
+        // 3 colors each time for blending
         let c_a = triangle.color_a;
         let c_b = triangle.color_b;
         let c_c = triangle.color_c;
+
         let color = null;
 
         // ab - ac
@@ -814,10 +810,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
             for( ; y < triangle.b.y ; y += 1){
 
-                debugger
-
-                x_start = Math.round( (y - intercepts.inside.ab) / slopes.ab );
-                x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
+                x_start = Math.round( MATH.Xintercept2D(y , slopes.ab , intercepts.inside.ab) );
+                x_end   = Math.round( MATH.Xintercept2D(y , slopes.ac , intercepts.inside.ac) );
                 
                 if(x_start > x_end){
                     [x_start , x_end] = [x_end , x_start];
@@ -829,9 +823,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                     p.x = x; 
                     p.y = y;
 
-                    alpha = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.b , p , triangle.c ) / triangle_area);
-                    beta  = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.a , p , triangle.c ) / triangle_area);
-                    gamma = Math.abs(1 - alpha - beta);
+                    alpha = MATH.AreaOfTriangle2D( triangle.b , p , triangle.c ) / triangle_area;
+                    beta  = MATH.AreaOfTriangle2D( triangle.a , p , triangle.c ) / triangle_area;
+                    gamma = 1 - alpha - beta;
 
                     c_a = RGBA.ChangeByFactor( triangle.color_a , alpha );
                     c_b = RGBA.ChangeByFactor( triangle.color_b , beta  );
@@ -852,8 +846,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
             for( ; y <= triangle.c.y ; y += 1){
 
-                x_start = Math.round( (y - intercepts.inside.bc) / slopes.bc );
-                x_end   = Math.round( (y - intercepts.inside.ac) / slopes.ac );
+                x_start = Math.round( MATH.Xintercept2D(y , slopes.bc , intercepts.inside.bc) );
+                x_end   = Math.round( MATH.Xintercept2D(y , slopes.ac , intercepts.inside.ac) );
              
                 if(x_start > x_end){
                     [x_start , x_end] = [x_end , x_start];
@@ -861,12 +855,13 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
                 // computer gradient
                 for( let x = x_start ; x <= x_end ; x += 1 ){
+
                     p.x = x; 
                     p.y = y;
 
-                    alpha = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.b , p , triangle.c ) / triangle_area);
-                    beta  = Math.abs(Draw.#CalcAreaOf2DTriangle( triangle.a , p , triangle.c ) / triangle_area);
-                    gamma = Math.abs(1 - alpha - beta);
+                    alpha = MATH.AreaOfTriangle2D( triangle.b , p , triangle.c ) / triangle_area;
+                    beta  = MATH.AreaOfTriangle2D( triangle.a , p , triangle.c ) / triangle_area;
+                    gamma = 1 - alpha - beta;
 
                     c_a = RGBA.ChangeByFactor( triangle.color_a , alpha );
                     c_b = RGBA.ChangeByFactor( triangle.color_b , beta  );
@@ -877,6 +872,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
                     Draw.#SetPixle( x , y , color );
                 }
+
             }
 
         }
@@ -1607,23 +1603,23 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         if( f1 && f2 ){
 
             // make copy for drawing usage 
-            let copy = Triangle2D.Copy(triangle_object);
+            let triangle_copy = Triangle2D.Copy(triangle_object);
 
             // sort points depend on Y-axis
-            Triangle2D.SortByY(copy);
+            Triangle2D.SortByY(triangle_copy);
             
-            if( copy.fill_color instanceof RGBA ){
+            if( triangle_copy.fill_color instanceof RGBA ){
 
                 // fill triangle  
-                Draw.#FillTriangle( copy );
+                Draw.#FillTriangle( triangle_copy );
                 
             }
 
-            if( copy.border_color instanceof RGBA ){
+            if( triangle_copy.border_color instanceof RGBA && triangle_copy.thickness > 0 ){
                 
                 
-                if(draw_thick_border) Draw.#DrawTriangleBorder( copy );
-                else Draw.#DrawFastTriangleBorder( copy );
+                if(draw_thick_border) Draw.#DrawTriangleBorder( triangle_copy );
+                else Draw.#DrawFastTriangleBorder( triangle_copy );
 
             }
 

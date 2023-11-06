@@ -215,7 +215,7 @@ export class Check {
 
             let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
             let check_canvas = Check.#RESOURCES.canvas;
-            let check_type   = triangle instanceof TRIANGLE_2D ;
+            let check_type   = triangle instanceof Triangle2D ;
 
             if( check_buffer || check_canvas ){
 

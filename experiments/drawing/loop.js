@@ -26,15 +26,15 @@ var Config = {
 
     RenderingLoop : false ,
     DrawGrid : false ,
-    DrawPointsForDebug : true ,
+    DrawPointsForDebug : false ,
     GenerateRandomShapesEachTime : true ,
     NewTestEachTime : false ,
     IntervalTime : 3000 , // ms
     AntiAlias : false ,
-    ShapesIndex  : 6 ,
+    ShapesIndex  : 3 ,
     ShapesAmount : 3 ,
-    BorderThickness  : 4 ,
-    Gradient : true ,
+    BorderThickness : 4 ,
+    Gradient : false ,
     MaxWidth  : Canvas.clientWidth  / 1.5 ,
     MaxHeight : Canvas.clientHeight / 1.5 ,
 
@@ -59,14 +59,24 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    
+    /*
     new Triangle2DGradient( 
         new Point2D(350, 10) ,
         new Point2D(10 ,500)  ,
         new Point2D(700 , 500)  ,
         // new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
         new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
-    ),
+        ),
+    */
+
+    new Triangle2D(
+        new Point2D(100  , 350) ,
+        new Point2D(160  , 240) ,
+        new Point2D(630  , 450) ,
+        2 , 
+        new RGBA(200,100,25,1) ,  
+        new RGBA(0,0,255,1) ,
+    )
 
 ];
 
@@ -186,7 +196,7 @@ function NewFrame(){
             for( let triangle of triangles ){
 
                 if( !Config.Gradient ) {
-                    Draw.Triangle2D(triangle);
+                    Draw.Triangle2D(triangle , true );
                 }
                 else {
                     Draw.Triangle2DWithGradient(triangle);
@@ -197,7 +207,7 @@ function NewFrame(){
                 if( Config.GenerateRandomShapesEachTime ){
 
                     triangles = Generator.Random.Triangles2D(
-                        shapes_amount , 0 , max_width/2 , 0, max_height/2 , 0 , new RGBA(150,150,55,0.7) , 0 
+                        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(150,150,55,0.7) , 0 
                     );
 
                 }

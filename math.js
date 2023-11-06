@@ -14,12 +14,14 @@ export class MATH{
     }
 
     // calc slope of a line bettween to points in 2D space 
+    // note : vertical line => slope gonna be high slope not infinity
     // formula :: delta_y / delta_x
     static Slope2D( point_1 = new Point2D() , point_2 = new Point2D() ){
 
         let delta_x = MATH.Deltha( point_1.x , point_2.x );
 
-        return (delta_x == 0) ? 0 : MATH.Deltha( point_1.y , point_2.y ) / delta_x ;
+        return (delta_x == 0) ? 1000 : MATH.Deltha( point_1.y , point_2.y ) / delta_x ;
+
     }
     
     // calc the "Y interception" at "X position" in 2D space
@@ -141,7 +143,7 @@ export class MATH{
         few functions for 2D triangles
     */
 
-    // formula : X = a.x + b.x + c.x / 3 | Y =  a.y + b.y + c.y / 3
+    // formula : X = (a.x + b.x + c.x) / 3 | Y = (a.y + b.y + c.y) / 3
     static Triangle2DCentroid( 
         // points in 2D space
         a = undefined , 
@@ -150,12 +152,33 @@ export class MATH{
     ){
 
         return new Point2D(
-            a.x + b.x + c.x / 3 ,
-            a.y + b.y + c.y / 3
+            (a.x + b.x + c.x) / 3 ,
+            (a.y + b.y + c.y) / 3
         );
 
     };
 
+    // calculate the area of 2D triangle using "Heron's Formula"
+    // note : no negative area 
+    // formula1 : p = (a+b+c) / 3
+    // formula2 : area = sqrt( p * (p - A) * (p - B) * (p - C) )
+    static AreaOfTriangle2D(
+        point_1 = undefined ,
+        point_2 = undefined ,
+        point_3 = undefined ,
+    ){
+
+        let A = MATH.Distance( point_2 , point_1 );
+        let B = MATH.Distance( point_3 , point_2 );
+        let C = MATH.Distance( point_3 , point_1 );
+
+        let p = (A+B+C) / 2;
+
+        return Math.abs( 
+            Math.sqrt( p * (p - A) * (p - B) * (p - C) ) 
+        );
+
+    }
 
     /*
         few functions for 2D vectors/points
