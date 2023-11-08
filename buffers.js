@@ -165,3 +165,22 @@ export class FrameBuffer{
 
 }
 
+/*
+    a boundry "declaration" of a sub-buffer on the top of a main buffer  
+*/
+export class SubBuffer{
+
+    constructor( x_min , y_min , x_max , y_max ){
+
+        this.x_min = x_min;
+        this.x_max = x_max;
+
+        this.y_min = y_min;
+        this.y_max = y_max;
+
+        this.width  = x_max - x_min;
+        this.height = y_max - y_min;
+        
+    }
+
+}

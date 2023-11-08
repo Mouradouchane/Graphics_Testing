@@ -19,7 +19,7 @@ export class Line2D{
 
     static Copy( line = new Line2D() ) {
 
-        return new Line2D( line.a.Copy() , line.b.Copy() , this.width );
+        return new Line2D( Point2D.Copy(line.a) , Point2D.Copy(line.b) , line.width , RGBA.Copy(this.color) );
 
     }
     

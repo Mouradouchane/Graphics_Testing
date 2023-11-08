@@ -236,7 +236,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let delta_y = (point_b.y - point_a.y); 
     
         // calc "slop" of the line and "Y intercept"
-        let slope = ( delta_x == 0 ) ? 0 : delta_y / delta_x ; // M
+        let slope = ( delta_x == 0 ) ? 1000 : delta_y / delta_x ; // M
         let Y_intercept = point_a.y - ( slope * point_a.x );   // B
 
         let x_or_y = Math.abs(delta_x) >= Math.abs(delta_y); 
@@ -1550,10 +1550,10 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static Rectangle2D( rectangle_object = new RECT() ){
+    static Rectangle2D( rectangle_object = new Rectangle2D() ){
 
         let f1 = Draw.#CheckForBuffer();
-        let f2 = (rectangle_object instanceof RECT);
+        let f2 = (rectangle_object instanceof Rectangle2D);
 
         // debugger
         if( f1 && f2 ){

@@ -10,11 +10,14 @@ import {Ellipse2D} from "../../ellipse.js";
 import {Check} from "../../check.js";
 import {Rotate} from "../../rotate.js";
 import {Draw} from "../../draw/draw.js";
-import {FrameBuffer} from "../../buffers.js";
+import {FrameBuffer , SubBuffer} from "../../buffers.js";
+import { Clip2D } from "../../clipping.js";
 
 const Canvas = document.querySelector("#canvas");
 const CTX = Canvas.getContext("2d");
 const Buffer = new FrameBuffer( 800 , 600 );
+
+const SBuffer = new SubBuffer( 150 , 150 , Canvas.clientWidth - 150 , Canvas.clientHeight - 150 );
 
 var FPS = 0;
 var FpsCounter = 0;
@@ -27,15 +30,15 @@ var Config = {
     RenderingLoop : false ,
     RenderToBuffer : true , 
     DrawGrid : false ,
-    DrawPointsForDebug : false ,
+    DrawPointsForDebug : true ,
     GenerateRandomShapesEachTime : true ,
     NewTestEachTime : false ,
-    IntervalTime : 3000 , // ms
+    SleepTime : 3000 , // ms
     AntiAlias : false ,
-    ShapesIndex  : 3 ,
+    ShapesIndex  : 1 ,
     ShapesAmount : 3 ,
     BorderThickness : 4 ,
-    Gradient : false ,
+    Gradient  : false ,
     MaxWidth  : Canvas.clientWidth  / 1.5 ,
     MaxHeight : Canvas.clientHeight / 1.5 ,
 
@@ -48,15 +51,29 @@ var Config = {
 */
 
 var lines = [
+    /*
     ...Generator.Random.Lines2D(
         Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight 
     )
+    */
+    new Line2D( new Point2D(100,50) ,  new Point2D(700,550), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(120,50) ,  new Point2D(700,450), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(260,70) ,  new Point2D(700,300), 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(300,70) ,  new Point2D(300,550), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,350) ,  new Point2D(700,350), 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(400,400) , new Point2D(50,480), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,400)  , new Point2D(240,570) , 2 , RGBA.RandomColor(false) ),
+
 ];
 
 var rectangles = [
+    /*
     ...Generator.Random.Rectangles2D(
-        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , null , true , null , true , 3
+        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , null , true , null , true , 2
     )
+    */
 ]; 
 
 var triangles = [ 
@@ -161,11 +178,19 @@ function NewFrame(){
         case 1 : {
                 
             for( let line of lines ){
+        
+                let lcopy = Line2D.Copy( line ); 
+                lcopy.color = new RGBA(255,0,0,1);
 
-                Draw.line( line );
+                let status = Clip2D.Line2D( line , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max );
 
-                if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( line );
-                
+                if(status != Clip2D.DISCARDED ){
+                    Draw.Line2D( lcopy );
+                    Draw.Line2D( line  );
+
+                    if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( line );
+                    if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( lcopy );
+                }
             }
 
         } break;
@@ -278,8 +303,17 @@ function NewFrame(){
         
     } // end of "switch-case"
     
-    Draw.RenderBuffer();
+    if(SBuffer instanceof SubBuffer){
 
+        Draw.Rectangle2D( 
+            new Rectangle2D( 
+                SBuffer.x_min , SBuffer.y_min , SBuffer.width , SBuffer.height , 0 , new RGBA(0,255,0,1) , 1
+            )
+        );
+
+    }
+
+    Draw.RenderBuffer();
 
 }
 
@@ -369,7 +403,7 @@ function main(){
                 ClearCanvas();
                 NewFrame();
 
-            } , Config.IntervalTime );
+            } , Config.SleepTime );
 
         }
         else{

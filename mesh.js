@@ -1,4 +1,4 @@
-import {triangle} from "./triangle.js"
+import {Triangle2D} from "./triangle.js"
 
 export class mesh{
 

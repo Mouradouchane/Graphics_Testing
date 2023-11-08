@@ -10,17 +10,17 @@ export class Clip2D {
 
     // "status codes" representing the region a point lies on
     // could be combined to represent all the sides : for example left + top => 10 
-    static #CENTER = 0;
-    static #LEFT   = 1;
-    static #RIGHT  = 2;
-    static #TOP    = 8;
-    static #BUTTOM = 4;
+    static CENTER = 0;
+    static LEFT   = 1;
+    static RIGHT  = 2;
+    static TOP    = 8;
+    static BUTTOM = 4;
 
     // "status codes" representing what's happend to the shape
     // goona be usefull later in drawing
-    static #DISCARDED  = -1;// when the shape fully outside the range "got deleted"
-    static #NOT_CLIPED = 0; // when the shape fully inside the range
-    static #CLIPPED    = 1; // when a part of the shape "got clipped"
+    static DISCARDED  = -1;// when the shape fully outside the range "got deleted"
+    static NOT_CLIPED = 0; // when the shape fully inside the range
+    static CLIPPED    = 1; // when a part of the shape "got clipped"
 
     static #ClippingFunctions = [
 
@@ -57,8 +57,8 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) => { // buttom + left
 
-            let px = Clip2D.#ClippingFunctions[Clip2D.#BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
-            let py = Clip2D.#ClippingFunctions[Clip2D.#LEFT  ](x_min , y_min , x_max , y_max , outside_point , slope);
+            let px = Clip2D.#ClippingFunctions[Clip2D.BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.LEFT  ](x_min , y_min , x_max , y_max , outside_point , slope);
         
             if( ( px.x < x_min ) && ( py.y > y_max ) ) return undefined;
 
@@ -71,8 +71,8 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) => { // buttom + right 
 
-            let px = Clip2D.#ClippingFunctions[Clip2D.#BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
-            let py = Clip2D.#ClippingFunctions[Clip2D.#RIGHT ](x_min , y_min , x_max , y_max , outside_point , slope);
+            let px = Clip2D.#ClippingFunctions[Clip2D.BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.RIGHT ](x_min , y_min , x_max , y_max , outside_point , slope);
      
             if( ( px.x > x_max ) && ( py.y > y_max ) ) return undefined;
 
@@ -96,8 +96,8 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) =>  { // top + left
 
-            let px = Clip2D.#ClippingFunctions[Clip2D.#TOP ](x_min , y_min , x_max , y_max , outside_point , slope);
-            let py = Clip2D.#ClippingFunctions[Clip2D.#LEFT](x_min , y_min , x_max , y_max , outside_point , slope);
+            let px = Clip2D.#ClippingFunctions[Clip2D.TOP ](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.LEFT](x_min , y_min , x_max , y_max , outside_point , slope);
      
             if( ( px.x < x_min ) && ( py.y < y_min ) ) return undefined;
 
@@ -110,8 +110,8 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) =>  { // top + right
 
-            let px = Clip2D.#ClippingFunctions[Clip2D.#TOP  ](x_min , y_min , x_max , y_max , outside_point , slope);
-            let py = Clip2D.#ClippingFunctions[Clip2D.#RIGHT](x_min , y_min , x_max , y_max , outside_point , slope);
+            let px = Clip2D.#ClippingFunctions[Clip2D.TOP  ](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.RIGHT](x_min , y_min , x_max , y_max , outside_point , slope);
      
             if( ( px.x > x_max ) && ( py.y < y_min ) ) return undefined;
 
@@ -134,13 +134,13 @@ export class Clip2D {
         x_max , y_max   // buffer-range max values
     ){
 
-        let region = Clip2D.#CENTER;
+        let region = Clip2D.CENTER;
 
-        if( point.x < x_min )       region += Clip2D.#LEFT;
-        else if( point.x > x_max )  region += Clip2D.#RIGHT;
+        if( point.x < x_min )       region += Clip2D.LEFT;
+        else if( point.x > x_max )  region += Clip2D.RIGHT;
 
-        if( point.y < y_min )       region += Clip2D.#TOP;
-        else if( point.y > y_max )  region += Clip2D.#BUTTOM;
+        if( point.y < y_min )       region += Clip2D.TOP;
+        else if( point.y > y_max )  region += Clip2D.BUTTOM;
 
         return region;
 
@@ -155,6 +155,8 @@ export class Clip2D {
         x_max , y_max   // buffer-range max values
     ){
 
+        debugger;
+        
         let slope = MATH.Slope2D( line.a , line.b );
         
         // get in wich side the points of the line is .  
@@ -163,11 +165,11 @@ export class Clip2D {
 
         // both points inside the buffer-range 
         // "nothing to clip"
-        if( pa_status == 0 && pb_status == 0 ) return Clip2D.#NOT_CLIPED;
+        if( pa_status == 0 && pb_status == 0 ) return Clip2D.NOT_CLIPED;
 
         // both points outside the buffer-range in same side 
         // "nothing to draw"
-        if( pa_status != 0 && (pa_status == pb_status) ) return Clip2D.#DISCARDED;
+        if( pa_status != 0 && (pa_status == pb_status) ) return Clip2D.DISCARDED;
 
         // one point inside and the other one outside
         // "need clipping"
@@ -180,25 +182,31 @@ export class Clip2D {
                 line.a = Clip2D.#ClippingFunctions[pa_status]( x_min , y_min , x_max , y_max , line.a , slope);
             }
 
-            return Clip2D.#CLIPPED;
+            return Clip2D.CLIPPED;
         }
         // both points outside 
         // "clip or discard"
         else {
 
+            let detected_outside = 0;
+
             line.a = Clip2D.#ClippingFunctions[pa_status](x_min , y_min , x_max , y_max , line.a , slope);
 
             if( line.a == undefined ) {
-                return Clip2D.#DISCARDED;
+                return Clip2D.DISCARDED;
             }
+            if(line.a.x == -1 || line.a.y == -1) detected_outside += 1;
 
             line.b = Clip2D.#ClippingFunctions[pb_status](x_min , y_min , x_max , y_max , line.b , slope);
 
             if( line.b == undefined ) {
-                return Clip2D.#DISCARDED;
+                return Clip2D.DISCARDED;
             }
+            if(line.a.x == -1 || line.a.y == -1) detected_outside += 1;
 
-            return Clip2D.#CLIPPED;
+            if( detected_outside == 2 ) return Clip2D.DISCARDED;
+
+            return Clip2D.CLIPPED;
         }
 
     }
