@@ -25,6 +25,7 @@ var FpsCounter = 0;
 var Config = {
 
     RenderingLoop : false ,
+    RenderToBuffer : true , 
     DrawGrid : false ,
     DrawPointsForDebug : false ,
     GenerateRandomShapesEachTime : true ,

@@ -1,163 +1,211 @@
 
-import {point} from "./point.js"
-import {triangle, triangle as trig} from "./triangle.js"
+import {Point2D} from "./point.js"
+import {Line2D} from "./line.js"
+import {Triangle2D} from "./triangle.js"
+import {MATH} from "./math.js";
+// import {FrameBuffer} from "./buffers.js"
 
 
-export function xy_check( NDC , triangle = new triangle() ){
-    let names = ['a' , 'b' , 'c'];
+export class Clip2D {
 
-    // object contain all check result
-    let check_obj = {
-        a : 0,
-        b : 0,
-        c : 0,
-        case : 0
-    }
+    // "status codes" representing the region a point lies on
+    // could be combined to represent all the sides : for example left + top => 10 
+    static #CENTER = 0;
+    static #LEFT   = 1;
+    static #RIGHT  = 2;
+    static #TOP    = 8;
+    static #BUTTOM = 4;
 
-    for(let p = 0 ; p < names.length ; p += 1){
+    // "status codes" representing what's happend to the shape
+    // goona be usefull later in drawing
+    static #DISCARDED  = -1;// when the shape fully outside the range "got deleted"
+    static #NOT_CLIPED = 0; // when the shape fully inside the range
+    static #CLIPPED    = 1; // when a part of the shape "got clipped"
 
-        // check for x
-        if( triangle[ names[p] ].x < NDC.l){
-            check_obj[names[p]] += 2;
-            check_obj.case += 1;
-        } 
-        if( triangle[ names[p] ].x > NDC.r){
-            check_obj[names[p]] += 8;
-            check_obj.case += 1;
-        } 
+    static #ClippingFunctions = [
 
-        // check for y
-        if( triangle[ names[p] ].y < NDC.t){
-            check_obj[names[p]] += 1;
-            check_obj.case += 1;
-        } 
-        if( triangle[ names[p] ].y > NDC.b){
-            check_obj[names[p]] += 4;
-            check_obj.case += 1;
-        } 
+        null ,  // center
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) => { // left
         
-        if(check_obj[names[p]] != 0){
-            console.warn("bottom" , names[p] , check_obj[names[p]]);
-            console.warn("case" , check_obj.case);
+            return new Point2D(  
+                x_min, 
+                MATH.Yintercept2D( x_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) )
+            );
+
+        } ,
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) => { // right
+
+            return new Point2D( 
+                x_max, 
+                MATH.Yintercept2D( x_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) )
+            );
+
+        } ,
+
+        null ,
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) => { // buttom
+        
+            return new Point2D( 
+                MATH.Xintercept2D( y_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) ),
+                y_max
+            );
+
+        } ,
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) => { // buttom + left
+
+            let px = Clip2D.#ClippingFunctions[Clip2D.#BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.#LEFT  ](x_min , y_min , x_max , y_max , outside_point , slope);
+        
+            if( ( px.x < x_min ) && ( py.y > y_max ) ) return undefined;
+
+            return new Point2D(
+                ( px.x < x_min ) ? x_min : px.x ,
+                ( py.y > y_max ) ? y_max : py.y
+            );
+
+        },
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) => { // buttom + right 
+
+            let px = Clip2D.#ClippingFunctions[Clip2D.#BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.#RIGHT ](x_min , y_min , x_max , y_max , outside_point , slope);
+     
+            if( ( px.x > x_max ) && ( py.y > y_max ) ) return undefined;
+
+            return new Point2D(
+                ( px.x > x_max ) ? x_max : px.x ,
+                ( py.y > y_max ) ? y_max : py.y
+            );
+
+        },
+
+        null , 
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) =>  { // top
+            
+            return new Point2D( 
+                MATH.Xintercept2D( y_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) ),
+                y_min
+            );
+
+        } ,
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) =>  { // top + left
+
+            let px = Clip2D.#ClippingFunctions[Clip2D.#TOP ](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.#LEFT](x_min , y_min , x_max , y_max , outside_point , slope);
+     
+            if( ( px.x < x_min ) && ( py.y < y_min ) ) return undefined;
+
+            return new Point2D(
+                ( px.x < x_min ) ? x_min : px.x,
+                ( py.y < y_min ) ? y_min : py.y
+            );
+
+        } , 
+
+        (x_min , y_min , x_max , y_max , outside_point , slope) =>  { // top + right
+
+            let px = Clip2D.#ClippingFunctions[Clip2D.#TOP  ](x_min , y_min , x_max , y_max , outside_point , slope);
+            let py = Clip2D.#ClippingFunctions[Clip2D.#RIGHT](x_min , y_min , x_max , y_max , outside_point , slope);
+     
+            if( ( px.x > x_max ) && ( py.y < y_min ) ) return undefined;
+
+            return new Point2D(
+                ( px.x > x_max ) ? x_max : px.x,
+                ( py.y < y_min ) ? y_min : py.y
+            );
+
         } 
+
+    ];
+
+    /*
+        function to check wich side a point lies on , in a buffer range 
+        "Cohen–Sutherland" conecpt 
+    */
+    static GetStatusOfPoint(  
+        point = new Point2D() , // target point to check
+        x_min , y_min , // buffer-range min values 
+        x_max , y_max   // buffer-range max values
+    ){
+
+        let region = Clip2D.#CENTER;
+
+        if( point.x < x_min )       region += Clip2D.#LEFT;
+        else if( point.x > x_max )  region += Clip2D.#RIGHT;
+
+        if( point.y < y_min )       region += Clip2D.#TOP;
+        else if( point.y > y_max )  region += Clip2D.#BUTTOM;
+
+        return region;
+
     }
 
-    return check_obj;
+    /* 
+        function clip a Line2D againts buffer-range
+    */
+    static Line2D( 
+        line = new Line2D() , 
+        x_min , y_min , // buffer-range min values
+        x_max , y_max   // buffer-range max values
+    ){
+
+        let slope = MATH.Slope2D( line.a , line.b );
+        
+        // get in wich side the points of the line is .  
+        let pa_status = Clip2D.GetStatusOfPoint( line.a , x_min , y_min , x_max , y_max ); 
+        let pb_status = Clip2D.GetStatusOfPoint( line.b , x_min , y_min , x_max , y_max );
+
+        // both points inside the buffer-range 
+        // "nothing to clip"
+        if( pa_status == 0 && pb_status == 0 ) return Clip2D.#NOT_CLIPED;
+
+        // both points outside the buffer-range in same side 
+        // "nothing to draw"
+        if( pa_status != 0 && (pa_status == pb_status) ) return Clip2D.#DISCARDED;
+
+        // one point inside and the other one outside
+        // "need clipping"
+        if( pa_status == 0 || pb_status == 0 ) {
+
+            if(pa_status == 0){
+                line.b = Clip2D.#ClippingFunctions[pb_status]( x_min , y_min , x_max , y_max , line.b , slope);
+            }
+            else { 
+                line.a = Clip2D.#ClippingFunctions[pa_status]( x_min , y_min , x_max , y_max , line.a , slope);
+            }
+
+            return Clip2D.#CLIPPED;
+        }
+        // both points outside 
+        // "clip or discard"
+        else {
+
+            line.a = Clip2D.#ClippingFunctions[pa_status](x_min , y_min , x_max , y_max , line.a , slope);
+
+            if( line.a == undefined ) {
+                return Clip2D.#DISCARDED;
+            }
+
+            line.b = Clip2D.#ClippingFunctions[pb_status](x_min , y_min , x_max , y_max , line.b , slope);
+
+            if( line.b == undefined ) {
+                return Clip2D.#DISCARDED;
+            }
+
+            return Clip2D.#CLIPPED;
+        }
+
+    }
+
 }
 
-export function xy_clipping( NDC , trig = new triangle() , check_obj = {} ){
-        //debugger
-        let inp1 = null;
-        let inp2 = null;
 
-        let names = ['a' , 'b' , 'c'];
-        let new_points = [];
+export class Clip3D{
 
-        // if all outside
-        if(check_obj.case == 3){
-
-            // if all outside in same side
-            if(check_obj.a == check_obj.b && check_obj.b == check_obj.c) return null;
-            // if all outside but in different side's , that's mean we need clipping 
-            else{
-
-            }
-
-        } 
-        // if all inside , don't clip the tirangle 
-        if(check_obj.case == 0) return trig;
-
-        // if tow points outside and one inside
-        if(check_obj.case == 2){
-            // name of inside point 
-            let inp = check_obj.a == 0 ? "a" : check_obj.b == 0 ? "b" : "c";
-  
-            for(let i = 0 ; i < names.length ; i += 1){
-                if(names[i] == inp) continue;
-                else{
-
-                    let new_point = new point(0,0,0,1);
-
-                    // we need left clip
-                    if(check_obj[names[i]] == 2){
-                        // slope
-                        let m = (trig[inp].y - trig[names[i]].y ) / (trig[inp].x - trig[names[i]].x);
-
-                        // calculate new y position of new point
-                        let new_y = -(m * trig[inp].x) + trig[inp].y ;
-
-                        new_point.y = new_y;
-                        new_point.z = trig[names[i].z];
-
-                        new_points.push( new_point );
-                    }
-
-                }
-            }
-
-            new_points.push( trig[names[inp]]);
-        }
-
-        // if one point outside and tow inside
-        if(check_obj.case == 1){
-            inp1 = check_obj.a == 0 ? "a" : check_obj.b == 0 ? "b" : "c";
-            inp2 = check_obj.c == 0 ? "c" : "b";
-
-            for(let i = 0 ; i < names.length ; i += 1){
-
-                // outside point
-                if(names[i] != inp1 && names[i] != inp2){
-
-                    let new_point1 = new point(0,0,0,1);
-                    let new_point2 = new point(0,0,0,1);
-
-                    // we need left clip
-                    if(check_obj[names[i]] == 2){
-
-                        // slope
-                        let m1 = (trig[inp1].y - trig[names[i]].y ) / (trig[inp1].x - trig[names[i]].x);
-                        let m2 = (trig[inp2].y - trig[names[i]].y ) / (trig[inp2].x - trig[names[i]].x);
-                        
-                        //debugger
-
-                        // calculate new y position of new point
-                        let new_y1 = -(m1 * trig[inp1].x) + trig[inp1].y;
-                        let new_y2 = -(m2 * trig[inp2].x) + trig[inp2].y;
-
-                        new_point1.y = new_y1;
-                        new_point2.y = new_y2;
-
-                        new_point1.z = trig[inp1].z;
-                        new_point2.z = trig[inp2].z;
-
-                        new_points.push( new_point1 );
-                        new_points.push( new_point2 );
-
-                        break;
-                    }
-
-                }
-
-            }
-
-            new_points.push( trig[inp1] );
-            new_points.push( trig[inp2] );
-        }
-
-        //debugger
-        // connect points & made triangles
-
-        if(new_points.length == 3){
-            return triangle(...new_points);
-        }
-
-        if(new_points.length == 4){
-            let new_triangles = [
-                new triangle( new_points[0] , new_points[1] , new_points[2]),
-                new triangle( new_points[2] , new_points[3] , new_points[0]),
-
-            ];
-
-            return new_triangles;
-        }
 }

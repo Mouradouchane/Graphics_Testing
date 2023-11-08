@@ -5,21 +5,26 @@ import { RGBA } from "./color.js";
 */
 export class FrameBuffer{
 
-    // PRIVATE PROPERTIES 
+    // PRIVATE PROPERTIES
+    #x = 0;
+    #y = 0; 
     #width  = 1;
     #height = 1;
     #length = 1;
     #buffer = undefined;
-    #clear_color = new RGBA(0,0,0,1);
+    #color  = new RGBA(0,0,0,1);
 
     constructor( 
-        buffer_width = 1 , buffer_height = 1 , clear_color = new RGBA(0,0,0,1) 
+        x = 0 , y = 0 , width = 1 , height = 1 , color = new RGBA(0,0,0,1) 
     ){
         
-        if( clear_color instanceof RGBA ) this.#clear_color = clear_color;
+        if( color instanceof RGBA ) this.#color = color;
         
-        if( buffer_width > 0 ) {
-            this.#width = Number.parseInt(buffer_width);
+        this.#x = x;
+        this.#y = y;
+
+        if( width > 0 ) {
+            this.#width = Number.parseInt(width);
         }
         else {
 
@@ -29,8 +34,8 @@ export class FrameBuffer{
 
         }
 
-        if( buffer_height > 0 ) {
-            this.#height = Number.parseInt(buffer_height);
+        if( height > 0 ) {
+            this.#height = Number.parseInt(height);
         }
         else {
             
@@ -43,7 +48,7 @@ export class FrameBuffer{
         // allocate buffer array 
         this.#length = this.#width * this.#height;
         this.#buffer = new Array( this.#length );
-        this.#buffer.fill( this.#clear_color );
+        this.#buffer.fill( this.#color );
 
 
         /*
@@ -86,7 +91,7 @@ export class FrameBuffer{
                 clear_color = color_to_clear_with;
             }
             else {
-                clear_color = this.#clear_color;
+                clear_color = this.#color;
             }
 
             for( let y = 0; y < (this.#height - 1) ; y++ ){
@@ -107,7 +112,7 @@ export class FrameBuffer{
                 clear_color = color_to_clear_with;
             }
             else {
-                clear_color = this.#clear_color;
+                clear_color = this.#color;
             }
            
             x = ( x < 0 ) ? 0 : ( x > (this.#width  - 1) ) ? this.#width  - 1  : x;
@@ -134,6 +139,13 @@ export class FrameBuffer{
             return this.#height - 1;
         }
 
+        this.GetX = () => {
+            return this.#x;
+        }
+
+        this.GetY = () => {
+            return this.#y;
+        }
     }
 
 
@@ -152,3 +164,4 @@ export class FrameBuffer{
     }
 
 }
+
