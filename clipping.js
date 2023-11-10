@@ -28,18 +28,22 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) => { // left
         
+            let y =  MATH.Yintercept2D( x_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) );
+            
             return new Point2D(  
-                x_min, 
-                MATH.Yintercept2D( x_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) )
+                x_min , 
+                ( (y < y_min) || (y > y_max) ) ? -1 : y
             );
-
+                
         } ,
 
         (x_min , y_min , x_max , y_max , outside_point , slope) => { // right
 
+            let y =  MATH.Yintercept2D( x_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) );
+
             return new Point2D( 
                 x_max, 
-                MATH.Yintercept2D( x_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) )
+                ( (y < y_min) || (y > y_max) ) ? -1 : y
             );
 
         } ,
@@ -48,8 +52,10 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) => { // buttom
         
+            let x =  MATH.Xintercept2D( y_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) );
+
             return new Point2D( 
-                MATH.Xintercept2D( y_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) ),
+                ( (x < x_min) || (x > x_max) ) ? -1 : x ,
                 y_max
             );
 
@@ -60,11 +66,11 @@ export class Clip2D {
             let px = Clip2D.#ClippingFunctions[Clip2D.BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
             let py = Clip2D.#ClippingFunctions[Clip2D.LEFT  ](x_min , y_min , x_max , y_max , outside_point , slope);
         
-            if( ( px.x < x_min ) && ( py.y > y_max ) ) return undefined;
+            if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x < x_min ) ? x_min : px.x ,
-                ( py.y > y_max ) ? y_max : py.y
+                ( px.x == -1 ) ? x_min : px.x ,
+                ( py.y == -1 ) ? y_max : py.y
             );
 
         },
@@ -74,11 +80,11 @@ export class Clip2D {
             let px = Clip2D.#ClippingFunctions[Clip2D.BUTTOM](x_min , y_min , x_max , y_max , outside_point , slope);
             let py = Clip2D.#ClippingFunctions[Clip2D.RIGHT ](x_min , y_min , x_max , y_max , outside_point , slope);
      
-            if( ( px.x > x_max ) && ( py.y > y_max ) ) return undefined;
+            if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x > x_max ) ? x_max : px.x ,
-                ( py.y > y_max ) ? y_max : py.y
+                ( px.x == -1 ) ? x_max : px.x ,
+                ( py.y == -1 ) ? y_max : py.y
             );
 
         },
@@ -87,8 +93,10 @@ export class Clip2D {
 
         (x_min , y_min , x_max , y_max , outside_point , slope) =>  { // top
             
-            return new Point2D( 
-                MATH.Xintercept2D( y_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) ),
+            let x = MATH.Xintercept2D( y_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) );
+
+            return new Point2D(
+                ( (x < x_min) || (x > x_max) ) ? -1 : x , 
                 y_min
             );
 
@@ -99,11 +107,11 @@ export class Clip2D {
             let px = Clip2D.#ClippingFunctions[Clip2D.TOP ](x_min , y_min , x_max , y_max , outside_point , slope);
             let py = Clip2D.#ClippingFunctions[Clip2D.LEFT](x_min , y_min , x_max , y_max , outside_point , slope);
      
-            if( ( px.x < x_min ) && ( py.y < y_min ) ) return undefined;
+            if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x < x_min ) ? x_min : px.x,
-                ( py.y < y_min ) ? y_min : py.y
+                ( px.x == -1 ) ? x_min : px.x,
+                ( py.y == -1 ) ? y_min : py.y
             );
 
         } , 
@@ -113,11 +121,11 @@ export class Clip2D {
             let px = Clip2D.#ClippingFunctions[Clip2D.TOP  ](x_min , y_min , x_max , y_max , outside_point , slope);
             let py = Clip2D.#ClippingFunctions[Clip2D.RIGHT](x_min , y_min , x_max , y_max , outside_point , slope);
      
-            if( ( px.x > x_max ) && ( py.y < y_min ) ) return undefined;
+            if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x > x_max ) ? x_max : px.x,
-                ( py.y < y_min ) ? y_min : py.y
+                ( px.x == -1 ) ? x_max : px.x,
+                ( py.y == -1 ) ? y_min : py.y
             );
 
         } 
@@ -155,7 +163,6 @@ export class Clip2D {
         x_max , y_max   // buffer-range max values
     ){
 
-        debugger;
         
         let slope = MATH.Slope2D( line.a , line.b );
         
@@ -202,7 +209,8 @@ export class Clip2D {
             if( line.b == undefined ) {
                 return Clip2D.DISCARDED;
             }
-            if(line.a.x == -1 || line.a.y == -1) detected_outside += 1;
+
+            if(line.b.x == -1 || line.b.y == -1) detected_outside += 1;
 
             if( detected_outside == 2 ) return Clip2D.DISCARDED;
 

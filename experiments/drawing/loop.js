@@ -39,11 +39,11 @@ var Config = {
     ShapesAmount : 3 ,
     BorderThickness : 4 ,
     Gradient  : false ,
-    MaxWidth  : Canvas.clientWidth  / 1.5 ,
-    MaxHeight : Canvas.clientHeight / 1.5 ,
+    MaxWidth  : Canvas.clientWidth  ,
+    MaxHeight : Canvas.clientHeight ,
 
     ShowFps : true,
-    
+    DrawClipped : true,
 }
 
 /*
@@ -51,21 +51,53 @@ var Config = {
 */
 
 var lines = [
-    /*
+   
     ...Generator.Random.Lines2D(
-        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight 
-    )
-    */
+        Config.ShapesAmount * 100 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , 0 , 2
+    ),
+    
+    /* 
+    // test 1
     new Line2D( new Point2D(100,50) ,  new Point2D(700,550), 2 , RGBA.RandomColor(false) ),
-    new Line2D( new Point2D(120,50) ,  new Point2D(700,450), 2 , RGBA.RandomColor(false) ),
-    new Line2D( new Point2D(260,70) ,  new Point2D(700,300), 2 , RGBA.RandomColor(false) ),
 
-    new Line2D( new Point2D(300,70) ,  new Point2D(300,550), 2 , RGBA.RandomColor(false) ),
     new Line2D( new Point2D(50,350) ,  new Point2D(700,350), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,350) ,  new Point2D(700,100), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,350) ,  new Point2D(790,120), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,350) ,  new Point2D(500,120), 2 , RGBA.RandomColor(false) ),
 
-    new Line2D( new Point2D(400,400) , new Point2D(50,480), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,350) ,  new Point2D(750,550), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,380) ,  new Point2D(750,500), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,310) ,  new Point2D(790,480), 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(300,70) ,  new Point2D(300,500), 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(300,70) ,  new Point2D(300,500), 2 , RGBA.RandomColor(false) ),
+    
+    // test 2
+
+    new Line2D( new Point2D(400,400) , new Point2D(50,480), 2 ,  RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(400,300) , new Point2D(20,480), 2 ,  RGBA.RandomColor(false) ),
+    
     new Line2D( new Point2D(50,400)  , new Point2D(240,570) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,350)  , new Point2D(310,520) , 2 , RGBA.RandomColor(false) ),
 
+    new Line2D( new Point2D(50,150)  , new Point2D(310,20) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(50,250)  , new Point2D(300,20) , 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(50,100)  , new Point2D(310,200) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(10,110)  , new Point2D(280,200) , 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(450, 100)  , new Point2D(680,200) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(450, 50)  , new Point2D(700,160) , 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(550, 200)  , new Point2D(700,100) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(550, 200)  , new Point2D(700,140) , 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(550, 400)  , new Point2D(700,540) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(550, 400)  , new Point2D(750,490) , 2 , RGBA.RandomColor(false) ),
+
+    new Line2D( new Point2D(750,430) , new Point2D(550, 500) , 2 , RGBA.RandomColor(false) ),
+    new Line2D( new Point2D(750,420) , new Point2D(500, 480) , 2 , RGBA.RandomColor(false) ),
+    */
 ];
 
 var rectangles = [
@@ -179,18 +211,23 @@ function NewFrame(){
                 
             for( let line of lines ){
         
-                let lcopy = Line2D.Copy( line ); 
-                lcopy.color = new RGBA(255,0,0,1);
+                if(Config.DrawClipped){
 
-                let status = Clip2D.Line2D( line , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max );
+                    let lcopy = Line2D.Copy( line ); 
+                    lcopy.color = new RGBA(255,0,0,0.4);
 
-                if(status != Clip2D.DISCARDED ){
                     Draw.Line2D( lcopy );
-                    Draw.Line2D( line  );
+                    if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( lcopy , 2 , new RGBA(255,255,255,1));
 
-                    if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( line );
-                    if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( lcopy );
                 }
+
+                let clipping_status = Clip2D.Line2D( line , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max );
+
+                if(clipping_status != Clip2D.DISCARDED ){
+                    Draw.Line2D( line  );
+                    if( Config.DrawPointsForDebug ) Check.VisualCheck.Line2D( line );
+                }
+
             }
 
         } break;
