@@ -133,13 +133,13 @@ export class Clip2D {
     ];
 
     /*
-        function to check wich side a point lies on , in a buffer range 
+        function to check wich side a point lies on a boundaries
         "Cohen–Sutherland" conecpt 
     */
     static GetStatusOfPoint(  
         point = new Point2D() , // target point to check
-        x_min , y_min , // buffer-range min values 
-        x_max , y_max   // buffer-range max values
+        x_min , y_min , // boundary-range min values 
+        x_max , y_max , // boundary-range max values
     ){
 
         let region = Clip2D.CENTER;
@@ -154,13 +154,27 @@ export class Clip2D {
 
     }
 
+    static IsPointAtBoundry(  
+        point = new Point2D() , // target point to check
+        x_min , y_min , // boundary-range min values 
+        x_max , y_max , // boundary-range max values
+    ){
+     
+        if( (point.x == x_min) || (point.x == x_max) ) return true;
+
+        if( (point.y == y_min) || (point.y == y_max) ) return true;
+
+        return false;
+
+    }
+
     /* 
-        function clip a Line2D againts buffer-range
+        function to clip 2D Lines againts boundaries
     */
     static Line2D( 
         line = new Line2D() , 
-        x_min , y_min , // buffer-range min values
-        x_max , y_max   // buffer-range max values
+        x_min , y_min , // boundary-range min values
+        x_max , y_max   // boundary-range max values
     ){
 
         
@@ -219,7 +233,34 @@ export class Clip2D {
 
     }
 
-}
+
+    /*
+        function to clip 2D triangles againts boundaries
+    */
+    static Triangle2D(
+        triangle = new Triangle2D() , 
+        x_min , y_min , // boundary-range min values
+        x_max , y_max   // boundary-range max values
+    ){
+
+        let pa_status = Clip2D.GetStatusOfPoint( triangle.a , x_min , y_min , x_max , y_max );
+        let pb_status = Clip2D.GetStatusOfPoint( triangle.b , x_min , y_min , x_max , y_max );
+        let pc_status = Clip2D.GetStatusOfPoint( triangle.c , x_min , y_min , x_max , y_max );
+
+        // all triangle points inside boundary
+        if( (pa_status == 0) && (pb_status == 0) && (pc_status == 0) ) return Clip2D.NOT_CLIPED;
+
+        // all triangle points in the same side outside boundary
+        if(( pa_status != 0) && (pa_status == pb_status) && (pa_status == pc_status) ) return Clip2D.DISCARDED;
+
+        // else : clipping needed
+        
+
+
+    }
+
+
+} // end of Clip2D class
 
 
 export class Clip3D{
