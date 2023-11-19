@@ -746,12 +746,6 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         }
 
-        /*
-        Draw.#DrawCircle(border_triangle.a.x ,  border_triangle.a.y , 2 , 0 , new RGBA(200,200,0,1));
-        Draw.#DrawCircle(border_triangle.b.x ,  border_triangle.b.y , 2 , 0 , new RGBA(200,200,0,1));
-        Draw.#DrawCircle(border_triangle.c.x ,  border_triangle.c.y , 2 , 0 , new RGBA(200,200,0,1));
-        */
-
     } 
     // end of #DRAW_TRIANGLE_BORDER
 
