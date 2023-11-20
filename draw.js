@@ -1,15 +1,15 @@
 
-import {RGBA} from "../color.js";
-import {Point2D} from "../point.js";
-import {Line2D}  from "../line.js";
-import {MATH} from "../math.js";
-import {Rectangle2D} from "../rectangle.js";
-import {Triangle2D} from "../triangle.js";
-import {Circle2D} from "../circle.js";
-import {Ellipse2D} from "../ellipse.js";
-import {Curve2D , LongCurve2D} from "../curve.js";
-import {Rotate} from "../rotate.js";
-import {FrameBuffer} from "../buffers.js";
+import {RGBA} from "./color.js";
+import {Point2D} from "./point.js";
+import {Line2D}  from "./line.js";
+import {MATH} from "./math.js";
+import {Rectangle2D} from "./rectangle.js";
+import {Triangle2D} from "./triangle.js";
+import {Circle2D} from "./circle.js";
+import {Ellipse2D} from "./ellipse.js";
+import {Curve2D , LongCurve2D} from "./curve.js";
+import {Rotate} from "./rotate.js";
+import {FrameBuffer} from "./buffers.js";
 
 export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 

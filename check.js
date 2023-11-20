@@ -1,8 +1,8 @@
 
-import {RGBA} from "../../color.js";
+import {RGBA} from "./color.js";
 import {Point2D} from "./point.js";
 import {Line2D} from "./line.js";
-import {Draw} from "../draw/draw.js";
+import {Draw} from "./draw.js";
 import {Rectangle2D} from "./rectangle.js";
 import {Triangle2D} from "./triangle.js";
 import {Circle2D} from "./circle.js";

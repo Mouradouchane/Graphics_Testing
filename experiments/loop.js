@@ -1,17 +1,17 @@
-import {RGBA} from "../../color.js";
-import {Point2D} from "../../point.js";
-import {Line2D} from "../../line.js";
-import {Curve2D, LongCurve2D} from "../../curve.js";
-import {Rectangle2D} from "../../rectangle.js";
-import {Triangle2D, Triangle2DGradient} from "../../triangle.js";
-import {Generator} from "../../generators.js";
-import {Circle2D} from "../../circle.js";
-import {Ellipse2D} from "../../ellipse.js";
-import {Check} from "../../check.js";
-import {Rotate} from "../../rotate.js";
-import {Draw} from "../../draw/draw.js";
-import {FrameBuffer , SubBuffer} from "../../buffers.js";
-import { Clip2D } from "../../clipping.js";
+import {RGBA} from "../color.js";
+import {Point2D} from "../point.js";
+import {Line2D} from "../line.js";
+import {Curve2D, LongCurve2D} from "../curve.js";
+import {Rectangle2D} from "../rectangle.js";
+import {Triangle2D, Triangle2DGradient} from "../triangle.js";
+import {Generator} from "../generators.js";
+import {Circle2D} from "../circle.js";
+import {Ellipse2D} from "../ellipse.js";
+import {Check} from "../check.js";
+import {Rotate} from "../rotate.js";
+import {Draw} from "../draw.js";
+import {FrameBuffer , SubBuffer} from "../buffers.js";
+import { Clip2D } from "../clipping.js";
 
 const Canvas = document.querySelector("#canvas");
 const CTX = Canvas.getContext("2d");
@@ -68,7 +68,7 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-   
+    /*
     new Triangle2DGradient( 
         new Point2D(350, 200) ,
         new Point2D(10 ,400)  ,
@@ -76,8 +76,8 @@ var triangles = [
         // new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
         new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
         ),
-    
-/*
+    */
+
     new Triangle2D(
         new Point2D(200  , 50) ,
         new Point2D(60  , 240) ,
@@ -86,7 +86,7 @@ var triangles = [
         new RGBA(200,100,25,0.2) ,  
         new RGBA(0,0,255,1) ,
     )
-*/
+
 ];
 
 var circles = [

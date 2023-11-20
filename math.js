@@ -180,6 +180,28 @@ export class MATH{
 
     }
 
+
+    static IsPointInsideTriangle(
+        // point to check if it lies inside traingle 
+        target_point = new Point2D() , 
+        // a , b , c : area triangle points
+        a = new Point2D(), 
+        b = new Point2D(),
+        c = new Point2D(),
+    ){
+        let triangle_area = MATH.AreaOfTriangle2D(a,b,c);
+        
+        let alpha =  MATH.AreaOfTriangle2D(a, target_point , c) / triangle_area;    
+        let beta  =  MATH.AreaOfTriangle2D(target_point , b , c) / triangle_area;    
+        let gamma =  MATH.AreaOfTriangle2D(a , b , target_point) / triangle_area;    
+
+        /*
+          if 3 values bigger than 1 mean the target_point is outside
+        */
+        return ( (alpha + beta + gamma) < 1 );
+
+    }
+
     /*
         few functions for 2D vectors/points
     */

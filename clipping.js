@@ -3,7 +3,7 @@ import {Point2D} from "./point.js"
 import {Line2D} from "./line.js"
 import {Triangle2D} from "./triangle.js"
 import {MATH} from "./math.js";
-import {Draw} from "./draw/draw.js";
+import {Draw} from "./draw.js";
 import {RGBA} from "./color.js";
 // import {FrameBuffer} from "./buffers.js"
 
@@ -236,6 +236,42 @@ export class Clip2D {
     }
 
 
+    static #ClipTo3Triangles(
+        target_point = new Point2D() ,
+        triangle = new Triangle2D() ,
+        sub_triangles_array ,
+        x_min , y_min , // boundary-range min values
+        x_max , y_max   // boundary-range max values
+    ){
+            debugger;
+
+           // clip to 3 triangle 
+           let triangle1 = Triangle2D.Copy(triangle);
+           let triangle2 = Triangle2D.Copy(triangle);
+           let triangle3 = Triangle2D.Copy(triangle);
+
+           triangle1.a = Point2D.Copy(target_point);
+           triangle2.b = Point2D.Copy(target_point);
+           triangle3.c = Point2D.Copy(target_point);
+
+           // try to clip those new triangles
+
+           Clip2D.Triangle2D(
+               triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max 
+           );
+           
+           Clip2D.Triangle2D(
+               triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max 
+           );
+           
+           Clip2D.Triangle2D(
+               triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max 
+           );
+
+           return Clip2D.CLIPPED;
+
+    }
+
     /*
         function to clip 2D triangles againts boundaries
     */
@@ -246,18 +282,19 @@ export class Clip2D {
         x_max , y_max   // boundary-range max values
     ){
 
-        triangle.border_color = new RGBA(255,50,200,0.1);
+        triangle.border_color = new RGBA(255,0,100,);
         triangle.fill_color = null;
         triangle.thickness = 1;
         Draw.Triangle2D( triangle );
 
         debugger;
 
+        // 1 - get status code
         let a_status = Clip2D.GetStatusOfPoint( triangle.a , x_min , y_min , x_max , y_max );
         let b_status = Clip2D.GetStatusOfPoint( triangle.b , x_min , y_min , x_max , y_max );
         let c_status = Clip2D.GetStatusOfPoint( triangle.c , x_min , y_min , x_max , y_max );
 
-        // all triangle points inside boundary
+        // 2 - check if all the points inside boundary
         if( (a_status == 0) && (b_status == 0) && (c_status == 0) ){
 
             sub_triangles_array.push( triangle );
@@ -265,100 +302,62 @@ export class Clip2D {
             return Clip2D.NOT_CLIPED;
         } 
 
-        // all triangle points in the same side outside boundary
-        if( ( a_status != 0) && (a_status == b_status) && (a_status == c_status) ) return Clip2D.DISCARDED;
+        // 3 - check if triangle contain one of the boundary edges inside
+        // note that's useful for easy clipping to 3 triangles
+        
+        let edge_point = new Point2D(x_min , y_min);
+
+        if( 
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+        ){
+
+            return Clip2D.#ClipTo3Triangles(
+                edge_point , triangle , sub_triangles_array ,
+                x_min , y_min , x_max , y_max 
+            );
+        }
+
+        edge_point = new Point2D(x_max , y_min);
+
+        if( 
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+        ){
+            return Clip2D.#ClipTo3Triangles(
+                edge_point , triangle , sub_triangles_array ,
+                x_min , y_min , x_max , y_max 
+            );
+        }
+
+        edge_point = new Point2D(x_min , y_max);
+
+        if( 
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+        ){
+            return Clip2D.#ClipTo3Triangles(
+                edge_point , triangle , sub_triangles_array ,
+                x_min , y_min , x_max , y_max 
+            );
+        }
+
+        edge_point = new Point2D(x_max , y_max);
+
+        if( 
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+        ){
+            return Clip2D.#ClipTo3Triangles(
+                edge_point , triangle , sub_triangles_array ,
+                x_min , y_min , x_max , y_max 
+            );
+        }
+
+
 
         /*
-            else : clipping cases
+            4 - try to find a valid clipping point to clip with int o 2 triangles
         */
 
         let clip_point;
 
-        // try to get a valid point for clip between a & b 
-
-        if( (a_status != 0) || (b_status != 0) ){
-
-            clip_point = Clip2D.#ClippingFunctions[ ((a_status != 0) ? a_status : b_status) ]( 
-                x_min , y_min , x_max , y_max , 
-                (a_status != 0) ? triangle.a : triangle.b ,
-                MATH.Slope2D(triangle.a , triangle.b)
-            );
-
-            if( 
-                clip_point != undefined && Point2D.Valid(clip_point) &&
-                !Point2D.Equals(clip_point , triangle.a) && !Point2D.Equals(clip_point , triangle.b) 
-            ) {
-
-                let sub_triangle_1 = Triangle2D.Copy( triangle );
-                let sub_triangle_2 = Triangle2D.Copy( triangle );
-
-                sub_triangle_1.b = Point2D.Copy( clip_point );
-                sub_triangle_2.a = Point2D.Copy( clip_point );
-
-                Clip2D.Triangle2D( sub_triangle_1 , sub_triangles_array , x_min , y_min , x_max , y_max );
-                Clip2D.Triangle2D( sub_triangle_2 , sub_triangles_array , x_min , y_min , x_max , y_max );
-
-                return Clip2D.CLIPPED;
-            }
-
-        }
-
-        // try to get a valid point for clip between a & c 
-        if( (a_status != 0) || (c_status != 0) ){
-
-            clip_point = Clip2D.#ClippingFunctions[ (a_status != 0) ? a_status : c_status ]( 
-                x_min , y_min , x_max , y_max , 
-                (a_status != 0) ? triangle.a : triangle.c ,
-                MATH.Slope2D(triangle.a , triangle.c)
-            );
-
-            if( 
-                clip_point != undefined && Point2D.Valid(clip_point) &&
-                !Point2D.Equals(clip_point , triangle.a) && !Point2D.Equals(clip_point , triangle.c) 
-            ) {
-
-                let sub_triangle_1 = Triangle2D.Copy( triangle );
-                let sub_triangle_2 = Triangle2D.Copy( triangle );
-
-                sub_triangle_1.c = Point2D.Copy( clip_point );
-                sub_triangle_2.a = Point2D.Copy( clip_point );
-
-                Clip2D.Triangle2D( sub_triangle_1 , sub_triangles_array , x_min , y_min , x_max , y_max );
-                Clip2D.Triangle2D( sub_triangle_2 , sub_triangles_array , x_min , y_min , x_max , y_max );
-
-                return Clip2D.CLIPPED;
-            }
-
-        }
-
-        // try to get a valid point for clip between b & c 
-
-        if( (b_status != 0) || ( c_status != 0) ){
-
-            clip_point = Clip2D.#ClippingFunctions[ (b_status != 0) ? b_status : c_status ]( 
-                x_min , y_min , x_max , y_max , 
-                (b_status != 0) ? triangle.b : triangle.c ,
-                MATH.Slope2D(triangle.b , triangle.c)
-            );
-
-            if( 
-                clip_point != undefined && Point2D.Valid(clip_point) &&
-                !Point2D.Equals(clip_point , triangle.b) && !Point2D.Equals(clip_point , triangle.c) 
-            ) {
-
-                let sub_triangle_1 = Triangle2D.Copy( triangle );
-                let sub_triangle_2 = Triangle2D.Copy( triangle );
-
-                sub_triangle_1.b = Point2D.Copy( clip_point );
-                sub_triangle_2.c = Point2D.Copy( clip_point );
-
-                Clip2D.Triangle2D( sub_triangle_1 , sub_triangles_array , x_min , y_min , x_max , y_max );
-                Clip2D.Triangle2D( sub_triangle_2 , sub_triangles_array , x_min , y_min , x_max , y_max );
-
-                return Clip2D.CLIPPED;
-            } 
-
-        }
 
     }
 
