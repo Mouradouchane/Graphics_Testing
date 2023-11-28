@@ -79,13 +79,40 @@ var triangles = [
     */
 
     new Triangle2D(
+        new Point2D(550  , 150) ,
+        new Point2D(460  , 480) ,
+        new Point2D(730  , 590) ,
+        1 , 
+        new RGBA(200,100,25,0.2) ,  
+        new RGBA(0,0,255,1) ,
+    ),
+
+    new Triangle2D(
+        new Point2D(50  , 350) ,
+        new Point2D(60  , 500) ,
+        new Point2D(430  , 590) ,
+        1 , 
+        new RGBA(200,100,25,0.2) ,  
+        new RGBA(0,0,255,1) ,
+    ),
+
+    new Triangle2D(
+        new Point2D(700  , 50) ,
+        new Point2D(360  , 240) ,
+        new Point2D(630  , 390) ,
+        1 , 
+        new RGBA(200,100,25,0.2) ,  
+        new RGBA(0,0,255,1) ,
+    ),
+
+    new Triangle2D(
         new Point2D(200  , 50) ,
         new Point2D(60  , 240) ,
         new Point2D(630  , 490) ,
         1 , 
         new RGBA(200,100,25,0.2) ,  
         new RGBA(0,0,255,1) ,
-    )
+    ),
 
 ];
 

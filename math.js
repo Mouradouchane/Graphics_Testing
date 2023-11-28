@@ -178,29 +178,30 @@ export class MATH{
             Math.sqrt( p * (p - A) * (p - B) * (p - C) ) 
         );
 
-    }
+    };
 
 
     static IsPointInsideTriangle(
         // point to check if it lies inside traingle 
         target_point = new Point2D() , 
-        // a , b , c : area triangle points
+        // a , b , c : triangle points
         a = new Point2D(), 
         b = new Point2D(),
         c = new Point2D(),
     ){
-        let triangle_area = MATH.AreaOfTriangle2D(a,b,c);
+
+        let triangle_area = Math.round(MATH.AreaOfTriangle2D(a,b,c));
         
-        let alpha =  MATH.AreaOfTriangle2D(a, target_point , c) / triangle_area;    
-        let beta  =  MATH.AreaOfTriangle2D(target_point , b , c) / triangle_area;    
-        let gamma =  MATH.AreaOfTriangle2D(a , b , target_point) / triangle_area;    
+        let alpha =   Math.round( MATH.AreaOfTriangle2D(a, target_point , c)  );    
+        let beta  =   Math.round( MATH.AreaOfTriangle2D(target_point , b , c) );    
+        let gamma =   Math.round( MATH.AreaOfTriangle2D(a , b , target_point) );    
 
         /*
           if 3 values bigger than 1 mean the target_point is outside
         */
-        return ( (alpha + beta + gamma) < 1 );
+        return ( (alpha + beta + gamma) <= triangle_area );
 
-    }
+    };
 
     /*
         few functions for 2D vectors/points
@@ -241,7 +242,6 @@ export class MATH{
 
     };
 
-
     static Vector2DScale( vector , scalar ){ 
 
         return new Vector2D(
@@ -278,6 +278,6 @@ export class MATH{
         n.y *= scalar;
 
         return n;
-    }
+    };
 
 }
