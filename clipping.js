@@ -34,7 +34,7 @@ export class Clip2D {
             
             return new Point2D(  
                 x_min , 
-                ( (y < y_min) || (y > y_max) ) ? -1 : y
+                ( (y < y_min) || (y > y_max) ) ? -1 : Math.floor(y)
             );
                 
         } ,
@@ -45,7 +45,7 @@ export class Clip2D {
 
             return new Point2D( 
                 x_max, 
-                ( (y < y_min) || (y > y_max) ) ? -1 : y
+                ( (y < y_min) || (y > y_max) ) ? -1 : Math.floor(y)
             );
 
         } ,
@@ -57,7 +57,7 @@ export class Clip2D {
             let x =  MATH.Xintercept2D( y_max , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) );
 
             return new Point2D( 
-                ( (x < x_min) || (x > x_max) ) ? -1 : x ,
+                ( (x < x_min) || (x > x_max) ) ? -1 : Math.floor(x) ,
                 y_max
             );
 
@@ -71,8 +71,8 @@ export class Clip2D {
             if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x == -1 ) ? x_min : px.x ,
-                ( py.y == -1 ) ? y_max : py.y
+                ( px.x == -1 ) ? x_min : Math.floor(px.x) ,
+                ( py.y == -1 ) ? y_max : Math.floor(py.y)
             );
 
         },
@@ -85,8 +85,8 @@ export class Clip2D {
             if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x == -1 ) ? x_max : px.x ,
-                ( py.y == -1 ) ? y_max : py.y
+                ( px.x == -1 ) ? x_max : Math.floor(px.x) ,
+                ( py.y == -1 ) ? y_max : Math.floor(py.y)
             );
 
         },
@@ -98,7 +98,7 @@ export class Clip2D {
             let x = MATH.Xintercept2D( y_min , slope , MATH.Yintercept_At_X0_2D( outside_point , slope ) );
 
             return new Point2D(
-                ( (x < x_min) || (x > x_max) ) ? -1 : x , 
+                ( (x < x_min) || (x > x_max) ) ? -1 : Math.floor(x) , 
                 y_min
             );
 
@@ -112,8 +112,8 @@ export class Clip2D {
             if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x == -1 ) ? x_min : px.x,
-                ( py.y == -1 ) ? y_min : py.y
+                ( px.x == -1 ) ? x_min : Math.floor(px.x),
+                ( py.y == -1 ) ? y_min : Math.floor(py.y)
             );
 
         } , 
@@ -126,8 +126,8 @@ export class Clip2D {
             if( ( px.x == -1 ) && ( py.y == -1 ) ) return undefined;
 
             return new Point2D(
-                ( px.x == -1 ) ? x_max : px.x,
-                ( py.y == -1 ) ? y_min : py.y
+                ( px.x == -1 ) ? x_max : Math.floor(px.x),
+                ( py.y == -1 ) ? y_min : Math.floor(py.y)
             );
 
         } 
@@ -243,7 +243,6 @@ export class Clip2D {
         x_min , y_min , // boundary-range min values
         x_max , y_max , // boundary-range max values
     ){
-            debugger;
 
            // clip to 3 triangle 
            let triangle1 = Triangle2D.Copy(triangle);
@@ -265,10 +264,20 @@ export class Clip2D {
            );
            
            Clip2D.Triangle2D(
-               triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+               triangle3 , sub_triangles_array , x_min , y_min , x_max , y_max , false
            );
 
            return Clip2D.CLIPPED;
+
+    }
+
+    static IsPointAtRange( p1 , p2 , pt ) {
+
+        return (
+            ( (p1.x < p2.x) ? (p1.x <= pt.x && p2.x >= pt.x) : (p2.x <= pt.x && p1.x >= pt.x) ) 
+            && 
+            ( (p1.y < p2.y) ? (p1.y <= pt.y && p2.y >= pt.y) : (p2.y <= pt.y && p1.y >= pt.y) )
+        );
 
     }
 
@@ -283,17 +292,32 @@ export class Clip2D {
         check_againts_boundry_edges = true
     ){
 
-        triangle.border_color = new RGBA(255,0,100,);
+        if( 
+            Point2D.Equals(triangle.a , triangle.b) || 
+            Point2D.Equals(triangle.a , triangle.c) ||  
+            Point2D.Equals(triangle.c , triangle.b)
+        ){
+
+            return Clip2D.DISCARDED;
+        }
+
+        triangle.border_color = RGBA.RandomColor() // new RGBA(255,255,255,1);
         triangle.fill_color = null;
         triangle.thickness = 1;
         Draw.Triangle2D( triangle );
 
-        debugger;
+        console.log();
+        console.log(`a = x : ${triangle.a.x} | y : ${triangle.a.y}`);
+        console.log(`b = x : ${triangle.b.x} | y : ${triangle.b.y}`);
+        console.log(`c = x : ${triangle.c.x} | y : ${triangle.c.y}`);
+        console.log();
 
         // 1 - get status code
         let a_status = Clip2D.GetStatusOfPoint( triangle.a , x_min , y_min , x_max , y_max );
         let b_status = Clip2D.GetStatusOfPoint( triangle.b , x_min , y_min , x_max , y_max );
         let c_status = Clip2D.GetStatusOfPoint( triangle.c , x_min , y_min , x_max , y_max );
+        
+        debugger;
 
         // 2 - check if all the points inside boundary
         if( (a_status == 0) && (b_status == 0) && (c_status == 0) ){
@@ -351,6 +375,7 @@ export class Clip2D {
                     x_min , y_min , x_max , y_max , false
                 );
             }
+
         }
 
         /*
@@ -358,9 +383,139 @@ export class Clip2D {
         */
 
         let clip_point;
+        
+        let triangle1;
+        let triangle2;
 
-        // try to find valid point between a , b
+        // try to find a valid point between "a & b"
+        if( a_status != 0 || b_status != 0 ){
 
+            clip_point = Clip2D.#ClippingFunctions[ a_status || b_status ](
+                x_min , y_min , x_max , y_max , triangle.a , MATH.Slope2D(triangle.a , triangle.b)
+            );
+
+            if( clip_point != undefined ){
+
+                // if valid point found preform clip using it
+                if( 
+                     (clip_point.x != -1 && clip_point.y != -1)  && 
+                    !( Point2D.Equals(clip_point , triangle.b) ) &&
+                    !( Point2D.Equals(clip_point , triangle.a) )
+                ) {
+
+                    if( Clip2D.IsPointAtRange( triangle.a , triangle.b , clip_point ) ) {
+
+                        triangle1 = Triangle2D.Copy( triangle );
+                        triangle2 = Triangle2D.Copy( triangle );
+
+                        triangle1.b = Point2D.Copy( clip_point );
+                        triangle2.a = Point2D.Copy( clip_point );
+
+                        Clip2D.Triangle2D(
+                            triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+                        ); 
+
+                        Clip2D.Triangle2D( 
+                            triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+                        );
+
+                        return Clip2D.CLIPPED;
+                    }
+
+                }
+
+            }
+
+            
+        }
+        
+        // try to find a valid point between "a & c"
+        if( c_status != 0 || a_status != 0 ){
+
+            clip_point = Clip2D.#ClippingFunctions[ c_status || a_status ](
+                x_min , y_min , x_max , y_max , triangle.a , MATH.Slope2D(triangle.a , triangle.c)
+            );
+
+            if( clip_point != undefined ){
+
+                // if valid point found preform clip using it
+                if( 
+                    (clip_point.x != -1 && clip_point.y != -1) && 
+                    !( Point2D.Equals(clip_point , triangle.c) ) && 
+                    !( Point2D.Equals(clip_point , triangle.a) )
+                ) {
+            
+                    if( Clip2D.IsPointAtRange( triangle.a , triangle.c , clip_point ) ) {
+
+                        triangle1 = Triangle2D.Copy( triangle );
+                        triangle2 = Triangle2D.Copy( triangle );
+
+                        triangle1.c = Point2D.Copy( clip_point );
+                        triangle2.a = Point2D.Copy( clip_point );
+
+                        Clip2D.Triangle2D(
+                            triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+                        ); 
+
+                        Clip2D.Triangle2D( 
+                            triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+                        );
+
+                        return Clip2D.CLIPPED;
+                    }
+
+                }
+
+            }
+
+        }
+        
+        // try to find a valid point between "b & c"
+        if( b_status != 0 || c_status != 0){
+
+            clip_point = Clip2D.#ClippingFunctions[ b_status || c_status ](
+                x_min , y_min , x_max , y_max , triangle.b , MATH.Slope2D(triangle.c , triangle.b)
+            );
+
+            // if valid point found preform clip using it
+            if( clip_point != undefined ){
+
+                if( 
+                    clip_point.x != -1 && clip_point.y != -1 && 
+                    !( Point2D.Equals(clip_point , triangle.c) ) &&
+                    !( Point2D.Equals(clip_point , triangle.b) )
+                ) {
+                    
+                    if( Clip2D.IsPointAtRange( triangle.b , triangle.c , clip_point ) ) {
+
+                        triangle1 = Triangle2D.Copy( triangle );
+                        triangle2 = Triangle2D.Copy( triangle );
+
+                        triangle1.c = Point2D.Copy( clip_point );
+                        triangle2.b = Point2D.Copy( clip_point );
+
+                        Clip2D.Triangle2D(
+                            triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+                        ); 
+
+                        Clip2D.Triangle2D( 
+                            triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+                        );
+
+                        return Clip2D.CLIPPED;
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        triangle.border_color = new RGBA(255,0,0,1);
+        triangle.fill_color = null;
+        triangle.thickness = 1;
+        Draw.Triangle2D( triangle );
 
 
     }

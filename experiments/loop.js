@@ -68,15 +68,33 @@ var rectangles = [
 ]; 
 
 var triangles = [ 
-    /*
+    /* */
+
+    new Triangle2D(
+        new Point2D(40,200) ,
+        new Point2D(350,109) ,
+        new Point2D(700,200) ,
+        1 , 
+        new RGBA(200,100,25,0.2) ,  
+        new RGBA(0,0,255,1) ,
+    ),
+
+    new Triangle2D(
+        new Point2D(200  , 50) ,
+        new Point2D(60  , 240) ,
+        new Point2D(630  , 490) ,
+        1 , 
+        new RGBA(200,100,25,0.2) ,  
+        new RGBA(0,0,255,1) ,
+    ),
+
     new Triangle2DGradient( 
         new Point2D(350, 200) ,
         new Point2D(10 ,400)  ,
         new Point2D(40 , 400)  ,
         // new RGBA(255,0,255,1) , new RGBA(0,255,255,1) , new RGBA(255,255,0,1) ,
         new RGBA(0,0,255,1) , new RGBA(255,0,0,1) , new RGBA(0,255,0,1) ,  
-        ),
-    */
+    ),
 
     new Triangle2D(
         new Point2D(550  , 150) ,
@@ -105,14 +123,6 @@ var triangles = [
         new RGBA(0,0,255,1) ,
     ),
 
-    new Triangle2D(
-        new Point2D(200  , 50) ,
-        new Point2D(60  , 240) ,
-        new Point2D(630  , 490) ,
-        1 , 
-        new RGBA(200,100,25,0.2) ,  
-        new RGBA(0,0,255,1) ,
-    ),
 
 ];
 
