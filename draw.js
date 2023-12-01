@@ -643,8 +643,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         Point2D.Round( triangle.b );
         Point2D.Round( triangle.c );
 
-        triangle.thickness = Math.abs( triangle.thickness );
-
+        triangle.thickness = (triangle.thickness >= 2 ) ? Math.abs( triangle.thickness ) : 2 ;
+ 
         // calculate the outside triangle that represent triangle border
         let border_triangle = Draw.#GenerateOutsideTriangle( Triangle2D.Copy(triangle) , true );
 
@@ -883,9 +883,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     static #DrawFastTriangleBorder( triangle = new Triangle2D() ){
 
         triangle.border_color.alpha = 1;
-        Draw.#DrawLineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
-        Draw.#DrawLineNoGradient( triangle.a , triangle.c , 2 , triangle.border_color );
-        Draw.#DrawLineNoGradient( triangle.b , triangle.c , 2 , triangle.border_color );
+        Draw.#DrawLineNoGradient( triangle.a , triangle.b , 1 , triangle.border_color );
+        Draw.#DrawLineNoGradient( triangle.a , triangle.c , 1 , triangle.border_color );
+        Draw.#DrawLineNoGradient( triangle.b , triangle.c , 1 , triangle.border_color );
 
     }
 
@@ -1610,7 +1610,6 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             }
 
             if( triangle_copy.border_color instanceof RGBA && triangle_copy.thickness > 0 ){
-                
                 
                 if(draw_thick_border) Draw.#DrawTriangleBorder( triangle_copy );
                 else Draw.#DrawFastTriangleBorder( triangle_copy );
