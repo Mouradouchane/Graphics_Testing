@@ -19,6 +19,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         ==============================================================
     */
 
+    static debug = false;
+
     static #LOG = {
 
         ERROR : {
@@ -223,6 +225,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         point_1 = new Point2D() , point_2 = new Point2D() , 
         width = 1 , color = new RGBA()
     ) {
+
+        if(Draw.debug) debugger;
 
         let point_a = Point2D.Copy(point_1);
         let point_b = Point2D.Copy(point_2);
@@ -440,39 +444,34 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     //                      TRIANGLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
-    // NOTE !!! triangle points need to be sorted by "Y-axis"
+    /*
+        NOTE !!! triangle points need to be sorted by "Y-axis"
+    */
     static #FillTriangle( triangle = new Triangle2D() ){
         
-        // calc needed values for the process 
-
         // A-B
-        let D_AB_X = (triangle.a.x - triangle.b.x);
-            // D_AB_X = (D_AB_X == 0) ? 1 : D_AB_X;
-        let D_AB_Y = (triangle.a.y - triangle.b.y);
-        let slope_AB = (D_AB_X == 0) ? D_AB_Y : ( D_AB_Y / D_AB_X );
-            // slope_AB = (slope_AB == 0) ? 1 : slope_AB;
-        let intercept_AB = triangle.a.y - (slope_AB * triangle.a.x);
+        let slope_AB = MATH.Slope2D( triangle.a , triangle.b );
+        let intercept_AB = MATH.Yintercept_At_X0_2D( triangle.a , slope_AB );
 
         // A-C
-        let D_AC_X = (triangle.a.x - triangle.c.x);
-            // D_AC_X = (D_AC_X == 0) ? 1 : D_AC_X;
-        let D_AC_Y = (triangle.a.y - triangle.c.y);
-        let slope_AC = (D_AC_X == 0) ? D_AC_Y : ( D_AC_Y / D_AC_X ); 
-            // slope_AC = (slope_AC == 0) ? 1 : slope_AC;
-        let intercept_AC = triangle.a.y - (slope_AC * triangle.a.x);
+        let slope_AC = MATH.Slope2D( triangle.a , triangle.c );
+        let intercept_AC = MATH.Yintercept_At_X0_2D( triangle.a , slope_AC );
 
-        let x_start = Math.round(triangle.a.x);
-        let x_end   = Math.round(triangle.b.x);
-        let y       = Math.round(triangle.a.y);
+        let x_start = (triangle.a.x);
+        let x_end   = (triangle.b.x);
+        let y       = (triangle.a.y);
         
         // fill from A to B
         if( slope_AB != 0 ){
 
+            // find X's
             for( ; y <= triangle.b.y; y++ ){
     
-                // find X's
-                x_start = (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
-                x_end   = (slope_AB == 0) ? y : Math.round((y - intercept_AB) / slope_AB);
+                // (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
+                x_start = MATH.Xintercept2D( y , slope_AC , intercept_AC ); 
+
+                // (slope_AB == 0) ? y : Math.round((y - intercept_AB) / slope_AB);
+                x_end   = MATH.Xintercept2D( y , slope_AB , intercept_AB ); 
                 
                 // fill range
                 Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
@@ -486,24 +485,21 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         }
         
         // B-C
-        let D_BC_X = (triangle.b.x - triangle.c.x);
-            // D_BC_X = (D_BC_X == 0) ? 1 : D_BC_X;
-        let D_BC_Y = (triangle.b.y - triangle.c.y);
-        let slope_BC = (D_BC_X == 0) ? D_BC_Y : ( D_BC_Y / D_BC_X );
-            // slope_BC = (slope_BC == 0) ? 1 : slope_BC;
-        let intercept_BC = triangle.b.y - (slope_BC * triangle.b.x);
+        let slope_BC = MATH.Slope2D(triangle.b, triangle.c);
+        let intercept_BC = MATH.Yintercept_At_X0_2D( triangle.b , slope_BC );
         
         // fill from B to C
         for( ; y <= triangle.c.y ; y += 1 ){
-
-            x_start = (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
-            x_end   = (slope_BC == 0) ? y : Math.round((y - intercept_BC) / slope_BC);
+            
+            x_start = MATH.Xintercept2D( y , slope_AC , intercept_AC ); 
+            x_end   = MATH.Xintercept2D( y , slope_BC , intercept_BC ); 
 
             Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
 
         }
 
-    }
+
+    } // end of fill triangle function
 
 
     /*
@@ -681,7 +677,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let in_x_start = 0;
         let in_x_end = 0;
 
-        // debugger
+        
         // ab - ac
         if( slopes.ab != 0 && slopes.ac != 0 ){
 
@@ -714,7 +710,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         }
 
-        // debugger
+        
         // bc - ac
         if( slopes.bc != 0 && slopes.ac != 0 ){
 
@@ -882,10 +878,14 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     */
     static #DrawFastTriangleBorder( triangle = new Triangle2D() ){
 
-        triangle.border_color.alpha = 1;
-        Draw.#DrawLineNoGradient( triangle.a , triangle.b , 1 , triangle.border_color );
-        Draw.#DrawLineNoGradient( triangle.a , triangle.c , 1 , triangle.border_color );
-        Draw.#DrawLineNoGradient( triangle.b , triangle.c , 1 , triangle.border_color );
+        if( triangle.border_color.alpha > 0){
+
+            triangle.border_color.alpha = 1;
+            Draw.#DrawLineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
+            Draw.#DrawLineNoGradient( triangle.a , triangle.c , 2 , triangle.border_color );
+            Draw.#DrawLineNoGradient( triangle.b , triangle.c , 2 , triangle.border_color );
+            
+        }
 
     }
 
@@ -1308,7 +1308,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         for( ; x <= A ; x += gap ){
 
-            // debugger
+            
             // if( m >= 1 ) break;
 
             x_sqr = x * x;
@@ -1319,7 +1319,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
      
                 if( (x_sqr / A_sqr) + (y_sqr / B_sqr) <= 1 ){
                     
-                    // debugger
+                    
                     // rotating x and y 
 
                     ref = [
@@ -1549,7 +1549,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let f1 = Draw.#CheckForBuffer();
         let f2 = (rectangle_object instanceof Rectangle2D);
 
-        // debugger
+        
         if( f1 && f2 ){
 
             if( rectangle_object.fill_color ){
@@ -1595,7 +1595,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let f2 = (triangle_object instanceof Triangle2D);
         
         if( f1 && f2 ){
-
+            
+            if( Draw.debug ) debugger;
             // make copy for drawing usage 
             let triangle_copy = Triangle2D.Copy(triangle_object);
 
@@ -1609,7 +1610,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                 
             }
 
-            if( triangle_copy.border_color instanceof RGBA && triangle_copy.thickness > 0 ){
+            if( triangle_copy.border_color instanceof RGBA && triangle_copy.thickness > 0 ) {
                 
                 if(draw_thick_border) Draw.#DrawTriangleBorder( triangle_copy );
                 else Draw.#DrawFastTriangleBorder( triangle_copy );

@@ -7,6 +7,8 @@ import { Point2D , Vector2D } from "./point.js";
 
 export class MATH{
 
+    static debug = false;
+
     // calc the deltha bettween tow values 
     // formula :: a2 - a1
     static Deltha( v1 , v2 ){
@@ -189,12 +191,12 @@ export class MATH{
         b = new Point2D(),
         c = new Point2D(),
     ){
-
+        if(MATH.debug) debugger;
         let triangle_area = Math.round(MATH.AreaOfTriangle2D(a,b,c));
         
-        let alpha =   Math.round( MATH.AreaOfTriangle2D(a, target_point , c)  );    
-        let beta  =   Math.round( MATH.AreaOfTriangle2D(target_point , b , c) );    
-        let gamma =   Math.round( MATH.AreaOfTriangle2D(a , b , target_point) );    
+        let alpha =   Math.floor( MATH.AreaOfTriangle2D(a, target_point , c)  );    
+        let beta  =   Math.floor( MATH.AreaOfTriangle2D(target_point , b , c) );    
+        let gamma =   Math.floor( MATH.AreaOfTriangle2D(a , b , target_point) );    
 
         /*
           if 3 values bigger than 1 mean the target_point is outside

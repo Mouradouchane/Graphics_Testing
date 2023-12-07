@@ -29,6 +29,7 @@ var Config = {
 
     RenderingLoop : false ,
     RenderToBuffer : true , 
+    Debug : false , 
     DrawGrid : false ,
     DrawPointsForVisualDebug : true ,
     GenerateRandomShapesEachTime : true ,
@@ -59,17 +60,24 @@ var lines = [
     
 ];
 
-var rectangles = [
-    /*
-    ...Generator.Random.Rectangles2D(
-        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , null , true , null , true , 2
-    )
-    */
-]; 
+var rectangles = [ ]; 
 
 var triangles = [ 
- 
+    ...Generator.Random.Triangles2D(
+        1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(0,100,50,1) , new RGBA(255,100,50,1)
+    ),
+    
     /*
+
+    new Triangle2D(
+        new Point2D(354.54263290185526,497.67410681868176),
+        new Point2D(592.5425682106843,57.16486590423517),
+        new Point2D(7.441806950783558,98.90698861020483),
+        1 , 
+        new RGBA(255,0,255,1) ,
+        new RGBA(0,0,255,1) ,
+    ),
+
     new Triangle2D(
         new Point2D(494 , 150),
         new Point2D(350 , 109),
@@ -112,16 +120,18 @@ var triangles = [
         1 , 0 ,
         new RGBA(0,0,255,1) ,
     ),
-    */
+
     new Triangle2D(
         new Point2D(300  , 50) ,
         new Point2D(60  , 500) ,
         new Point2D(430  , 590) ,
-        1 , 0 ,
-        new RGBA(0,0,255,1) ,
+        1 , 
+        new RGBA(255,100,100,0.5) ,
+        new RGBA(0,255,255,1) ,
+        
     ),
-
-  
+        
+    */
 
 ];
 
@@ -251,7 +261,6 @@ function NewFrame(){
         // triangles 
         case 3 : {
 
-            debugger;
             if(SBuffer instanceof SubBuffer){
 
                 Draw.Rectangle2D( 
@@ -276,19 +285,29 @@ function NewFrame(){
                         triangle , sub_triangles , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max 
                     );
 
-                    /*
                     if( clipping_status != Clip2D.DISCARDED ){
 
-                        for(let sub_triangle of sub_triangles ){
+                        for( let triangle of sub_triangles ){                                          
+                            
+                            if( Config.Debug ){
+                                triangle.border_color = null;
+                                triangle.fill_color = new RGBA(25,0,190,1);
+                            }
 
-                            sub_triangle.border_color = new RGBA(255,0,0,1);
-                            Draw.Triangle2D(sub_triangle , true);
+                            Draw.Triangle2D( triangle );
 
-                            if( Config.DrawPointsForVisualDebug ) Check.VisualCheck.Triangle2D( sub_triangle );
                         }
 
+                        if( Config.Debug ){   
+                            triangle.fill_color = null;
+                            triangle.border_color = new RGBA(255,0,0,1);
+                            Draw.Triangle2D( triangle );
+                        }
+                            
                     }
-                    */
+
+                    if( Config.Debug ) debugger;
+                
                 }
 
                 if( Config.DrawPointsForVisualDebug ) Check.VisualCheck.Triangle2D(triangle);

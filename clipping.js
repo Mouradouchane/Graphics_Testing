@@ -9,6 +9,7 @@ import {Circle2D} from "./circle.js"
 
 // import {FrameBuffer} from "./buffers.js"
 
+let debug = false; 
 
 export class Clip2D {
 
@@ -246,30 +247,39 @@ export class Clip2D {
         x_max , y_max , // boundary-range max values
     ){
 
-           // clip to 3 triangle 
-           let triangle1 = Triangle2D.Copy(triangle);
-           let triangle2 = Triangle2D.Copy(triangle);
-           let triangle3 = Triangle2D.Copy(triangle);
+        // clip to 3 triangle 
+        let triangle1 = Triangle2D.Copy(triangle);
+        let triangle2 = Triangle2D.Copy(triangle);
+        let triangle3 = Triangle2D.Copy(triangle);
 
-           triangle1.a = Point2D.Copy(target_point);
-           triangle2.b = Point2D.Copy(target_point);
-           triangle3.c = Point2D.Copy(target_point);
+        triangle1.a = Point2D.Copy(target_point);
+        triangle2.b = Point2D.Copy(target_point);
+        triangle3.c = Point2D.Copy(target_point);
 
-           // try to clip those new triangles
+        // try to clip those new triangles
 
-           Clip2D.Triangle2D(
-               triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
-           );
-           
-           Clip2D.Triangle2D(
-               triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max , false
-           );
-           
-           Clip2D.Triangle2D(
-               triangle3 , sub_triangles_array , x_min , y_min , x_max , y_max , false
-           );
+        if(debug){
+            triangle1.border_color = new RGBA(255,0,255,1);
+            triangle2.border_color = new RGBA(0,100,255,1);
+            triangle3.border_color = new RGBA(255,0,100,1);
+            Draw.Triangle2D( triangle1 );
+            Draw.Triangle2D( triangle2 );
+            Draw.Triangle2D( triangle2 );
+        }
 
-           return Clip2D.CLIPPED;
+        Clip2D.Triangle2D(
+            triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+        );
+        
+        Clip2D.Triangle2D(
+            triangle2 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+        );
+        
+        Clip2D.Triangle2D(
+            triangle3 , sub_triangles_array , x_min , y_min , x_max , y_max , false
+        );
+
+        return Clip2D.CLIPPED;
 
     }
 
@@ -316,18 +326,23 @@ export class Clip2D {
 
             return Clip2D.DISCARDED;
         }
+     
+        if(debug){
+            triangle.border_color = new RGBA(255,255,255,1);
+            triangle.fill_color = new RGBA(255,255,255,0.2);
+            Draw.Triangle2D( triangle );
+        }
 
         // 1 - get status code
         let a_status = Clip2D.GetStatusOfPoint( triangle.a , x_min , y_min , x_max , y_max );
         let b_status = Clip2D.GetStatusOfPoint( triangle.b , x_min , y_min , x_max , y_max );
         let c_status = Clip2D.GetStatusOfPoint( triangle.c , x_min , y_min , x_max , y_max );
         
-        triangle.border_color = new RGBA(255,255,255,1);
-        Draw.Triangle2D( triangle );
+        if(debug) debugger;
 
         // 2 - check if all the points inside boundary
         if( (a_status == 0) && (b_status == 0) && (c_status == 0) ){
-
+            
             sub_triangles_array.push( triangle );
 
             return Clip2D.NOT_CLIPED;
@@ -393,7 +408,6 @@ export class Clip2D {
         let triangle1 = null;
         let triangle2 = null;
 
-
         if( a_status != 0 ){
             
             // try "a -> b"
@@ -411,13 +425,16 @@ export class Clip2D {
 
                 triangle1.b = Point2D.Copy( clip_point );
                 triangle2.a = Point2D.Copy( clip_point );
-
-                triangle1.border_color = RGBA.RandomColor(0)  // new RGBA(255,255,255,1);
-                triangle2.border_color = new RGBA(0,200,200,1) // new RGBA(255,255,255,1);
                 
-                debugger;
-                Draw.Triangle2D( triangle1 );
-                Draw.Triangle2D( triangle2 );
+                if(debug){
+                    debugger;
+                    triangle1.border_color = new RGBA(150,100,55,1);
+                    triangle2.border_color = new RGBA(100,100,100,1);
+                    triangle1.fill_color = new RGBA(150,100,0,0.2);
+                    triangle2.fill_color = new RGBA(100,100,10,0.2);
+                    Draw.Triangle2D( triangle1 );
+                    Draw.Triangle2D( triangle2 );
+                }
 
                 Clip2D.Triangle2D(
                     triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
@@ -448,12 +465,16 @@ export class Clip2D {
                 triangle1.c = Point2D.Copy( clip_point );
                 triangle2.a = Point2D.Copy( clip_point );
 
-                triangle1.border_color = RGBA.RandomColor(0)  // new RGBA(255,255,255,1);
-                triangle2.border_color = new RGBA(0,200,200,1) // new RGBA(255,255,255,1);
-                
-                debugger;
-                Draw.Triangle2D( triangle1 );
-                Draw.Triangle2D( triangle2 );
+                if(debug){
+                   
+                    triangle1.border_color = new RGBA(150,100,55,1);
+                    triangle2.border_color = new RGBA(100,100,100,1);
+                    triangle1.fill_color = new RGBA(150,100,0,0.2);
+                    triangle2.fill_color = new RGBA(100,10,10,0.2);
+                    debugger;                    
+                    Draw.Triangle2D( triangle1 );
+                    Draw.Triangle2D( triangle2 );
+                }
 
                 Clip2D.Triangle2D(
                     triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
@@ -488,12 +509,16 @@ export class Clip2D {
                 triangle1.b = Point2D.Copy( clip_point );
                 triangle2.a = Point2D.Copy( clip_point );
 
-                triangle1.border_color = RGBA.RandomColor(0)  // new RGBA(255,255,255,1);
-                triangle2.border_color = new RGBA(0,200,200,1) // new RGBA(255,255,255,1);
-                
-                debugger;
-                Draw.Triangle2D( triangle1 );
-                Draw.Triangle2D( triangle2 );
+                if(debug){
+                   
+                    triangle1.border_color = new RGBA(150,100,55,1);
+                    triangle2.border_color = new RGBA(100,100,100,1);
+                    triangle1.fill_color = new RGBA(150,100,0,0.2);
+                    triangle2.fill_color = new RGBA(100,10,10,0.2);
+                    debugger;                    
+                    Draw.Triangle2D( triangle1 );
+                    Draw.Triangle2D( triangle2 );
+                }
 
                 Clip2D.Triangle2D(
                     triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
@@ -524,12 +549,16 @@ export class Clip2D {
                 triangle1.c = Point2D.Copy( clip_point );
                 triangle2.b = Point2D.Copy( clip_point );
 
-                triangle1.border_color = RGBA.RandomColor(0)  // new RGBA(255,255,255,1);
-                triangle2.border_color = new RGBA(0,200,200,1) // new RGBA(255,255,255,1);
-                
-                debugger;
-                Draw.Triangle2D( triangle1 );
-                Draw.Triangle2D( triangle2 );
+                if(debug){
+                   
+                    triangle1.border_color = new RGBA(150,100,55,1);
+                    triangle2.border_color = new RGBA(100,100,100,1);
+                    triangle1.fill_color = new RGBA(150,100,0,0.2);
+                    triangle2.fill_color = new RGBA(100,10,10,0.2);
+                    debugger;                    
+                    Draw.Triangle2D( triangle1 );
+                    Draw.Triangle2D( triangle2 );
+                }
 
                 Clip2D.Triangle2D(
                     triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
@@ -564,12 +593,16 @@ export class Clip2D {
                 triangle1.c = Point2D.Copy( clip_point );
                 triangle2.a = Point2D.Copy( clip_point );
 
-                triangle1.border_color = RGBA.RandomColor(0)  // new RGBA(255,255,255,1);
-                triangle2.border_color = new RGBA(0,200,200,1) // new RGBA(255,255,255,1);
-                
-                debugger;
-                Draw.Triangle2D( triangle1 );
-                Draw.Triangle2D( triangle2 );
+                if(debug){
+                   
+                    triangle1.border_color = new RGBA(150,100,55,1);
+                    triangle2.border_color = new RGBA(100,100,100,1);
+                    triangle1.fill_color = new RGBA(150,100,0,0.2);
+                    triangle2.fill_color = new RGBA(100,10,10,0.2);
+                    debugger;                    
+                    Draw.Triangle2D( triangle1 );
+                    Draw.Triangle2D( triangle2 );
+                }
 
                 Clip2D.Triangle2D(
                     triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
@@ -600,12 +633,16 @@ export class Clip2D {
                 triangle1.c = Point2D.Copy( clip_point );
                 triangle2.b = Point2D.Copy( clip_point );
 
-                triangle1.border_color = RGBA.RandomColor(0)  // new RGBA(255,255,255,1);
-                triangle2.border_color = new RGBA(0,200,200,1) // new RGBA(255,255,255,1);
-                
-                debugger;
-                Draw.Triangle2D( triangle1 );
-                Draw.Triangle2D( triangle2 );
+                if(debug){
+                   
+                    triangle1.border_color = new RGBA(150,100,55,1);
+                    triangle2.border_color = new RGBA(100,100,100,1);
+                    triangle1.fill_color = new RGBA(150,100,0,0.2);
+                    triangle2.fill_color = new RGBA(100,10,10,0.2);
+                    debugger;                    
+                    Draw.Triangle2D( triangle1 );
+                    Draw.Triangle2D( triangle2 );
+                }
 
                 Clip2D.Triangle2D(
                     triangle1 , sub_triangles_array , x_min , y_min , x_max , y_max , false
@@ -621,11 +658,13 @@ export class Clip2D {
 
         }
 
+        if(debug){
+            debugger;
+            triangle.fill_color = new RGBA(255,0,0,1);
+            Draw.Triangle2D( triangle );
+        }
 
-        triangle.border_color = new RGBA(255,0,0,1);
-        triangle.fill_color = null;
-        triangle.thickness = 1;
-        Draw.Triangle2D( triangle );
+        return Clip2D.DISCARDED;
 
     }
 
