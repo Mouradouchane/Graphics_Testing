@@ -19,7 +19,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         ==============================================================
     */
 
-    static debug = false;
+    static debug = true;
 
     static #LOG = {
 
@@ -99,7 +99,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         return ( Draw.#Resource.Buffer instanceof FrameBuffer ) ? true : false;
     }
 
-    static #SetPixle( x , y , pixle_color = null ) {
+    static SetPixle( x , y , pixle_color = null ) {
 
         x = Number.parseInt(x);
         y = Number.parseInt(y);
@@ -124,17 +124,17 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     }
 
     /* need work */
-    static #GetPixle( x , y ){
+    static GetPixle( x , y ){
 
     }
     
     // needed for sampling :)
 
     /* need work */
-    static #SetSample( x , y , sample_color ){
+    static SetSample( x , y , sample_color ){
     }
     /* need work */
-    static #GetSample( x , y ) {
+    static GetSample( x , y ) {
     }
 
     // =========================================================================
@@ -194,7 +194,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             if(x_or_y){
 
                 do{
-                    this.#SetPixle( position , start , color );
+                    this.SetPixle( position , start , color );
                     start += 1;
                 }
                 while(start < end);
@@ -203,7 +203,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             else {
 
                 do{
-                    this.#SetPixle( start , position , color );
+                    this.SetPixle( start , position , color );
                     start += 1;
                 }
                 while(start < end);
@@ -221,72 +221,39 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     } 
 
     // standard line draw 
-    static #DrawLineNoGradient( 
-        point_1 = new Point2D() , point_2 = new Point2D() , 
-        width = 1 , color = new RGBA()
+    static #DrawLineWithoutGradient( 
+        p1 = new Point2D() , p2 = new Point2D() , color = new RGBA()
     ) {
 
         if(Draw.debug) debugger;
-
-        let point_a = Point2D.Copy(point_1);
-        let point_b = Point2D.Copy(point_2);
-
-        width = Math.abs(width);
-        let width_mod = Math.floor(width) % 2;
-        width = Math.floor( width / 2 );
-
-        // calc line delta
-        let delta_x = (point_b.x - point_a.x); 
-        let delta_y = (point_b.y - point_a.y); 
-    
-        // calc "slop" of the line and "Y intercept"
-        let slope = ( delta_x == 0 ) ? 1000 : delta_y / delta_x ; // M
-        let Y_intercept = point_a.y - ( slope * point_a.x );   // B
-
-        let x_or_y = Math.abs(delta_x) >= Math.abs(delta_y); 
- 
-        // sort point for proper drawing 
-        if( x_or_y && point_a.x > point_b.x || !x_or_y && point_a.y > point_b.y ) {
-            [point_a.x , point_b.x] = [point_b.x , point_a.x];
-            [point_a.y , point_b.y] = [point_b.y , point_a.y];
+        
+        let slope = MATH.Slope2D( p1 , p2 );
+        
+        if(slope == 0) {
+            Draw.#DrawHorizontalLine(p1.x , p2.x , p1.y , color);
+            return ; 
         }
-      
-        let new_p = (Math.abs(slope) == 0) ? point_a[(!x_or_y) ? "x" : "y"] : 0;
-    
-        for( let position = point_a[(x_or_y) ? "x" : "y"]; position <= point_b[(x_or_y) ? "x" : "y"] ; position += 1 ){
-
-            // calc new position if slope not 0
-            if(slope != 0){
-                new_p = (x_or_y) ? (position * slope) + Y_intercept : (position - Y_intercept) / slope;
-            }
-
-            // calc line thickness range 
-            let start = Math.abs(new_p - width - width_mod);
-            let end   = Math.abs(new_p + width);
-            
-            // fill the thickness of the line 
-            if(x_or_y){
-
-                do{
-                    this.#SetPixle( position , start , color );
-                    start += 1;
-                }
-                while(start < end);
-
-            }
-            else {
-
-                do{
-                    this.#SetPixle( start , position , color );
-                    start += 1;
-                }
-                while(start < end);
-
-            }
-
+        
+        if( slope > 999 ) {
+            Draw.#DrawVerticalLine(p1.x , p1.y , p2.y , color);
+            return ;
         }
-            
+                
+        let is_x_longer = MATH.Deltha(p1.x , p2.x) > MATH.Deltha(p1.y , p2.y); 
+    
+        p1.x = Math.floor(p1.x) + 0.5;
+        p1.y = Math.floor(p1.y) + 0.5;
 
+        p2.x = Math.floor(p2.x) + 0.5;
+        p2.y = Math.floor(p2.y) + 0.5;
+
+        if( is_x_longer ){
+            Draw.#DrawLineOverX( p1 , p2 , slope , color );
+        }
+        else {
+            Draw.#DrawLineOverY( p1 , p2 , slope , color );
+        }
+  
     }
 
     static #DDALineDrawAlgorithm(
@@ -330,7 +297,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             if(x_or_y){
 
                 do{
-                    this.#SetPixle(Math.round(x) , Math.round(sT) , line_object.color);
+                    this.SetPixle(Math.round(x) , Math.round(sT) , line_object.color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -339,7 +306,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             else {
 
                 do{
-                    this.#SetPixle(Math.round(sT) , Math.round(y) , line_object.color);
+                    this.SetPixle(Math.round(sT) , Math.round(y) , line_object.color);
                     sT += 1;
                 }
                 while( sT <= eT );
@@ -360,7 +327,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         for( let x = x1 ; x <= x2 ; x += 1 ){
 
-            Draw.#SetPixle( x , y , color );
+            Draw.SetPixle( x , y , color );
 
         }
 
@@ -373,12 +340,50 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         for( let y = y1 ; y <= y2 ; y += 1 ){
 
-            Draw.#SetPixle( x , y , color );
+            Draw.SetPixle( x , y , color );
 
         }
 
     }
     
+    // function as routine for drawing simple line
+    static #DrawLineOverX( p1 , p2 , slope , color ){
+
+        if(Draw.debug) debugger;
+
+        if( p1.x > p2.x ) Point2D.Swap(p1, p2);
+
+        let y_intercept = MATH.Yintercept_At_X0_2D(p1 , slope );
+        let y = p1.y;
+
+        for( let x = p1.x ; x <= p2.x ; x += 1 ){
+
+            y = MATH.Yintercept2D( x , slope , y_intercept);
+            Draw.SetPixle( x , y , color );
+
+        }
+
+    }
+    
+    // function as routine for drawing simple line
+    static #DrawLineOverY( p1 , p2 , slope , color ){
+        
+        if(Draw.debug) debugger;
+
+        if( p1.y > p2.y ) Point2D.Swap(p1, p2);
+
+        let y_intercept = MATH.Yintercept_At_X0_2D(p1 , slope );
+        let x = p1.x;
+        
+        for(let y = p1.y ; y <= p2.y ; y += 1){
+
+            x = MATH.Xintercept2D( y , slope , y_intercept );
+            Draw.SetPixle( x , y , color );
+
+        }
+
+    }
+
 
     // =========================================================================
     //                      RECTANGLE DRAW PRIVATE FUNCTIONS
@@ -399,7 +404,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             
             for(let y = Y ; y <= h ; y += 1){
                 
-                Draw.#SetPixle( x , y , color );
+                Draw.SetPixle( x , y , color );
                 
             }
             
@@ -429,7 +434,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             for(let x = range.x ; x <= range.w ; x += 1){
                 
                 for(let y = range.y ; y <= range.h; y += 1) {
-                    Draw.#SetPixle( x , y , color );
+                    Draw.SetPixle( x , y , color );
                 }
                 
             }
@@ -535,7 +540,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             
         let end_point = MATH.Point2DAtLine( point , M , distance );
 
-        Draw.#DrawLineNoGradient( point , end_point , thickness , color );
+        Draw.#DrawLineWithoutGradient( point , end_point , thickness , color );
     }
 
     // generate a 3 points outside triangle by certain distance
@@ -824,7 +829,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                     // blend colors 
                     color = RGBA.Blend( RGBA.Blend( c_a , c_b ) , c_c );
 
-                    Draw.#SetPixle( x , y , color );
+                    Draw.SetPixle( x , y , color );
                 }
 
             }
@@ -860,7 +865,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                     // blend colors 
                     color = RGBA.Blend( RGBA.Blend( c_a , c_b ) , c_c );
 
-                    Draw.#SetPixle( x , y , color );
+                    Draw.SetPixle( x , y , color );
                 }
 
             }
@@ -881,9 +886,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         if( triangle.border_color.alpha > 0){
 
             triangle.border_color.alpha = 1;
-            Draw.#DrawLineNoGradient( triangle.a , triangle.b , 2 , triangle.border_color );
-            Draw.#DrawLineNoGradient( triangle.a , triangle.c , 2 , triangle.border_color );
-            Draw.#DrawLineNoGradient( triangle.b , triangle.c , 2 , triangle.border_color );
+            Draw.#DrawLineWithoutGradient( triangle.a , triangle.b , 2 , triangle.border_color );
+            Draw.#DrawLineWithoutGradient( triangle.a , triangle.c , 2 , triangle.border_color );
+            Draw.#DrawLineWithoutGradient( triangle.b , triangle.c , 2 , triangle.border_color );
             
         }
 
@@ -899,15 +904,15 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         X = 1 , Y = 1 , x_org = 1 , y_org = 1 , color_ = "white"
     ){
 
-        Draw.#SetPixle( (X+x_org)  , (Y+y_org)  , color_ );
-        Draw.#SetPixle( (X+x_org)  , (-Y+y_org) , color_ );
-        Draw.#SetPixle( (-X+x_org) , (Y+y_org)  , color_ );
-        Draw.#SetPixle( (-X+x_org) , (-Y+y_org) , color_ );
+        Draw.SetPixle( (X+x_org)  , (Y+y_org)  , color_ );
+        Draw.SetPixle( (X+x_org)  , (-Y+y_org) , color_ );
+        Draw.SetPixle( (-X+x_org) , (Y+y_org)  , color_ );
+        Draw.SetPixle( (-X+x_org) , (-Y+y_org) , color_ );
         
-        Draw.#SetPixle( (Y+x_org)  , (X+y_org)  , color_ );
-        Draw.#SetPixle( (Y+x_org)  , (-X+y_org) , color_ );
-        Draw.#SetPixle( (-Y+x_org) , (X+y_org)  , color_ );
-        Draw.#SetPixle( (-Y+x_org) , (-X+y_org) , color_ );
+        Draw.SetPixle( (Y+x_org)  , (X+y_org)  , color_ );
+        Draw.SetPixle( (Y+x_org)  , (-X+y_org) , color_ );
+        Draw.SetPixle( (-Y+x_org) , (X+y_org)  , color_ );
+        Draw.SetPixle( (-Y+x_org) , (-X+y_org) , color_ );
 
     }
 
@@ -1336,7 +1341,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                         // todo : fix this bug 
                         // if( Draw.#CalcDistance())
 
-                        Draw.#DrawLineNoGradient(
+                        Draw.#DrawLineWithoutGradient(
                             new Point2D( x_org + ref[i].X , y_org + ref[i].Y ) ,
                             new Point2D( x_org + old_ref[i].X , y_org + old_ref[i].Y ) ,
                             1 , border_color 
@@ -1378,7 +1383,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 		    new_point.x = Math.round( (curve.a.x * k1) + (curve.b.x * k2) + (curve.c.x * k3) + (curve.d.x * k4) );			
 			new_point.y = Math.round( (curve.a.y * k1) + (curve.b.y * k2) + (curve.c.y * k3) + (curve.d.y * k4) );			
 
-            Draw.#DrawLineNoGradient( 
+            Draw.#DrawLineWithoutGradient( 
                 Point2D.Copy(old_point) , Point2D.Copy(new_point) , curve.thickness , curve.color 
             );
 
@@ -1500,17 +1505,20 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     }
 
     static Line2D( 
-        line_object = new Line2D()
+        line_object = new Line2D() 
     ) { 
+
+        if(Draw.debug) debugger;
 
         let f1 = Draw.#CheckForBuffer();
         let f2 = (line_object instanceof Line2D);
 
         if( f1 && f2 ){
 
-            this.#DrawLineNoGradient(
-                line_object.a , line_object.b , 
-                line_object.width , line_object.color , line_object.anti_alias
+            this.#DrawLineWithoutGradient(
+                Point2D.Copy(line_object.a) , 
+                Point2D.Copy(line_object.b) , 
+                line_object.color
             );
 
         } 

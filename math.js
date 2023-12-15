@@ -12,7 +12,7 @@ export class MATH{
     // calc the deltha bettween tow values 
     // formula :: a2 - a1
     static Deltha( v1 , v2 ){
-        return v2 - v1 ;
+        return (v2 > v1) ? v2 - v1 : v1 - v2;
     }
 
     // calc slope of a line bettween to points in 2D space 

@@ -119,6 +119,36 @@ export class Check {
     */
     static VisualCheck = {  
 
+        Pixel : function( point = new Point2D() , color = undefined ){
+            
+            let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;
+            let check_canvas = Check.#RESOURCES.canvas;
+            let check_type   = true ;
+
+            if( check_buffer || check_canvas ){
+                
+                if( check_type ){
+                    
+                    color = (color instanceof RGBA) ? color : Check.#RESOURCES.default_point_color;
+                    
+                    Draw.SetPixle( point.x , point.y , color );
+                
+                }
+                else {
+                
+                    Check.#LOG.ERROR.OBJECT_INVALID("check.visual_check.pixel" , "pixel");
+                    Check.#LOG.HINT.USE_THIS_TYPE_TO_THIS_FUNCTION("check.visual_check.pixel" , "pixle");
+                
+                }
+                
+            }
+
+            if( !check_buffer && !check_canvas ){
+                Check.#LOG.NO_RESOURCE_FOR_DRAW( "check.visual_check" );
+            }
+            
+        },
+
         Point2D : function( point = new Point2D() , point_radius = undefined , color = undefined ){
             
             let check_buffer = Check.#RESOURCES.buffer instanceof FrameBuffer;

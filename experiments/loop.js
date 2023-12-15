@@ -27,16 +27,17 @@ var FpsCounter = 0;
 */
 var Config = {
 
+    Debug : true , 
     RenderingLoop : false ,
     RenderToBuffer : true , 
-    Debug : false , 
     DrawGrid : false ,
-    DrawPointsForVisualDebug : true ,
+    DrawPointsForVisualDebug : false ,
+    DrawPixelsForVisualDebug : true ,
     GenerateRandomShapesEachTime : true ,
     NewTestEachTime : false ,
     SleepTime : 3000 , // ms
     AntiAlias : false ,
-    ShapesIndex  : 3 ,
+    ShapesIndex  : 1 ,
     ShapesAmount : 3 ,
     BorderThickness : 4 ,
     Gradient  : false ,
@@ -46,6 +47,8 @@ var Config = {
 
     ShowFps : true,
     DrawClipped : true,
+    PreformeClipping : true ,
+
 }
 
 /*
@@ -53,11 +56,32 @@ var Config = {
 */
 
 var lines = [
-   
+    /*
     ...Generator.Random.Lines2D(
-        Config.ShapesAmount * 100 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , 0 , 2
+        Config.ShapesAmount * 4 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , 0 , 2
     ),
-    
+    */
+    new Line2D( 
+        new Point2D( 410 , 100 ),
+        new Point2D( 410 , 471 ), 1,
+        new RGBA(0,100,155,1)
+    ),
+    new Line2D( 
+        new Point2D( 220 , 400 ), 
+        new Point2D( 200 , 100 ),
+        1,
+        new RGBA(0,100,155,1)
+    ),
+    new Line2D( 
+        new Point2D( 220 , 100 ),
+        new Point2D( 400 , 120 ), 1,
+        new RGBA(0,100,155,1)
+    ),
+    new Line2D( 
+        new Point2D( 320 , 100 ),
+        new Point2D( 400 , 100 ), 1,
+        new RGBA(0,100,155,1)
+    ),
 ];
 
 var rectangles = [ ]; 
@@ -212,28 +236,44 @@ function NewFrame(){
     switch( Config.ShapesIndex ){
 
         // lines
-        case 1 : {
-                
-            for( let line of lines ){
+    case 1 : {
         
-                if(Config.DrawClipped){
+        for( let line of lines ){
+            
+            if(Config.Debug){
+                
+                debugger;
 
+                if(Config.DrawClipped){
+                        
                     let line_copy = Line2D.Copy( line ); 
-                    line_copy.color = new RGBA(255,0,0,0.4);
+                    line_copy.color = new RGBA(255,0,0,0.5);
 
                     Draw.Line2D( line_copy );
-                    if( Config.DrawPointsForVisualDebug ) Check.VisualCheck.Line2D( line_copy , 2 , new RGBA(255,255,255,1));
+                    if( Config.DrawPointsForVisualDebug ) {
+                        Check.VisualCheck.Line2D( line_copy , 2 , new RGBA(255,255,255,1));
+                    }
 
                 }
+                  
+            } 
 
-                let clipping_status = Clip2D.Line2D( line , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max );
+            let clipping_output = Clip2D.NOT_CLIPED;
 
-                if( clipping_status != Clip2D.DISCARDED ){
-                    Draw.Line2D( line  );
-                    if( Config.DrawPointsForVisualDebug ) Check.VisualCheck.Line2D( line );
-                }
-
+            if(Config.PreformeClipping){
+                clipping_output = Clip2D.Line2D( line , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max );
             }
+            
+            if( clipping_output != Clip2D.DISCARDED ){
+                Draw.Line2D( line );
+            }
+
+            if( Config.DrawPixelsForVisualDebug ){
+                Check.VisualCheck.Pixel( line.a , new RGBA(255,255,0,1));
+                Check.VisualCheck.Pixel( line.b , new RGBA(255,255,0,1));
+            }
+            
+        }
 
         } break;
 
