@@ -10,6 +10,7 @@ import {Ellipse2D} from "./ellipse.js";
 import {Curve2D , LongCurve2D} from "./curve.js";
 import {Rotate} from "./rotate.js";
 import {FrameBuffer} from "./buffers.js";
+import {Config} from "../config.js";
 
 export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
@@ -18,8 +19,6 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
                     PRIVATE FUNCTIONS/STUFF FOR DRAW API 
         ==============================================================
     */
-
-    static debug = true;
 
     static #LOG = {
 
@@ -225,7 +224,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         p1 = new Point2D() , p2 = new Point2D() , color = new RGBA()
     ) {
 
-        if(Draw.debug) debugger;
+        if(Config.Debug) debugger;
         
         let slope = MATH.Slope2D( p1 , p2 );
         
@@ -234,20 +233,25 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             return ; 
         }
         
-        if( slope > 999 ) {
+        if( slope > 999 || slope < -999 ) {
             Draw.#DrawVerticalLine(p1.x , p1.y , p2.y , color);
             return ;
         }
-                
-        let is_x_longer = MATH.Deltha(p1.x , p2.x) > MATH.Deltha(p1.y , p2.y); 
-    
+             
+        /*
+        let dx = (p1.x > p2.x) ? MATH.Deltha(p1.x , p2.x) : MATH.Deltha(p2.x , p1.x);
+        let dy = (p1.y > p2.y) ? MATH.Deltha(p1.y , p2.y) : MATH.Deltha(p2.y , p1.y); 
+
+        let is_x_longer = dx > dy;
+        */
+
         p1.x = Math.floor(p1.x) + 0.5;
         p1.y = Math.floor(p1.y) + 0.5;
 
         p2.x = Math.floor(p2.x) + 0.5;
         p2.y = Math.floor(p2.y) + 0.5;
 
-        if( is_x_longer ){
+        if( slope < 1 && slope > -1 ){
             Draw.#DrawLineOverX( p1 , p2 , slope , color );
         }
         else {
@@ -349,9 +353,12 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     // function as routine for drawing simple line
     static #DrawLineOverX( p1 , p2 , slope , color ){
 
-        if(Draw.debug) debugger;
+        if(Config.Debug) debugger;
 
-        if( p1.x > p2.x ) Point2D.Swap(p1, p2);
+        if( p1.x > p2.x ){
+            Point2D.Swap(p1, p2);
+            // slope = MATH.Slope2D(p1,p2);
+        } 
 
         let y_intercept = MATH.Yintercept_At_X0_2D(p1 , slope );
         let y = p1.y;
@@ -368,9 +375,12 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     // function as routine for drawing simple line
     static #DrawLineOverY( p1 , p2 , slope , color ){
         
-        if(Draw.debug) debugger;
+        if(Config.Debug) debugger;
 
-        if( p1.y > p2.y ) Point2D.Swap(p1, p2);
+        if( p1.y > p2.y ){
+            Point2D.Swap(p1, p2);
+            // slope = MATH.Slope2D(p1,p2);
+        } 
 
         let y_intercept = MATH.Yintercept_At_X0_2D(p1 , slope );
         let x = p1.x;
@@ -462,15 +472,15 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         let slope_AC = MATH.Slope2D( triangle.a , triangle.c );
         let intercept_AC = MATH.Yintercept_At_X0_2D( triangle.a , slope_AC );
 
-        let x_start = (triangle.a.x);
-        let x_end   = (triangle.b.x);
-        let y       = (triangle.a.y);
+        let x_start = Math.floor(triangle.a.x) + 0.5;
+        let x_end   = Math.floor(triangle.b.x) + 0.5;
+        let y       = Math.floor(triangle.a.y) + 0.5;
         
         // fill from A to B
         if( slope_AB != 0 ){
 
             // find X's
-            for( ; y <= triangle.b.y; y++ ){
+            for(  ; y <= triangle.b.y ; y += 1 ){
     
                 // (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
                 x_start = MATH.Xintercept2D( y , slope_AC , intercept_AC ); 
@@ -1508,7 +1518,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         line_object = new Line2D() 
     ) { 
 
-        if(Draw.debug) debugger;
+        if(Config.Debug) debugger;
 
         let f1 = Draw.#CheckForBuffer();
         let f2 = (line_object instanceof Line2D);
@@ -1596,7 +1606,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
     }
 
-    static Triangle2D( triangle_object = new Triangle2D() , draw_thick_border = false ){
+    static Triangle2D( triangle_object = new Triangle2D() , fill = true , border = true ){
 
         // check canvas and triangle
         let f1 = Draw.#CheckForBuffer();
@@ -1604,24 +1614,24 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         
         if( f1 && f2 ){
             
-            if( Draw.debug ) debugger;
+            if( Config.Debug ) debugger;
+
             // make copy for drawing usage 
             let triangle_copy = Triangle2D.Copy(triangle_object);
 
             // sort points depend on Y-axis
             Triangle2D.SortByY(triangle_copy);
             
-            if( triangle_copy.fill_color instanceof RGBA ){
+            if( triangle_copy.fill_color instanceof RGBA && fill ){
 
                 // fill triangle  
                 Draw.#FillTriangle( triangle_copy );
                 
             }
 
-            if( triangle_copy.border_color instanceof RGBA && triangle_copy.thickness > 0 ) {
+            if( triangle_copy.border_color instanceof RGBA && border ) {
                 
-                if(draw_thick_border) Draw.#DrawTriangleBorder( triangle_copy );
-                else Draw.#DrawFastTriangleBorder( triangle_copy );
+                Draw.#DrawFastTriangleBorder( triangle_copy );
 
             }
 

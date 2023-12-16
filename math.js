@@ -1,5 +1,6 @@
 
 import { Point2D , Vector2D } from "./point.js";
+import { Config } from "./config.js";
 
 /*
     small math library contain functions in this project  
@@ -12,7 +13,7 @@ export class MATH{
     // calc the deltha bettween tow values 
     // formula :: a2 - a1
     static Deltha( v1 , v2 ){
-        return (v2 > v1) ? v2 - v1 : v1 - v2;
+        return v1 - v2;
     }
 
     // calc slope of a line bettween to points in 2D space 
@@ -191,12 +192,13 @@ export class MATH{
         b = new Point2D(),
         c = new Point2D(),
     ){
-        if(MATH.debug) debugger;
-        let triangle_area = Math.round(MATH.AreaOfTriangle2D(a,b,c));
+        if(Config.Debug) debugger;
+
+        let triangle_area = MATH.AreaOfTriangle2D(a,b,c);
         
-        let alpha =   Math.floor( MATH.AreaOfTriangle2D(a, target_point , c)  );    
-        let beta  =   Math.floor( MATH.AreaOfTriangle2D(target_point , b , c) );    
-        let gamma =   Math.floor( MATH.AreaOfTriangle2D(a , b , target_point) );    
+        let alpha = MATH.AreaOfTriangle2D(a , target_point , c) ;    
+        let beta  = MATH.AreaOfTriangle2D(target_point , b , c) ; 
+        let gamma = MATH.AreaOfTriangle2D(a , b , target_point) ;    
 
         /*
           if 3 values bigger than 1 mean the target_point is outside

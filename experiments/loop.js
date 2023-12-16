@@ -11,7 +11,8 @@ import {Check} from "../check.js";
 import {Rotate} from "../rotate.js";
 import {Draw} from "../draw.js";
 import {FrameBuffer , SubBuffer} from "../buffers.js";
-import { Clip2D } from "../clipping.js";
+import {Clip2D} from "../clipping.js";
+import {Config} from "../config.js";
 
 const Canvas = document.querySelector("#canvas");
 const CTX = Canvas.getContext("2d");
@@ -22,34 +23,7 @@ const SBuffer = new SubBuffer( 150 , 150 , Canvas.clientWidth - 150 , Canvas.cli
 var FPS = 0;
 var FpsCounter = 0;
 
-/*
-    small configuration rendering/drawing/debug
-*/
-var Config = {
 
-    Debug : true , 
-    RenderingLoop : false ,
-    RenderToBuffer : true , 
-    DrawGrid : false ,
-    DrawPointsForVisualDebug : false ,
-    DrawPixelsForVisualDebug : true ,
-    GenerateRandomShapesEachTime : true ,
-    NewTestEachTime : false ,
-    SleepTime : 3000 , // ms
-    AntiAlias : false ,
-    ShapesIndex  : 1 ,
-    ShapesAmount : 3 ,
-    BorderThickness : 4 ,
-    Gradient  : false ,
-
-    MaxWidth  : Canvas.clientWidth  ,
-    MaxHeight : Canvas.clientHeight ,
-
-    ShowFps : true,
-    DrawClipped : true,
-    PreformeClipping : true ,
-
-}
 
 /*
     generate random "shapes for testing"
@@ -57,24 +31,25 @@ var Config = {
 
 var lines = [
     /*
+    */
     ...Generator.Random.Lines2D(
         Config.ShapesAmount * 4 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , 0 , 2
     ),
-    */
+   
+    new Line2D( 
+        new Point2D( 300 , 100 ),
+        new Point2D( 400 , 220 ), 1,
+        new RGBA(0,100,155,1)
+    ),
+
     new Line2D( 
         new Point2D( 410 , 100 ),
         new Point2D( 410 , 471 ), 1,
         new RGBA(0,100,155,1)
     ),
     new Line2D( 
-        new Point2D( 220 , 400 ), 
-        new Point2D( 200 , 100 ),
-        1,
-        new RGBA(0,100,155,1)
-    ),
-    new Line2D( 
-        new Point2D( 220 , 100 ),
-        new Point2D( 400 , 120 ), 1,
+        new Point2D( 100 , 300 ),
+        new Point2D( 710 , 300 ), 1,
         new RGBA(0,100,155,1)
     ),
     new Line2D( 
@@ -82,26 +57,42 @@ var lines = [
         new Point2D( 400 , 100 ), 1,
         new RGBA(0,100,155,1)
     ),
+
+    new Line2D( 
+        new Point2D( 395 , 400 ),
+        new Point2D( 400 , 244 ), 1,
+        RGBA.RandomColor()
+    ),
+
+    new Line2D( 
+        new Point2D( 220 , 400 ), 
+        new Point2D( 200 , 100 ),
+        1,
+        new RGBA(0,100,155,1)
+    ),
+ 
 ];
 
 var rectangles = [ ]; 
 
 var triangles = [ 
+    /*
     ...Generator.Random.Triangles2D(
         1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(0,100,50,1) , new RGBA(255,100,50,1)
     ),
-    
-    /*
+    */
 
+   
     new Triangle2D(
         new Point2D(354.54263290185526,497.67410681868176),
         new Point2D(592.5425682106843,57.16486590423517),
         new Point2D(7.441806950783558,98.90698861020483),
         1 , 
-        new RGBA(255,0,255,1) ,
+        new RGBA(255,0,255,0.4) ,
         new RGBA(0,0,255,1) ,
     ),
-
+       
+    /*
     new Triangle2D(
         new Point2D(494 , 150),
         new Point2D(350 , 109),
@@ -235,7 +226,7 @@ function NewFrame(){
 
     switch( Config.ShapesIndex ){
 
-        // lines
+    // lines
     case 1 : {
         
         for( let line of lines ){
@@ -269,16 +260,16 @@ function NewFrame(){
             }
 
             if( Config.DrawPixelsForVisualDebug ){
-                Check.VisualCheck.Pixel( line.a , new RGBA(255,255,0,1));
-                Check.VisualCheck.Pixel( line.b , new RGBA(255,255,0,1));
+                Check.VisualCheck.Pixel(line.a , new RGBA(255,255,0,1));
+                Check.VisualCheck.Pixel(line.b , new RGBA(255,255,0,1));
             }
             
         }
 
         } break;
 
-        // rectangles
-        case 2 : {
+    // rectangles
+    case 2 : {
 
             for( let rectangle of rectangles ){
 
@@ -298,8 +289,10 @@ function NewFrame(){
 
         } break;
 
-        // triangles 
-        case 3 : {
+    // triangles 
+    case 3 : {
+        
+        if( Config.Debug ){
 
             if(SBuffer instanceof SubBuffer){
 
@@ -310,62 +303,59 @@ function NewFrame(){
                 );
         
             }
-        
-            for( let triangle of triangles ){
                 
-                if( Config.Gradient ) {
-                    Draw.Triangle2DWithGradient(triangle);
-                }
-                else {
+            debugger;
+        } 
+        
+        for( let triangle of triangles ) {
+                
+            if( Config.DrawPointsForVisualDebug ) {
+                Check.VisualCheck.Triangle2D(triangle);
+            }
 
-                    // Draw.Triangle2D( triangle , true );
+            if( Config.Gradient ) {
+                Draw.Triangle2DWithGradient(triangle);
+            }
+            else {
 
-                    let sub_triangles = [];
-                    let clipping_status = Clip2D.Triangle2D( 
-                        triangle , sub_triangles , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max 
-                    );
+                let sub_triangles = [];
+                let clipping_output = Clip2D.Triangle2D( 
+                    triangle , sub_triangles , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max 
+                );
 
-                    if( clipping_status != Clip2D.DISCARDED ){
+                if( clipping_output != Clip2D.DISCARDED ){
 
-                        for( let triangle of sub_triangles ){                                          
-                            
-                            if( Config.Debug ){
-                                triangle.border_color = null;
-                                triangle.fill_color = new RGBA(25,0,190,1);
-                            }
-
-                            Draw.Triangle2D( triangle );
-
+                    for( let sub_triangle of sub_triangles ){                                          
+                        
+                        if( Config.Debug ){
+                            sub_triangle.fill_color = new RGBA(255,0,0,0.5);
                         }
+                        
+                        Draw.Triangle2D( sub_triangle , true , false );
 
-                        if( Config.Debug ){   
-                            triangle.fill_color = null;
-                            triangle.border_color = new RGBA(255,0,0,1);
-                            Draw.Triangle2D( triangle );
-                        }
-                            
                     }
 
-                    if( Config.Debug ) debugger;
+                }
+
+                if( Config.Debug ) debugger;
                 
-                }
+            }
 
-                if( Config.DrawPointsForVisualDebug ) Check.VisualCheck.Triangle2D(triangle);
 
-                if( Config.GenerateRandomShapesEachTime ){
+            if( Config.GenerateRandomShapesEachTime ){
 
-                    triangles = Generator.Random.Triangles2D(
-                        Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(150,150,55,0.7) , 0 
-                    );
-
-                }
+                triangles = Generator.Random.Triangles2D(
+                    Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(150,150,55,0.7) , 0 
+                );
 
             }
+
+        }
             
         } break;
 
-        // cicrles
-        case 4 : {
+    // cicrles
+    case 4 : {
 
             for( let circle of circles ){
 
@@ -378,22 +368,23 @@ function NewFrame(){
 
         } break;
 
-        // ellipses
-        case 5 : {
+    // ellipses
+    case 5 : {
 
             for( let ellipse of ellipses ){
             
                 Draw.Ellipse2D( ellipse );
 
-                if( Config.DrawPointsForVisualDebug ) Check.VisualCheck.Ellipse2D( ellipse , true );
-
+                if( Config.DrawPointsForVisualDebug ){
+                    Check.VisualCheck.Ellipse2D( ellipse , true );
+                } 
 
             }
 
         } break;
 
-        // curves 
-        case 6 : {
+    // curves 
+    case 6 : {
 
             if( Config.DrawPointsForVisualDebug ) {
                 Check.VisualCheck.LongCurve2D( longcurve , true );
