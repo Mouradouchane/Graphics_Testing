@@ -76,13 +76,30 @@ var lines = [
 var rectangles = [ ]; 
 
 var triangles = [ 
+    
     /*
     ...Generator.Random.Triangles2D(
-        1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(0,100,50,1) , new RGBA(255,100,50,1)
+        4 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , RGBA.RandomColor(1) , new RGBA(255,100,50,1)
     ),
     */
-
-   
+    new Triangle2D(
+        new Point2D(494 , 350),
+        new Point2D(350 , 109),
+        new Point2D(100 , 200),
+        1 , 
+        new RGBA(0,0,255,0.5) ,
+        null ,
+    ),
+    
+    new Triangle2D(
+        new Point2D(494 , 350),
+        new Point2D(350 , 109),
+        new Point2D(700 , 200),
+        1 , 
+        new RGBA(0,0,255,0.5) ,
+        null ,
+    ),
+    /*
     new Triangle2D(
         new Point2D(354.54263290185526,497.67410681868176),
         new Point2D(592.5425682106843,57.16486590423517),
@@ -92,7 +109,6 @@ var triangles = [
         new RGBA(0,0,255,1) ,
     ),
        
-    /*
     new Triangle2D(
         new Point2D(494 , 150),
         new Point2D(350 , 109),

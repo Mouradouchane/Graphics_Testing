@@ -253,9 +253,10 @@ export class Clip2D {
         // try to clip those new triangles
 
         if(Config.Debug){
-            triangle1.fill_color = RGBA.RandomColor();
-            triangle2.fill_color = RGBA.RandomColor();
-            triangle3.fill_color = RGBA.RandomColor();
+            triangle1.fill_color = RGBA.RandomColor(1);
+            triangle2.fill_color = RGBA.RandomColor(1);
+            triangle3.fill_color = RGBA.RandomColor(1);
+
             Draw.Triangle2D( triangle1 , true , false );
             Draw.Triangle2D( triangle2 , true , false );
             Draw.Triangle2D( triangle3 , true , false );
@@ -311,20 +312,12 @@ export class Clip2D {
         x_max , y_max , // boundary-range max values
     ){
 
-        /*
-        if( 
-            Point2D.Equals(triangle.a , triangle.b) || 
-            Point2D.Equals(triangle.a , triangle.c) ||  
-            Point2D.Equals(triangle.c , triangle.b)
-        ){
-
-            return Clip2D.DISCARDED;
-        }
-        */
+        Triangle2D.SortByClockWise( triangle );
 
         if(Config.Debug){
             triangle.border_color = new RGBA(255,255,255,1);
-            triangle.fill_color = new RGBA(255,255,255,0.2);
+            triangle.fill_color = RGBA.RandomColor(1);
+            
             Draw.Triangle2D( triangle , true , false );
         }
 
@@ -352,7 +345,7 @@ export class Clip2D {
         let edge_point = new Point2D(x_min , y_min);
 
         if( 
-            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c , true )
         ){
 
             return Clip2D.#ClipTo3Triangles(
@@ -364,7 +357,7 @@ export class Clip2D {
         edge_point = new Point2D(x_max , y_min);
 
         if( 
-            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c , true )
         ){
             return Clip2D.#ClipTo3Triangles(
                 edge_point , triangle , sub_triangles_array ,
@@ -375,7 +368,7 @@ export class Clip2D {
         edge_point = new Point2D(x_min , y_max);
 
         if( 
-            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c , true )
         ){
             return Clip2D.#ClipTo3Triangles(
                 edge_point , triangle , sub_triangles_array ,
@@ -386,7 +379,7 @@ export class Clip2D {
         edge_point = new Point2D(x_max , y_max);
 
         if( 
-            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c )
+            MATH.IsPointInsideTriangle( edge_point , triangle.a , triangle.b , triangle.c ,true )
         ){
             return Clip2D.#ClipTo3Triangles(
                 edge_point , triangle , sub_triangles_array ,

@@ -183,7 +183,9 @@ export class MATH{
 
     };
 
-
+    /*
+        NOTE : a b c points must be already sorted in "clock-wise"
+    */
     static IsPointInsideTriangle(
         // point to check if it lies inside traingle 
         target_point = new Point2D() , 
@@ -191,25 +193,56 @@ export class MATH{
         a = new Point2D(), 
         b = new Point2D(),
         c = new Point2D(),
+        ignore_point_on_the_line = false
     ){
         if(Config.Debug) debugger;
 
-        let triangle_area = MATH.AreaOfTriangle2D(a,b,c);
+        if(ignore_point_on_the_line){
+
+            if( MATH.CrossProduct2D( target_point , a , b ) <= 0 ) return false;
+            
+            if( MATH.CrossProduct2D( target_point , b , c ) <= 0 ) return false;
+            
+            if( MATH.CrossProduct2D( target_point , c , a ) <= 0 ) return false;    
         
-        let alpha = MATH.AreaOfTriangle2D(a , target_point , c) ;    
-        let beta  = MATH.AreaOfTriangle2D(target_point , b , c) ; 
-        let gamma = MATH.AreaOfTriangle2D(a , b , target_point) ;    
+        }
+        else{
 
-        /*
-          if 3 values bigger than 1 mean the target_point is outside
-        */
-        return ( (alpha + beta + gamma) <= triangle_area );
+            if( MATH.CrossProduct2D( target_point , a , b ) < 0 ) return false;
+            
+            if( MATH.CrossProduct2D( target_point , b , c ) < 0 ) return false;
+            
+            if( MATH.CrossProduct2D( target_point , c , a ) < 0 ) return false;    
+        
+        }
 
+        return true;
     };
 
     /*
         few functions for 2D vectors/points
     */
+
+    /*
+        calc cross product between 3 points in 2D space  
+        note : ordering is matter
+    */
+    static CrossProduct2D( 
+        p  = new Point2D() , // target point  
+        v0 = new Point2D() , // start point 
+        v1 = new Point2D() , // end point
+    ){
+      
+        // if(Config.Debug) debugger;
+        
+        // 1 - move to (0,0) using v0
+        let a = new Vector2D( v1.x - v0.x , v1.y - v0.y );
+        let b = new Vector2D( p.x  - v0.x , p.y  - v0.y );
+
+        // 2 - calc normal.Z : a x b
+        return ( a.x * b.y ) - ( a.y * b.x );
+
+    };
 
     static Add2DPoints( a , b ){ 
 

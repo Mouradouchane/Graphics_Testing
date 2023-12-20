@@ -1,5 +1,9 @@
+
 import { RGBA } from "./color.js";
 import { Point2D } from "./point.js";
+import { MATH } from "./math.js";
+import { Config } from "./config.js";
+
 
 export class Triangle2D{
 
@@ -54,9 +58,17 @@ export class Triangle2D{
 
     static SortByY( triangle = new Triangle2D() ){
 
-        if( triangle.a.y > triangle.b.y || ((triangle.a.y == triangle.b.y) && triangle.a.x > triangle.b.x) ) Point2D.Swap( triangle.a , triangle.b );
-        if( triangle.a.y > triangle.c.y || ((triangle.a.y == triangle.c.y) && triangle.a.x > triangle.c.x) ) Point2D.Swap( triangle.a , triangle.c );
-        if( triangle.b.y > triangle.c.y || ((triangle.b.y == triangle.c.y) && triangle.b.x > triangle.c.x) ) Point2D.Swap( triangle.b , triangle.c );
+        if( triangle.a.y > triangle.b.y || ( (triangle.a.y == triangle.b.y) && triangle.a.x > triangle.b.x ) ){
+            Point2D.Swap( triangle.a , triangle.b );
+        } 
+
+        if( triangle.a.y > triangle.c.y || ( (triangle.a.y == triangle.c.y) && triangle.a.x > triangle.c.x ) ){
+            Point2D.Swap( triangle.a , triangle.c );
+        } 
+
+        if( triangle.b.y > triangle.c.y || ( (triangle.b.y == triangle.c.y) && triangle.b.x > triangle.c.x) ){
+            Point2D.Swap( triangle.b , triangle.c );
+        } 
 
     }
 
@@ -68,7 +80,32 @@ export class Triangle2D{
 
     }
     
-}
+    static SortByClockWise( triangle  = new Triangle2D() ){
+
+        //if( Config.Debug ) debugger;
+        
+        Triangle2D.SortByY( triangle );
+
+        // we need point inside triangle to determine triangle orientation 
+        let centroid = MATH.Triangle2DCentroid( triangle.a , triangle.b , triangle.c );
+
+        let n1 = MATH.CrossProduct2D( centroid , triangle.a , triangle.b );
+
+        if( n1 >= 0 ) return ;
+
+        Point2D.Swap( triangle.b , triangle.c );
+        return ;
+
+    }
+
+    // check/test if edge between 2 points should be rendered or not  
+    static top_left_rule( v0 = new Point2D() , v1 = new Point2D() ){
+
+        return ( ( v0.x < v1.x ) && (v0.y == v1.y) ) || ( v0.y > v1.y );
+
+    }
+
+} // end of class Triangle2D
 
 export class Triangle2DGradient extends Triangle2D {
 

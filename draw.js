@@ -464,6 +464,16 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     */
     static #FillTriangle( triangle = new Triangle2D() ){
         
+        Triangle2D.SortByY( triangle );
+        let centroid = MATH.Triangle2DCentroid( triangle.a , triangle.b , triangle.c );
+
+        if( MATH.CrossProduct2D( centroid , triangle.a , triangle.b ) >= 0){
+
+            // check if flat-top or top-left edge
+
+        }
+
+
         // A-B
         let slope_AB = MATH.Slope2D( triangle.a , triangle.b );
         let intercept_AB = MATH.Yintercept_At_X0_2D( triangle.a , slope_AB );
@@ -471,6 +481,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         // A-C
         let slope_AC = MATH.Slope2D( triangle.a , triangle.c );
         let intercept_AC = MATH.Yintercept_At_X0_2D( triangle.a , slope_AC );
+
 
         let x_start = Math.floor(triangle.a.x) + 0.5;
         let x_end   = Math.floor(triangle.b.x) + 0.5;
@@ -1620,7 +1631,7 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             let triangle_copy = Triangle2D.Copy(triangle_object);
 
             // sort points depend on Y-axis
-            Triangle2D.SortByY(triangle_copy);
+            Triangle2D.SortByY( triangle_copy );
             
             if( triangle_copy.fill_color instanceof RGBA && fill ){
 
