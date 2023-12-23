@@ -75,94 +75,53 @@ var lines = [
 
 var rectangles = [ ]; 
 
+var complex_mesh = [
+    ...Generator.Random.Points2D( 16 , 0 , Config.MaxWidth , 0 , 0 ) ,
+    ...Generator.Random.Points2D( 16 , 0 , Config.MaxWidth , 20 , 100 ) ,
+    ...Generator.Random.Points2D( 16 , 0 , Config.MaxWidth , 120 , 400 ) ,
+]
+
 var triangles = [ 
     
     /*
     ...Generator.Random.Triangles2D(
-        4 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , RGBA.RandomColor(1) , new RGBA(255,100,50,1)
+        1 , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , RGBA.RandomColor(1) , new RGBA(255,100,50,1)
     ),
     */
+
+    new Triangle2D(
+       new Point2D(494 , 350),
+       new Point2D(350 , 109),
+       new Point2D(100 , 200),
+       1 , 
+       new RGBA(100,200,255,0.5) ,
+       null ,
+    ),
     new Triangle2D(
         new Point2D(494 , 350),
         new Point2D(350 , 109),
+        new Point2D(700 , 200),
+        1 , 
+        new RGBA(100,200,55,0.5) ,
+        null ,
+     ),  
+    new Triangle2D(
+        new Point2D(494 , 350),
+        new Point2D(350 , 550),
         new Point2D(100 , 200),
         1 , 
-        new RGBA(0,0,255,0.5) ,
-        null ,
+        new RGBA(250,255,55,0.5) ,
+    null ,
     ),
-    
+
     new Triangle2D(
         new Point2D(494 , 350),
-        new Point2D(350 , 109),
+        new Point2D(350 , 550),
         new Point2D(700 , 200),
         1 , 
-        new RGBA(0,0,255,0.5) ,
-        null ,
+        new RGBA(250,50,155,0.5) ,
+    null ,
     ),
-    /*
-    new Triangle2D(
-        new Point2D(354.54263290185526,497.67410681868176),
-        new Point2D(592.5425682106843,57.16486590423517),
-        new Point2D(7.441806950783558,98.90698861020483),
-        1 , 
-        new RGBA(255,0,255,0.4) ,
-        new RGBA(0,0,255,1) ,
-    ),
-       
-    new Triangle2D(
-        new Point2D(494 , 150),
-        new Point2D(350 , 109),
-        new Point2D(700 , 200),
-        1 , null ,
-        new RGBA(0,0,255,1) ,
-    ),
-
-    new Triangle2D(
-        new Point2D(40,200) ,
-        new Point2D(350,109) ,
-        new Point2D(700,200) ,
-        1 , 
-        null ,  
-        new RGBA(0,0,255,1) ,
-    ),
-
-    new Triangle2D(
-        new Point2D(200  , 50) ,
-        new Point2D(60  , 240) ,
-        new Point2D(630  , 490) ,
-        1 , 
-        0 ,
-        new RGBA(200,100,25,0.2) ,  
-    ),
-       
-      
-    new Triangle2D(
-        new Point2D(550  , 150) ,
-        new Point2D(460  , 480) ,
-        new Point2D(730  , 590) ,
-        1 , 
-        new RGBA(200,100,25,0.2) ,  
-        new RGBA(0,0,255,1) ,
-    ),
-    new Triangle2D(
-        new Point2D(700  , 50) ,
-        new Point2D(360  , 240) ,
-        new Point2D(630  , 390) ,
-        1 , 0 ,
-        new RGBA(0,0,255,1) ,
-    ),
-
-    new Triangle2D(
-        new Point2D(300  , 50) ,
-        new Point2D(60  , 500) ,
-        new Point2D(430  , 590) ,
-        1 , 
-        new RGBA(255,100,100,0.5) ,
-        new RGBA(0,255,255,1) ,
-        
-    ),
-        
-    */
 
 ];
 
@@ -237,6 +196,16 @@ function NewFrame(){
 
     if( Config.Draw ) Draw.DrawGrid();
     
+    if(SBuffer instanceof SubBuffer && Config.DrawSubBuffer ){
+
+        Draw.Rectangle2D( 
+            new Rectangle2D( 
+                SBuffer.x_min , SBuffer.y_min , SBuffer.width , SBuffer.height , 0 , new RGBA(0,255,0,1) , 1
+            )
+        );
+
+    }
+
     CTX.fillStyle   = "white";
     CTX.strokeStyle = "white";
 
@@ -308,20 +277,7 @@ function NewFrame(){
     // triangles 
     case 3 : {
         
-        if( Config.Debug ){
-
-            if(SBuffer instanceof SubBuffer){
-
-                Draw.Rectangle2D( 
-                    new Rectangle2D( 
-                        SBuffer.x_min , SBuffer.y_min , SBuffer.width , SBuffer.height , 0 , new RGBA(0,255,0,1) , 1
-                    )
-                );
-        
-            }
-                
-            debugger;
-        } 
+        if( Config.Debug ) debugger;
         
         for( let triangle of triangles ) {
                 
@@ -332,10 +288,14 @@ function NewFrame(){
             if( Config.Gradient ) {
                 Draw.Triangle2DWithGradient(triangle);
             }
-            else {
 
-                let sub_triangles = [];
-                let clipping_output = Clip2D.Triangle2D( 
+
+            let sub_triangles = [];
+            let clipping_output;
+
+            if( Config.PreformeClipping ){
+                
+                clipping_output = Clip2D.Triangle2D( 
                     triangle , sub_triangles , SBuffer.x_min , SBuffer.y_min , SBuffer.x_max , SBuffer.y_max 
                 );
 
@@ -351,24 +311,33 @@ function NewFrame(){
 
                     }
 
-                }
-
-                if( Config.Debug ) debugger;
-                
+                } 
+ 
             }
 
+            else{
 
+                if( Config.Debug ){
+                    triangle.fill_color = new RGBA(255,0,0,0.5);
+                }
+            
+                Draw.Triangle2D( triangle , true , false );
+                
+            }
+                
             if( Config.GenerateRandomShapesEachTime ){
-
+                
                 triangles = Generator.Random.Triangles2D(
                     Config.ShapesAmount , 0 , Config.MaxWidth , 0 , Config.MaxHeight , 0 , new RGBA(150,150,55,0.7) , 0 
                 );
-
+                    
             }
+
+   
 
         }
             
-        } break;
+    } break;
 
     // cicrles
     case 4 : {
@@ -429,10 +398,33 @@ function NewFrame(){
             }
 
         } break;
-        
+     
+    case 7 : {
+
+        if(Config.Debug) debugger;
+
+        for(let i = 0 ; i <= complex_mesh.length ; i += 2 ){
+
+            if( (i+2) > complex_mesh.length ) break;
+
+            Draw.Triangle2D(
+                new Triangle2D(
+                    complex_mesh[i] ,
+                    complex_mesh[i+1] ,
+                    complex_mesh[i+2] ,
+                    0,
+                    RGBA.RandomColor(1),
+                    0
+                ),
+                true , false
+            )
+        }
+
+    }   
+
     } // end of "switch-case"
     
-    if(SBuffer instanceof SubBuffer){
+    if(SBuffer instanceof SubBuffer && Config.DrawSubBuffer) {
 
         Draw.Rectangle2D( 
             new Rectangle2D( 

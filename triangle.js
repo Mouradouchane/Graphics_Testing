@@ -98,7 +98,7 @@ export class Triangle2D{
 
     }
 
-    // check/test if edge between 2 points should be rendered or not  
+    // check if edge between 2 points should be rendered or not  
     static top_left_rule( v0 = new Point2D() , v1 = new Point2D() ){
 
         return ( ( v0.x < v1.x ) && (v0.y == v1.y) ) || ( v0.y > v1.y );

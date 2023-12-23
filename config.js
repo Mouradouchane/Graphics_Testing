@@ -10,14 +10,14 @@ export var Config = {
     Debug : false , 
     
     DrawGrid : false ,
-    DrawPointsForVisualDebug : true ,
+    DrawPointsForVisualDebug : false ,
     DrawPixelsForVisualDebug : false ,
     DrawClipped : true,
-
+    DrawSubBuffer : false,
     AntiAlias : false ,
     
     NewTestEachTime : false ,
-    GenerateRandomShapesEachTime : true ,
+    GenerateRandomShapesEachTime : false ,
     SleepTime : 3000 , // ms
     ShapesIndex  : 3 ,
     ShapesAmount : 3 ,
@@ -28,6 +28,6 @@ export var Config = {
     MaxHeight : 600 ,
 
     ShowFps : true,
-    PreformeClipping : true ,
+    PreformeClipping : false ,
 
 }

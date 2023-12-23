@@ -459,17 +459,33 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
     //                      TRIANGLE DRAW PRIVATE FUNCTIONS
     // =========================================================================
 
-    /*
-        NOTE !!! triangle points need to be sorted by "Y-axis"
-    */
     static #FillTriangle( triangle = new Triangle2D() ){
         
+        if(Config.Debug) debugger;
+
+        // sort triangle points by 'Y-axis'  
         Triangle2D.SortByY( triangle );
+        
+        // centroid to help us getting "clock-wise" orientation
         let centroid = MATH.Triangle2DCentroid( triangle.a , triangle.b , triangle.c );
 
-        if( MATH.CrossProduct2D( centroid , triangle.a , triangle.b ) >= 0){
+        let ab_bais = 0 , bc_bais = 0 , ac_bais = 0;
 
-            // check if flat-top or top-left edge
+        // check if centroid is on the right side of "a , b"  
+        // then direction is gonna be "a -> b -> c"
+        if ( MATH.CrossProduct2D( centroid , triangle.a , triangle.b ) >= 0 ){
+            
+            ab_bais = ( Triangle2D.top_left_rule(triangle.a , triangle.b) ) ? 0 : -1;
+            bc_bais = ( Triangle2D.top_left_rule(triangle.b , triangle.c) ) ? 0 : -1;
+            ac_bais = ( Triangle2D.top_left_rule(triangle.c , triangle.a) ) ? 0 :  1;
+
+        } 
+        // direction is gonna be "a -> c -> b"
+        else { 
+
+            ab_bais = ( Triangle2D.top_left_rule(triangle.b , triangle.a ) ) ? 0 :  1;
+            bc_bais = ( Triangle2D.top_left_rule(triangle.c , triangle.b ) ) ? 0 :  1;
+            ac_bais = ( Triangle2D.top_left_rule(triangle.a , triangle.c ) ) ? 0 : -1;
 
         }
 
@@ -493,11 +509,9 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
             // find X's
             for(  ; y <= triangle.b.y ; y += 1 ){
     
-                // (slope_AC == 0) ? y : Math.round((y - intercept_AC) / slope_AC);
-                x_start = MATH.Xintercept2D( y , slope_AC , intercept_AC ); 
-
-                // (slope_AB == 0) ? y : Math.round((y - intercept_AB) / slope_AB);
-                x_end   = MATH.Xintercept2D( y , slope_AB , intercept_AB ); 
+                x_start = Math.floor(MATH.Xintercept2D( y , slope_AB , intercept_AB )) + 0.5 + ab_bais; 
+                
+                x_end   = Math.floor(MATH.Xintercept2D( y , slope_AC , intercept_AC )) + 0.5 + ac_bais; 
                 
                 // fill range
                 Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
@@ -506,8 +520,13 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
 
         }
         else {
+
+            x_start += ab_bais;
+            x_end   += ab_bais;
+
             Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
             y += 1;
+            
         }
         
         // B-C
@@ -517,8 +536,8 @@ export class Draw {     // CLASS LIKE NAMESPACE LOL :)
         // fill from B to C
         for( ; y <= triangle.c.y ; y += 1 ){
             
-            x_start = MATH.Xintercept2D( y , slope_AC , intercept_AC ); 
-            x_end   = MATH.Xintercept2D( y , slope_BC , intercept_BC ); 
+            x_start = Math.floor(MATH.Xintercept2D( y , slope_AC , intercept_AC )) + 0.5 + ac_bais;
+            x_end   = Math.floor(MATH.Xintercept2D( y , slope_BC , intercept_BC )) + 0.5 + bc_bais;
 
             Draw.#DrawHorizontalLine( x_start , x_end , y , triangle.fill_color );
 
